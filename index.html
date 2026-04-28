@@ -127,7 +127,7 @@ select{background-image:url(“data:image/svg+xml,%3Csvg xmlns=‘http://www.w3.
 .prev-body li{margin-bottom:4px;}
 .prev-divider{border:none;border-top:1px solid #e0e0e0;margin:14px 0;}
 .prev-watermark{position:absolute;bottom:28px;right:28px;pointer-events:none;z-index:0;}
-.prev-watermark img{width:210px;height:auto;object-fit:contain;opacity:0.14;}
+.prev-watermark img{width:280px;height:auto;object-fit:contain;opacity:0.28;}
 
 @media print{
 *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
@@ -238,10 +238,30 @@ html,body{background:#fff!important;height:auto;}
 <div id="page-settings" class="page">
   <div class="stoggle" onclick="toggleSec('sc-contacts',this)"><span>&#128203; Contacts</span><span class="sarrow">&#8250;</span></div>
   <div class="sbody" id="sc-contacts">
-    <div class="field"><label>Full Name *</label><input type="text" id="nc-name" placeholder="e.g. John Smith"></div>
-    <div class="field"><label>Email Address</label><input type="email" id="nc-email" placeholder="john@example.com"></div>
-    <div class="field"><label>Role / Instrument</label><input type="text" id="nc-role" placeholder="e.g. Trumpet 1"></div>
-    <button class="btn-add" onclick="addContact()" style="border-style:solid;background:rgba(124,110,224,.12);color:var(--accent);margin-bottom:16px;">&#10003; Save Contact</button>
+    <!-- Add / Edit form -->
+    <div id="contact-form-wrap" style="background:#f8f9fc;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px;">
+      <div style="font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;" id="contact-form-title">Add New Contact</div>
+      <input type="hidden" id="nc-id" value="">
+      <div class="field"><label>Full Name *</label><input type="text" id="nc-name" placeholder="e.g. John Smith"></div>
+      <div class="field"><label>Email Address</label><input type="email" id="nc-email" placeholder="john@example.com"></div>
+      <div class="field"><label>Role / Instrument</label><input type="text" id="nc-role" placeholder="e.g. Trumpet 1"></div>
+      <div class="field"><label>Contact Type *</label>
+        <select id="nc-type">
+          <option value="">Select type...</option>
+          <option value="band">Band Member</option>
+          <option value="singer">Singer</option>
+        </select>
+      </div>
+      <div class="field" style="display:flex;align-items:center;gap:10px;margin-top:4px;">
+        <input type="checkbox" id="nc-default" style="width:20px;height:20px;cursor:pointer;accent-color:var(--accent);flex-shrink:0;">
+        <label for="nc-default" style="font-size:14px;color:var(--text);font-weight:600;letter-spacing:0;cursor:pointer;margin:0;">Default (auto-populate on every new event)</label>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button onclick="saveContact()" style="flex:1;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;">&#10003; Save Contact</button>
+        <button onclick="cancelContactEdit()" id="nc-cancel" style="display:none;background:#f0f2f7;color:var(--muted);border:1px solid var(--border);border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;">Cancel</button>
+      </div>
+    </div>
+    <!-- Search & list -->
     <input type="text" id="contact-search" placeholder="Search contacts..." oninput="renderContacts()" style="margin-bottom:10px;">
     <div style="font-size:11px;color:var(--muted);margin-bottom:8px;"><span id="contact-count">0</span> contacts saved</div>
     <div id="contact-list"></div>
@@ -662,26 +682,59 @@ function renderContacts() {
   var q = (document.getElementById('contact-search') ? document.getElementById('contact-search').value : '').toLowerCase();
   var list = document.getElementById('contact-list');
   if (!list) return;
-  var shown = q ? contacts.filter(function(c) { return c.name.toLowerCase().indexOf(q)>=0||(c.role||'').toLowerCase().indexOf(q)>=0||(c.email||'').toLowerCase().indexOf(q)>=0; }) : contacts;
+  var shown = q ? contacts.filter(function(c) {
+    return c.name.toLowerCase().indexOf(q)>=0 ||
+           (c.role||'').toLowerCase().indexOf(q)>=0 ||
+           (c.email||'').toLowerCase().indexOf(q)>=0;
+  }) : contacts;
   var cnt = document.getElementById('contact-count');
   if (cnt) cnt.textContent = contacts.length;
-  if (!shown.length) { list.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px 0;">No contacts found.</div>'; return; }
+  if (!shown.length) {
+    list.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px 0;">No contacts found.</div>';
+    return;
+  }
   while (list.firstChild) list.removeChild(list.firstChild);
   shown.forEach(function(c) {
     var row = document.createElement('div');
     row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:11px 0;border-bottom:1px solid var(--border);';
+    // Info
     var info = document.createElement('div'); info.style.flex = '1';
-    var n = document.createElement('div'); n.style.cssText = 'font-size:14px;font-weight:700;'; n.textContent = c.name;
-    var m = document.createElement('div'); m.style.cssText = 'font-size:11px;color:var(--muted);margin-top:2px;';
-    m.textContent = (c.role||'—') + ' · ' + (c.email||'no email');
-    info.appendChild(n); info.appendChild(m);
-    var btn = document.createElement('button'); btn.className = 'btn-remove';
-    btn.style.cssText = 'width:40px;height:40px;font-size:20px;'; btn.textContent = 'x';
-    btn.addEventListener('click', function() { removeContact(c.id); });
-    row.appendChild(info); row.appendChild(btn); list.appendChild(row);
+    var nameRow = document.createElement('div');
+    nameRow.style.cssText = 'display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:2px;';
+    var n = document.createElement('span'); n.style.cssText = 'font-size:14px;font-weight:700;'; n.textContent = c.name;
+    nameRow.appendChild(n);
+    if (c.ctype) {
+      var badge = document.createElement('span');
+      badge.textContent = c.ctype === 'band' ? 'Band' : 'Singer';
+      var bc = c.ctype === 'band' ? 'background:#e8ecff;color:#3347a0;' : 'background:#e8f7f1;color:#1e8a5a;';
+      badge.style.cssText = 'font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;'+bc;
+      nameRow.appendChild(badge);
+    }
+    if (c.isDefault) {
+      var db = document.createElement('span');
+      db.textContent = 'Default';
+      db.style.cssText = 'font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:#fff8e0;color:#b07800;';
+      nameRow.appendChild(db);
+    }
+    info.appendChild(nameRow);
+    var meta = document.createElement('div');
+    meta.style.cssText = 'font-size:11px;color:var(--muted);';
+    meta.textContent = (c.role || '—') + ' · ' + (c.email || 'no email');
+    info.appendChild(meta);
+    // Edit button
+    var eb = document.createElement('button');
+    eb.style.cssText = 'background:#f0f4ff;color:#3347a0;border:1px solid #c8d0f0;border-radius:8px;width:38px;height:38px;font-size:15px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;';
+    eb.textContent = '✏️';
+    (function(cid){ eb.addEventListener('click', function(){ editContact(cid); }); })(c.id);
+    // Delete button
+    var db2 = document.createElement('button');
+    db2.style.cssText = 'background:#fff0f0;color:#d93025;border:1px solid #fdd;border-radius:8px;width:38px;height:38px;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;';
+    db2.textContent = 'x';
+    (function(cid){ db2.addEventListener('click', function(){ removeContact(cid); }); })(c.id);
+    row.appendChild(info); row.appendChild(eb); row.appendChild(db2);
+    list.appendChild(row);
   });
 }
-
 // ── Toast ─────────────────────────────────────────────────────
 function toast(msg, isErr) {
   var t = document.getElementById('toast');
@@ -692,6 +745,19 @@ function toast(msg, isErr) {
 }
 
 // ── Init ──────────────────────────────────────────────────────
+// ── Apply defaults to editor ──────────────────────────────────
+function applyDefaults() {
+  // Only apply if band/singer lists are currently empty (fresh event)
+  var defaultBand   = contacts.filter(function(c){ return c.ctype==='band'   && c.isDefault; });
+  var defaultSingers= contacts.filter(function(c){ return c.ctype==='singer' && c.isDefault; });
+  if (defaultBand.length && bandRows.length === 0) {
+    defaultBand.forEach(function(c){ addBandRow(c.name, c.role||''); });
+  }
+  if (defaultSingers.length && singerRows.length === 0) {
+    defaultSingers.forEach(function(c){ addSingerRow(c.name); });
+  }
+}
+
 document.addEventListener('input', function(e) {
   if (e.target && e.target.closest && e.target.closest('#page-editor')) saveForm();
 });
