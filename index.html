@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="SK Events"/>
+<title>SK Music – Event Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400;1,700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:#0c0e18; --surface:#13172a; --card:#181d32; --border:#252a45;
+  --accent:#7c6ee0; --accent2:#4fc3a1; --text:#e8e4f4; --muted:#7a7aaa;
+  --danger:#e05555; --inp-bg:#0f1220; --inp-border:#2e3458;
+}
+html,body { height:100%; background:var(--bg); color:var(--text); font-family:'Lato',sans-serif; font-size:16px; -webkit-text-size-adjust:100%; }
+#app { display:flex; flex-direction:column; min-height:100vh; }
+
+/* ── Top bar ── */
+.topbar {
+background:linear-gradient(90deg,#0c0e18,#13172a);
+border-bottom:1px solid var(–border);
+padding:10px 14px;
+display:flex; align-items:center; gap:10px;
+position:sticky; top:0; z-index:100;
+}
+.topbar-logo svg { height:48px; width:auto; display:block; }
+.topbar-sub { flex:1; font-size:11px; color:var(–muted); padding-left:2px; letter-spacing:.05em; }
+.btn-email {
+background:linear-gradient(135deg,#27ae72,#1a8a55);
+color:#fff; border:none; border-radius:10px;
+padding:10px 13px; font-size:13px; font-weight:700;
+cursor:pointer; white-space:nowrap; flex-shrink:0;
+-webkit-tap-highlight-color:transparent;
+}
+
+/* ── Tabs ── */
+.tabs {
+display:flex;
+border-bottom:2px solid var(–border);
+background:var(–bg);
+position:sticky; top:69px; z-index:99;
+}
+.tab {
+flex:1; padding:13px 4px; border:none;
+font-size:12px; font-weight:700; cursor:pointer; letter-spacing:.02em;
+background:transparent; color:var(–muted); transition:all .2s;
+border-bottom:3px solid transparent; margin-bottom:-2px;
+-webkit-tap-highlight-color:transparent;
+}
+.tab.active { color:var(–accent); border-bottom-color:var(–accent); background:rgba(124,110,224,.06); }
+
+/* ── Pages ── */
+.page { display:none; padding:16px 14px 100px; }
+.page.active { display:block; }
+
+/* ── Cards ── */
+.card { background:var(–card); border:1px solid var(–border); border-radius:14px; padding:16px 14px; margin-bottom:14px; }
+.card-title { font-size:11px; font-weight:700; letter-spacing:.1em; color:var(–accent); text-transform:uppercase; margin-bottom:14px; }
+
+/* ── Fields ── */
+.field { margin-bottom:13px; }
+.field:last-child { margin-bottom:0; }
+label { display:block; font-size:12px; color:var(–muted); font-weight:700; letter-spacing:.05em; margin-bottom:5px; }
+input[type=text],input[type=email],input[type=date],textarea,select {
+width:100%; background:var(–inp-bg); color:var(–text);
+border:1.5px solid var(–inp-border); border-radius:10px;
+padding:13px 14px; font-size:15px; font-family:‘Lato’,sans-serif;
+outline:none; transition:border-color .2s; -webkit-appearance:none; appearance:none;
+}
+input[type=date]::-webkit-calendar-picker-indicator { filter:invert(1) opacity(.5); cursor:pointer; }
+input:focus,textarea:focus,select:focus { border-color:var(–accent); }
+textarea { resize:vertical; min-height:70px; }
+select {
+background-image:url(“data:image/svg+xml,%3Csvg xmlns=‘http://www.w3.org/2000/svg’ width=‘12’ height=‘8’ viewBox=‘0 0 12 8’%3E%3Cpath d=‘M1 1l5 5 5-5’ stroke=’%237a7aaa’ stroke-width=‘2’ fill=‘none’ stroke-linecap=‘round’/%3E%3C/svg%3E”);
+background-repeat:no-repeat; background-position:right 14px center; padding-right:38px;
+}
+
+/* ── Member rows ── */
+.member-row { display:flex; gap:8px; align-items:center; margin-bottom:10px; }
+.btn-remove {
+background:rgba(224,85,85,.12); color:var(–danger); border:none; border-radius:8px;
+width:40px; height:46px; font-size:22px; cursor:pointer; flex-shrink:0;
+display:flex; align-items:center; justify-content:center;
+-webkit-tap-highlight-color:transparent;
+}
+.btn-add {
+background:rgba(79,195,161,.08); color:var(–accent2);
+border:1.5px dashed rgba(79,195,161,.35); border-radius:10px;
+padding:11px; width:100%; font-size:13px; font-weight:700; cursor:pointer; margin-top:4px;
+-webkit-tap-highlight-color:transparent;
+}
+
+/* ── Autocomplete ── */
+.ac-wrap { position:relative; flex:1; }
+.ac-drop {
+position:absolute; top:calc(100% + 4px); left:0; right:0; z-index:600;
+background:#1a1f38; border:1.5px solid var(–accent); border-radius:10px;
+overflow:hidden; box-shadow:0 8px 30px rgba(0,0,0,.75);
+max-height:220px; overflow-y:auto;
+}
+.ac-item { padding:12px 14px; cursor:pointer; border-bottom:1px solid var(–border); -webkit-tap-highlight-color:transparent; }
+.ac-item:last-child { border-bottom:none; }
+.ac-item:active { background:rgba(124,110,224,.2); }
+.ac-name { font-size:14px; font-weight:700; color:var(–text); }
+.ac-sub  { font-size:11px; color:var(–muted); margin-top:2px; }
+
+/* ── Recipients ── */
+.recipient-chip { display:inline-block; background:rgba(79,195,161,.15); color:var(–accent2); border-radius:6px; padding:4px 9px; font-size:12px; margin:3px; }
+
+/* ── Settings ── */
+.settings-toggle {
+display:flex; align-items:center; justify-content:space-between;
+padding:15px 16px; background:var(–card); border:1px solid var(–border);
+border-radius:12px; cursor:pointer; font-weight:700; font-size:15px;
+transition:background .15s; margin-bottom:6px;
+-webkit-tap-highlight-color:transparent;
+}
+.settings-toggle:active { background:#1e2340; }
+.settings-arrow { color:var(–muted); font-size:20px; transition:transform .25s; display:inline-block; }
+.settings-toggle.open .settings-arrow { transform:rotate(90deg); }
+.settings-body {
+display:none; background:#11152a; border:1px solid var(–border);
+border-radius:12px; padding:16px 14px; margin-bottom:10px;
+}
+.settings-body.open { display:block; }
+
+/* ── Event type chips ── */
+.type-chips { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+.type-chip {
+background:rgba(124,110,224,.12); color:#c0b0f0;
+border:1px solid rgba(124,110,224,.3); border-radius:20px;
+padding:6px 14px; font-size:13px; display:flex; align-items:center; gap:6px;
+}
+.type-chip .del { color:var(–danger); cursor:pointer; font-size:17px; line-height:1; background:none; border:none; padding:0; -webkit-tap-highlight-color:transparent; }
+
+/* ── Toast ── */
+#toast {
+position:fixed; bottom:24px; left:50%;
+transform:translateX(-50%) translateY(80px);
+background:var(–accent2); color:#fff; border-radius:12px;
+padding:12px 22px; font-size:14px; font-weight:700;
+box-shadow:0 4px 20px rgba(0,0,0,.5); z-index:9999;
+transition:transform .3s ease; pointer-events:none; white-space:nowrap;
+}
+#toast.show { transform:translateX(-50%) translateY(0); }
+
+/* ══════════════════════════
+PREVIEW
+══════════════════════════ */
+.preview-wrapper {
+background:#fff; color:#222;
+max-width:700px; margin:0 auto;
+border-radius:4px; box-shadow:0 4px 40px rgba(0,0,0,.4);
+font-family:‘Times New Roman’,Times,serif; overflow:hidden;
+}
+.preview-inner { padding:44px 50px; position:relative; overflow:hidden; }
+.preview-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px; }
+.preview-contact-info { text-align:right; font-size:13px; line-height:1.65; font-family:‘Lato’,sans-serif; }
+.preview-contact-info .co-name { color:#1a5fa8; font-size:15px; font-weight:700; display:block; margin-bottom:2px; }
+.preview-contact-info a { color:#1a5fa8; text-decoration:none; }
+.preview-title { text-align:center; color:#1a5fa8; font-weight:700; font-size:20px; margin-bottom:22px; font-family:‘Lato’,sans-serif; letter-spacing:.02em; }
+.preview-body { font-size:14px; line-height:1.78; }
+.preview-body p { margin-bottom:10px; }
+.preview-body ul { margin:3px 0 10px 22px; }
+.preview-body li { margin-bottom:2px; }
+.preview-watermark { position:absolute; bottom:24px; right:28px; opacity:.1; pointer-events:none; }
+.preview-divider { border:none; border-top:1px solid #e0e0e0; margin:14px 0; }
+.btn-print {
+display:block; width:100%; margin-bottom:10px;
+background:linear-gradient(135deg,#7c6ee0,#5a4ac0);
+color:#fff; border:none; border-radius:12px;
+padding:14px; font-size:15px; font-weight:700; cursor:pointer; letter-spacing:.03em;
+-webkit-tap-highlight-color:transparent;
+}
+.preview-note { font-size:12px; color:var(–muted); text-align:center; margin-bottom:14px; line-height:1.5; }
+
+@media (max-width:420px) {
+.preview-inner { padding:28px 22px; }
+}
+@media print {
+body { background:#fff !important; }
+.topbar,.tabs,.btn-print,.preview-note,#toast { display:none !important; }
+.page { display:block !important; padding:0 !important; }
+.preview-wrapper { box-shadow:none; border-radius:0; max-width:100%; }
+.preview-inner { padding:24px 32px; }
+.preview-watermark { opacity:.08; }
+}
+</style>
+
+</head>
+<body>
+<div id="app">
+
+<!-- TOP BAR -->
+
+<div class="topbar">
+  <div class="topbar-logo" id="topbar-logo-wrap"><!-- JS injects SVG --></div>
+  <div class="topbar-sub">Event Builder</div>
+  <button class="btn-email" onclick="emailCrew()">✉&nbsp;Email Crew</button>
+</div>
+
+<!-- TABS -->
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('editor',this)">✏️ Editor</button>
+  <button class="tab" onclick="switchTab('preview',this)">👁 Preview</button>
+  <button class="tab" onclick="switchTab('settings',this)">⚙️ Settings</button>
+</div>
+
+<!-- ═══════════════ EDITOR ═══════════════ -->
+
+<div id="page-editor" class="page active">
+
+  <div class="card">
+    <div class="card-title">Event Info</div>
+    <div class="field">
+      <label>Date</label>
+      <input type="date" id="f-date" oninput="renderPreview()"/>
+    </div>
+    <div class="field">
+      <label>Type of Event</label>
+      <select id="f-type" onchange="handleTypeChange()"></select>
+    </div>
+    <div class="field" id="custom-type-field" style="display:none;">
+      <label>Custom Event Type</label>
+      <input type="text" id="f-type-custom" placeholder="Describe the event…" oninput="renderPreview()"/>
+    </div>
+    <div class="field">
+      <label>Venue Name</label>
+      <input type="text" id="f-venue" placeholder="e.g. Lake Terrace" oninput="renderPreview()"/>
+    </div>
+    <div class="field">
+      <label>Venue Address</label>
+      <input type="text" id="f-address" placeholder="1690 Oak Street Lakewood NJ" oninput="renderPreview()"/>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Schedule</div>
+    <div class="field"><label>Sound Check – Rhythm</label>
+      <input type="text" id="f-sc-rhythm" oninput="renderPreview()"/>
+    </div>
+    <div class="field"><label>Sound Check – Horns</label>
+      <input type="text" id="f-sc-horns" oninput="renderPreview()"/>
+    </div>
+    <div class="field"><label>KP Start Time</label>
+      <input type="text" id="f-kp-start" oninput="renderPreview()"/>
+    </div>
+    <div class="field"><label>KP Note</label>
+      <input type="text" id="f-kp-note" placeholder='e.g. "Only Choir"' oninput="renderPreview()"/>
+    </div>
+    <div class="field"><label>Chuppah / Main Event Time</label>
+      <input type="text" id="f-chuppah" oninput="renderPreview()"/>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Band Members</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Start typing — contacts appear as suggestions automatically.</p>
+    <div id="band-list"></div>
+    <button class="btn-add" onclick="addBandRow()">+ Add Band Member</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Singers</div>
+    <div id="singer-list"></div>
+    <button class="btn-add" onclick="addSingerRow()">+ Add Singer</button>
+    <div class="field" style="margin-top:14px;"><label>Choir / Group (optional)</label>
+      <input type="text" id="f-choir" oninput="renderPreview()"/>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Dress Code &amp; Notes</div>
+    <div class="field"><label>Dress Code</label>
+      <input type="text" id="f-dresscode" oninput="renderPreview()"/>
+    </div>
+    <div class="field"><label>Additional Notes</label>
+      <textarea id="f-notes" oninput="renderPreview()"></textarea>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📧 Email Recipients</div>
+    <div id="recipients-box">
+      <div style="color:var(--muted);font-size:13px;">Add band members &amp; singers above to see recipients.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════ PREVIEW ═══════════════ -->
+
+<div id="page-preview" class="page">
+  <button class="btn-print" onclick="window.print()">🖨 Print / Save as PDF</button>
+  <p class="preview-note">iPhone tip: Print → long-press preview thumbnail → Share → Save to Files as PDF</p>
+  <div class="preview-wrapper">
+    <div class="preview-inner" id="doc-preview"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ SETTINGS ═══════════════ -->
+
+<div id="page-settings" class="page">
+
+  <!-- Contacts -->
+
+  <div class="settings-toggle" onclick="toggleSection('sec-contacts',this)">
+    <span>📇 Contacts</span>
+    <span class="settings-arrow">›</span>
+  </div>
+  <div class="settings-body" id="sec-contacts">
+    <div class="field">
+      <label>Full Name *</label>
+      <input type="text" id="nc-name" placeholder="e.g. John Smith"/>
+    </div>
+    <div class="field">
+      <label>Email Address</label>
+      <input type="email" id="nc-email" placeholder="john@example.com"/>
+    </div>
+    <div class="field">
+      <label>Role / Instrument</label>
+      <input type="text" id="nc-role" placeholder="e.g. Trumpet 1"/>
+    </div>
+    <button class="btn-add" onclick="addContact()" style="border-style:solid;background:rgba(124,110,224,.12);color:var(--accent);margin-bottom:16px;">✓ Save Contact</button>
+    <input type="text" id="contact-search" placeholder="Search contacts…" oninput="renderContacts()" style="margin-bottom:10px;"/>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:8px;"><span id="contact-count">0</span> contacts saved</div>
+    <div id="contact-list"></div>
+  </div>
+
+  <!-- Event Types -->
+
+  <div class="settings-toggle" onclick="toggleSection('sec-evtypes',this)">
+    <span>🎭 Event Types</span>
+    <span class="settings-arrow">›</span>
+  </div>
+  <div class="settings-body" id="sec-evtypes">
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Manage the options shown in the "Type of Event" dropdown.</p>
+    <div class="type-chips" id="type-chips-list"></div>
+    <div style="display:flex;gap:8px;">
+      <input type="text" id="new-event-type" placeholder="e.g. Sheva Brachos" style="flex:1;"/>
+      <button onclick="addEventType()" style="background:rgba(124,110,224,.18);color:var(--accent);border:none;border-radius:10px;padding:0 16px;font-weight:700;cursor:pointer;font-size:15px;flex-shrink:0;">Add</button>
+    </div>
+  </div>
+
+  <!-- Defaults -->
+
+  <div class="settings-toggle" onclick="toggleSection('sec-defaults',this)">
+    <span>⚙️ Default Values</span>
+    <span class="settings-arrow">›</span>
+  </div>
+  <div class="settings-body" id="sec-defaults">
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">These values pre-fill every new event. Edit them here once.</p>
+    <div class="field"><label>Sound Check – Rhythm</label>
+      <input type="text" id="def-sc-rhythm" oninput="saveDefaults()"/>
+    </div>
+    <div class="field"><label>Sound Check – Horns</label>
+      <input type="text" id="def-sc-horns" oninput="saveDefaults()"/>
+    </div>
+    <div class="field"><label>KP Start</label>
+      <input type="text" id="def-kp-start" oninput="saveDefaults()"/>
+    </div>
+    <div class="field"><label>KP Note</label>
+      <input type="text" id="def-kp-note" oninput="saveDefaults()"/>
+    </div>
+    <div class="field"><label>Chuppah Time</label>
+      <input type="text" id="def-chuppah" oninput="saveDefaults()"/>
+    </div>
+    <div class="field"><label>Choir / Group</label>
+      <input type="text" id="def-choir" oninput="saveDefaults()"/>
+    </div>
+    <div class="field"><label>Dress Code</label>
+      <input type="text" id="def-dresscode" oninput="saveDefaults()"/>
+    </div>
+    <div class="field"><label>Additional Notes</label>
+      <textarea id="def-notes" oninput="saveDefaults()"></textarea>
+    </div>
+  </div>
+
+</div><!-- /settings -->
+
+</div><!-- /app -->
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+// LOGO SVG  — embedded, permanent, crisp
+// Two versions: black (for white doc) + ghost (watermark)
+// ══════════════════════════════════════════
+const LOGO_BLACK = (h) => `<svg viewBox="0 0 200 88" xmlns="http://www.w3.org/2000/svg" height="${h}" style="display:block;overflow:visible">
+  <text x="4" y="44" font-family="Palatino Linotype,Palatino,Book Antiqua,Georgia,serif"
+    font-size="46" font-style="italic" font-weight="700" fill="#111" letter-spacing="-0.5">Shea</text>
+  <text x="4" y="84" font-family="Palatino Linotype,Palatino,Book Antiqua,Georgia,serif"
+    font-size="46" font-style="italic" font-weight="700" fill="#111" letter-spacing="-0.5">Kaller</text>
+</svg>`;
+
+const LOGO_PURPLE = (h) => `<svg viewBox="0 0 200 88" xmlns="http://www.w3.org/2000/svg" height="${h}" style="display:block;overflow:visible">
+  <text x="4" y="44" font-family="Palatino Linotype,Palatino,Book Antiqua,Georgia,serif"
+    font-size="46" font-style="italic" font-weight="700" fill="#c4b4f0" letter-spacing="-0.5">Shea</text>
+  <text x="4" y="84" font-family="Palatino Linotype,Palatino,Book Antiqua,Georgia,serif"
+    font-size="46" font-style="italic" font-weight="700" fill="#c4b4f0" letter-spacing="-0.5">Kaller</text>
+</svg>`;
+
+const LOGO_GHOST = (h) => `<svg viewBox="0 0 200 88" xmlns="http://www.w3.org/2000/svg" height="${h}" style="display:block;overflow:visible">
+  <text x="4" y="44" font-family="Palatino Linotype,Palatino,Book Antiqua,Georgia,serif"
+    font-size="46" font-style="italic" font-weight="700" fill="#cccccc" letter-spacing="-0.5">Shea</text>
+  <text x="4" y="84" font-family="Palatino Linotype,Palatino,Book Antiqua,Georgia,serif"
+    font-size="46" font-style="italic" font-weight="700" fill="#cccccc" letter-spacing="-0.5">Kaller</text>
+</svg>`;
+
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+let contacts    = [];
+let bandRows    = [];
+let singerRows  = [];
+let bandRowId   = 0;
+let singerRowId = 0;
+let eventTypes  = ['Wedding','Bar Mitzvah','Bat Mitzvah','Corporate Event','Birthday Party','Anniversary','Concert'];
+
+const DEFAULT_CONTACTS = [
+  {id:1, name:"Eli Rosenberg",     email:"eli@example.com",     role:"Drums"},
+  {id:2, name:"Yossi Moseson",     email:"yossi@example.com",   role:"Bass"},
+  {id:3, name:"Yechiel Rosenberg", email:"yechiel@example.com", role:"Guitar"},
+  {id:4, name:"Shea Kaller",       email:"shea@example.com",    role:"Keys"},
+  {id:5, name:"Cliff Lions",       email:"cliff@example.com",   role:"Alto Saxophone / Flute"},
+  {id:6, name:"Morgen Price",      email:"morgen@example.com",  role:"Tenor Saxophone / Clarinet"},
+  {id:7, name:"Nolan Tsang",       email:"nolan@example.com",   role:"Trumpet 1"},
+  {id:8, name:"Ben Holmes",        email:"ben.h@example.com",   role:"Trumpet 2"},
+  {id:9, name:"Adam Dotson",       email:"adam@example.com",    role:"Trombone"},
+  {id:10,name:"Ben Crowder",       email:"ben.c@example.com",   role:"Trombone 2"},
+  {id:11,name:"Yidi Bialistozky",  email:"yidi@example.com",    role:"Singer"},
+  {id:12,name:"Hershy Weinberger", email:"hershy@example.com",  role:"Singer"},
+];
+
+const DEFAULT_VALUES = {
+  'f-sc-rhythm':'6:00','f-sc-horns':'6:45','f-kp-start':'6:45',
+  'f-kp-note':'Only Choir','f-chuppah':'7:45',
+  'f-choir':'Yedidim Choir 8 Members',
+  'f-dresscode':'White Shirt / Black Jacket, Yarmulka & Necktie.',
+  'f-notes':'Horn Players Should bring clip-on mics.'
+};
+
+// ══════════════════════════════════════════
+// LOCAL STORAGE HELPERS
+// ══════════════════════════════════════════
+function lsGet(k,fb){ try{ const r=localStorage.getItem(k); return r!==null?JSON.parse(r):fb; }catch(e){return fb;} }
+function lsSet(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+
+function saveContacts(){ lsSet('sk_contacts',contacts); }
+function loadContacts(){ contacts = lsGet('sk_contacts', JSON.parse(JSON.stringify(DEFAULT_CONTACTS))); }
+function saveEventTypes(){ lsSet('sk_event_types',eventTypes); }
+function loadEventTypes(){ eventTypes = lsGet('sk_event_types',eventTypes); }
+
+function saveDefaults(){
+  const d={};
+  ['def-sc-rhythm','def-sc-horns','def-kp-start','def-kp-note','def-chuppah','def-choir','def-dresscode','def-notes']
+    .forEach(id=>{ const el=document.getElementById(id); if(el) d[id]=el.value; });
+  lsSet('sk_defaults',d);
+}
+function loadDefaultSettings(){
+  const d = lsGet('sk_defaults',null);
+  if(!d) return;
+  Object.keys(d).forEach(id=>{ const el=document.getElementById(id); if(el) el.value=d[id]; });
+}
+
+function applyDefaultsToForm(){
+  // Map def- fields to f- fields
+  const map = {
+    'def-sc-rhythm':'f-sc-rhythm','def-sc-horns':'f-sc-horns',
+    'def-kp-start':'f-kp-start','def-kp-note':'f-kp-note',
+    'def-chuppah':'f-chuppah','def-choir':'f-choir',
+    'def-dresscode':'f-dresscode','def-notes':'f-notes'
+  };
+  Object.keys(map).forEach(defId=>{
+    const defEl = document.getElementById(defId);
+    const fEl   = document.getElementById(map[defId]);
+    if(defEl && fEl && !fEl.value) fEl.value = defEl.value;
+  });
+}
+
+function saveFormState(){
+  const ids=['f-date','f-type','f-type-custom','f-venue','f-address',
+             'f-sc-rhythm','f-sc-horns','f-kp-start','f-kp-note','f-chuppah',
+             'f-choir','f-dresscode','f-notes'];
+  const s={};
+  ids.forEach(id=>{ const el=document.getElementById(id); if(el) s[id]=el.value; });
+  s.bandRows=bandRows; s.singerRows=singerRows;
+  s.customTypeVisible=(document.getElementById('custom-type-field').style.display!=='none');
+  lsSet('sk_form',s);
+}
+function loadFormState(){
+  const s=lsGet('sk_form',null);
+  if(!s) return false;
+  const ids=['f-date','f-type','f-type-custom','f-venue','f-address',
+             'f-sc-rhythm','f-sc-horns','f-kp-start','f-kp-note','f-chuppah',
+             'f-choir','f-dresscode','f-notes'];
+  ids.forEach(id=>{ const el=document.getElementById(id); if(el&&s[id]!==undefined) el.value=s[id]; });
+  if(s.bandRows)   bandRows   = s.bandRows;
+  if(s.singerRows) singerRows = s.singerRows;
+  if(s.customTypeVisible) document.getElementById('custom-type-field').style.display='block';
+  return true;
+}
+
+// ══════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════
+function switchTab(name,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='preview') renderPreview();
+  if(name==='settings'){ renderContacts(); renderEventTypeChips(); }
+}
+function toggleSection(bodyId,toggleEl){
+  const body=document.getElementById(bodyId);
+  const open=body.classList.toggle('open');
+  toggleEl.classList.toggle('open',open);
+}
+
+// ══════════════════════════════════════════
+// EVENT TYPE DROPDOWN
+// ══════════════════════════════════════════
+function rebuildTypeSelect(){
+  const sel=document.getElementById('f-type');
+  if(!sel) return;
+  const cur=sel.value||'Wedding';
+  sel.innerHTML='';
+  eventTypes.forEach(t=>{
+    const o=document.createElement('option');
+    o.value=t; o.textContent=t; sel.appendChild(o);
+  });
+  const oth=document.createElement('option');
+  oth.value='Other'; oth.textContent='Other…'; sel.appendChild(oth);
+  if([...sel.options].some(o=>o.value===cur)) sel.value=cur;
+}
+function handleTypeChange(){
+  const val=document.getElementById('f-type').value;
+  const cf=document.getElementById('custom-type-field');
+  cf.style.display=(val==='Other')?'block':'none';
+  if(val!=='Other') document.getElementById('f-type-custom').value='';
+  saveFormState(); renderPreview();
+}
+function addEventType(){
+  const inp=document.getElementById('new-event-type');
+  const val=inp.value.trim(); if(!val) return;
+  if(eventTypes.includes(val)||val==='Other'){ showToast('Already exists'); return; }
+  eventTypes.push(val);
+  saveEventTypes(); rebuildTypeSelect(); renderEventTypeChips();
+  inp.value=''; showToast('"'+val+'" added to event types!');
+}
+function removeEventType(t){
+  eventTypes=eventTypes.filter(x=>x!==t);
+  saveEventTypes(); rebuildTypeSelect(); renderEventTypeChips();
+}
+function renderEventTypeChips(){
+  const el=document.getElementById('type-chips-list'); if(!el) return;
+  el.innerHTML=eventTypes.map(t=>`
+    <div class="type-chip">${escH(t)}
+      <button class="del" onclick="removeEventType('${t.replace(/'/g,"\\'")}')">×</button>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════
+// AUTOCOMPLETE
+// ══════════════════════════════════════════
+function makeAC(inputEl, onSelect, roleInput){
+  let drop=null;
+  function rm(){ if(drop){drop.remove();drop=null;} }
+  function show(matches){
+    rm(); if(!matches.length) return;
+    drop=document.createElement('div'); drop.className='ac-drop';
+    matches.forEach(c=>{
+      const item=document.createElement('div'); item.className='ac-item';
+      item.innerHTML=`<div class="ac-name">${escH(c.name)}</div><div class="ac-sub">${escH(c.role||'')}${c.email?' · '+escH(c.email):''}</div>`;
+      const pick=e=>{
+        e.preventDefault();
+        inputEl.value=c.name;
+        if(roleInput&&!roleInput.value) roleInput.value=c.role||'';
+        rm(); if(onSelect) onSelect(c);
+        saveFormState(); renderPreview(); updateRecipients();
+      };
+      item.addEventListener('mousedown',pick);
+      item.addEventListener('touchend',pick);
+      drop.appendChild(item);
+    });
+    const wrap=inputEl.closest('.ac-wrap');
+    if(wrap) wrap.appendChild(drop);
+  }
+  inputEl.addEventListener('input',function(){
+    const q=this.value.trim().toLowerCase();
+    if(!q){rm();return;}
+    show(contacts.filter(c=>c.name.toLowerCase().includes(q)).slice(0,8));
+    saveFormState(); renderPreview(); updateRecipients();
+  });
+  inputEl.addEventListener('blur',()=>setTimeout(rm,200));
+}
+
+// ══════════════════════════════════════════
+// BAND ROWS
+// ══════════════════════════════════════════
+function addBandRow(name='',role=''){
+  const id=++bandRowId;
+  bandRows.push({id,name,role});
+  renderBandRows();
+}
+function removeBandRow(id){
+  bandRows=bandRows.filter(r=>r.id!==id);
+  renderBandRows(); saveFormState(); renderPreview(); updateRecipients();
+}
+function renderBandRows(){
+  const list=document.getElementById('band-list'); list.innerHTML='';
+  bandRows.forEach(row=>{
+    const div=document.createElement('div'); div.className='member-row';
+    div.innerHTML=`
+      <div class="ac-wrap" style="flex:1.3">
+        <input type="text" placeholder="Name…" value="${escH(row.name)}" data-bid="${row.id}" data-f="name"/>
+      </div>
+      <input type="text" placeholder="Role…" value="${escH(row.role)}" data-bid="${row.id}" data-f="role" style="flex:1"/>
+      <button class="btn-remove" onclick="removeBandRow(${row.id})">×</button>`;
+    list.appendChild(div);
+    const ni=div.querySelector('[data-f="name"]'), ri=div.querySelector('[data-f="role"]');
+    ni.addEventListener('input',function(){
+      const r=bandRows.find(r=>r.id===row.id); if(r) r.name=this.value;
+      saveFormState(); renderPreview(); updateRecipients();
+    });
+    ri.addEventListener('input',function(){
+      const r=bandRows.find(r=>r.id===row.id); if(r) r.role=this.value;
+      saveFormState(); renderPreview();
+    });
+    makeAC(ni, c=>{
+      const r=bandRows.find(r=>r.id===row.id);
+      if(r){r.name=c.name; if(!r.role) r.role=c.role||'';}
+      ri.value=r?r.role:'';
+    }, ri);
+  });
+}
+
+// ══════════════════════════════════════════
+// SINGER ROWS
+// ══════════════════════════════════════════
+function addSingerRow(name=''){
+  const id=++singerRowId;
+  singerRows.push({id,name});
+  renderSingerRows();
+}
+function removeSingerRow(id){
+  singerRows=singerRows.filter(r=>r.id!==id);
+  renderSingerRows(); saveFormState(); renderPreview(); updateRecipients();
+}
+function renderSingerRows(){
+  const list=document.getElementById('singer-list'); list.innerHTML='';
+  singerRows.forEach(row=>{
+    const div=document.createElement('div'); div.className='member-row';
+    div.innerHTML=`
+      <div class="ac-wrap" style="flex:1">
+        <input type="text" placeholder="Singer name…" value="${escH(row.name)}" data-sid="${row.id}"/>
+      </div>
+      <button class="btn-remove" onclick="removeSingerRow(${row.id})">×</button>`;
+    list.appendChild(div);
+    const inp=div.querySelector('input');
+    inp.addEventListener('input',function(){
+      const r=singerRows.find(r=>r.id===row.id); if(r) r.name=this.value;
+      saveFormState(); renderPreview(); updateRecipients();
+    });
+    makeAC(inp, c=>{ const r=singerRows.find(r=>r.id===row.id); if(r) r.name=c.name; });
+  });
+}
+
+// ══════════════════════════════════════════
+// RECIPIENTS
+// ══════════════════════════════════════════
+function gatherEmails(){
+  const names=[...bandRows.map(r=>r.name),...singerRows.map(r=>r.name)].filter(Boolean);
+  const emails=[];
+  names.forEach(n=>{
+    const c=contacts.find(c=>c.name.toLowerCase()===n.toLowerCase());
+    if(c&&c.email&&!emails.includes(c.email)) emails.push(c.email);
+  });
+  return emails;
+}
+function updateRecipients(){
+  const emails=gatherEmails();
+  const box=document.getElementById('recipients-box');
+  if(!box) return;
+  box.innerHTML=emails.length
+    ? emails.map(e=>`<span class="recipient-chip">${escH(e)}</span>`).join('')
+    : '<div style="color:var(--muted);font-size:13px;">No emails matched. Make sure contacts have email addresses in Settings → Contacts.</div>';
+}
+
+// ══════════════════════════════════════════
+// EMAIL CREW
+// ══════════════════════════════════════════
+function emailCrew(){
+  const emails=gatherEmails();
+  if(!emails.length){ showToast('No emails found. Check Settings → Contacts.'); return; }
+  const date  = formatDateDisplay(document.getElementById('f-date').value);
+  const venue = document.getElementById('f-venue').value.trim();
+  const subject=encodeURIComponent('Event Details'+(date?' – '+date:'')+(venue?' at '+venue:''));
+  const body=encodeURIComponent(
+    'Dear Crew,\n\nPlease find the event details'+(date?' for '+date:'')+(venue?' at '+venue:'')+
+    '.\n\nKindly review the attached document for the full schedule and lineup.\n\nThank you,\nSK Music Production Inc\n845-445-6100\nInfo@Sheakallerband.com'
+  );
+  const a=document.createElement('a');
+  a.href='mailto:'+emails.join(',')+'?subject='+subject+'&body='+body;
+  a.style.display='none';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(()=>document.body.removeChild(a),300);
+  showToast('Opening email to '+emails.length+' recipient(s)…');
+}
+
+// ══════════════════════════════════════════
+// PREVIEW RENDER
+// ══════════════════════════════════════════
+function formatDateDisplay(val){
+  if(!val) return '___';
+  const parts=val.split('-');
+  if(parts.length!==3) return val;
+  const y=parseInt(parts[0]),m=parseInt(parts[1]),d=parseInt(parts[2]);
+  if(!y||!m||!d) return val;
+  const months=['January','February','March','April','May','June',
+                'July','August','September','October','November','December'];
+  return months[m-1]+' '+d+', '+y;
+}
+function getEventType(){
+  const sel=document.getElementById('f-type'); if(!sel) return 'Wedding';
+  if(sel.value==='Other'){
+    const c=document.getElementById('f-type-custom').value.trim();
+    return c||'Other';
+  }
+  return sel.value;
+}
+function raw(id){ const el=document.getElementById(id); return el?el.value:''; }
+
+function renderPreview(){
+  const date    = formatDateDisplay(raw('f-date'));
+  const venue   = raw('f-venue').trim();
+  const address = raw('f-address').trim();
+  const type    = getEventType();
+  const bandH   = bandRows.filter(r=>r.name).map(r=>`<li>${r.role?'<strong>'+escH(r.role)+':</strong> ':''}${escH(r.name)}</li>`).join('');
+  const singerH = singerRows.filter(r=>r.name).map(r=>`<li>${escH(r.name)}</li>`).join('');
+  const choir   = raw('f-choir').trim();
+
+  document.getElementById('doc-preview').innerHTML=`
+    <div class="preview-header">
+      <div class="preview-logo-top">${LOGO_BLACK(86)}</div>
+      <div class="preview-contact-info">
+        <span class="co-name">SK Music Production Inc</span>
+        845-445-6100<br/>
+        <a href="mailto:Info@Sheakallerband.com">Info@Sheakallerband.com</a>
+      </div>
+    </div>
+    <div class="preview-title">Event Details</div>
+    <div class="preview-body">
+      <p>Dear Crew,</p>
+      <p>Please find below the schedule and band lineup for the event on <strong>${escH(date)}</strong>${venue?', at <strong>'+escH(venue)+'</strong>':''}.</p>
+      <p><strong>Type of Event:</strong> ${escH(type)}<br/>
+         <strong>Location:</strong> ${escH(venue||'___')}${address?' – '+escH(address):''}</p>
+      <hr class="preview-divider"/>
+      <p><strong>Sound Check Schedule:</strong></p>
+      <ul>
+        <li>Rhythm: ${escH(raw('f-sc-rhythm'))}</li>
+        <li>Horns: ${escH(raw('f-sc-horns'))}</li>
+      </ul>
+      <p><strong>Event Schedule:</strong></p>
+      <ul>
+        <li>KP Start time: ${escH(raw('f-kp-start'))}${raw('f-kp-note')?' ('+escH(raw('f-kp-note'))+')':''}</li>
+        <li>Chuppah: ${escH(raw('f-chuppah'))}</li>
+      </ul>
+      ${bandH?'<p><strong>Band Members:</strong></p><ul>'+bandH+'</ul>':''}
+      ${(singerH||choir)?'<p><strong>Singers:</strong></p><ul>'+singerH+(choir?'<li>'+escH(choir)+'</li>':'')+'</ul>':''}
+      <p><strong>Dress Code:</strong></p>
+      <ul><li>${escH(raw('f-dresscode'))}</li></ul>
+      ${raw('f-notes')?'<p>'+escH(raw('f-notes'))+'</p>':''}
+      <p style="margin-top:22px;">We'll Keep you updated if anything changes</p>
+    </div>
+    <div class="preview-watermark">${LOGO_GHOST(140)}</div>
+  `;
+
+  saveFormState();
+  updateRecipients();
+}
+
+// ══════════════════════════════════════════
+// CONTACTS MANAGEMENT
+// ══════════════════════════════════════════
+function addContact(){
+  const name  = document.getElementById('nc-name').value.trim();
+  const email = document.getElementById('nc-email').value.trim();
+  const role  = document.getElementById('nc-role').value.trim();
+  if(!name){ showToast('Name is required.'); return; }
+  contacts.push({id:Date.now(),name,email,role});
+  saveContacts(); renderContacts();
+  document.getElementById('nc-name').value='';
+  document.getElementById('nc-email').value='';
+  document.getElementById('nc-role').value='';
+  showToast(name+' added!');
+}
+function removeContact(id){
+  contacts=contacts.filter(c=>c.id!==id);
+  saveContacts(); renderContacts();
+}
+function renderContacts(){
+  const q=(document.getElementById('contact-search')?.value||'').toLowerCase();
+  const list=document.getElementById('contact-list'); if(!list) return;
+  const shown=q?contacts.filter(c=>
+    c.name.toLowerCase().includes(q)||(c.role||'').toLowerCase().includes(q)||(c.email||'').toLowerCase().includes(q)
+  ):contacts;
+  const cnt=document.getElementById('contact-count');
+  if(cnt) cnt.textContent=contacts.length;
+  if(!shown.length){ list.innerHTML='<div style="color:var(--muted);font-size:13px;padding:8px 0;">No contacts found.</div>'; return; }
+  list.innerHTML=shown.map(c=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:11px 0;border-bottom:1px solid var(--border);">
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:700;">${escH(c.name)}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">${escH(c.role||'—')} · ${escH(c.email||'no email')}</div>
+      </div>
+      <button class="btn-remove" onclick="removeContact(${c.id})" style="width:40px;height:40px;font-size:20px;">×</button>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// ══════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════
+function escH(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+document.addEventListener('input',e=>{ if(e.target.closest('#page-editor')) saveFormState(); });
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+window.addEventListener('DOMContentLoaded',function(){
+  // Inject logo into topbar
+  document.getElementById('topbar-logo-wrap').innerHTML = LOGO_PURPLE(48);
+
+  loadContacts();
+  loadEventTypes();
+  rebuildTypeSelect();
+
+  // Load saved default settings into Settings page
+  loadDefaultSettings();
+  // If no saved defaults, set hard-coded defaults
+  const defMap={'def-sc-rhythm':'6:00','def-sc-horns':'6:45','def-kp-start':'6:45',
+                'def-kp-note':'Only Choir','def-chuppah':'7:45',
+                'def-choir':'Yedidim Choir 8 Members',
+                'def-dresscode':'White Shirt / Black Jacket, Yarmulka & Necktie.',
+                'def-notes':'Horn Players Should bring clip-on mics.'};
+  Object.keys(defMap).forEach(id=>{
+    const el=document.getElementById(id);
+    if(el&&!el.value) el.value=defMap[id];
+  });
+
+  // Set today's date
+  const today=new Date();
+  const pad=n=>String(n).padStart(2,'0');
+  document.getElementById('f-date').value=`${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`;
+
+  // Restore saved form or seed with defaults + sample data
+  const restored=loadFormState();
+  if(!restored){
+    // Apply defaults from Settings to the form fields
+    const fMap={'def-sc-rhythm':'f-sc-rhythm','def-sc-horns':'f-sc-horns',
+                'def-kp-start':'f-kp-start','def-kp-note':'f-kp-note',
+                'def-chuppah':'f-chuppah','def-choir':'f-choir',
+                'def-dresscode':'f-dresscode','def-notes':'f-notes'};
+    Object.keys(fMap).forEach(defId=>{
+      const defEl=document.getElementById(defId);
+      const fEl=document.getElementById(fMap[defId]);
+      if(defEl&&fEl) fEl.value=defEl.value;
+    });
+    // Seed sample band
+    [{name:'Eli Rosenberg',role:'Drums'},{name:'Yossi Moseson',role:'Bass'},
+     {name:'Yechiel Rosenberg',role:'Guitar'},{name:'Shea Kaller',role:'Keys'},
+     {name:'Cliff Lions',role:'Alto Saxophone / Flute'},{name:'Morgen Price',role:'Tenor Saxophone / Clarinet'},
+     {name:'Nolan Tsang',role:'Trumpet 1'},{name:'Ben Holmes',role:'Trumpet 2'},
+     {name:'Adam Dotson',role:'Trombone'},{name:'Ben Crowder',role:'Trombone 2'}
+    ].forEach(m=>addBandRow(m.name,m.role));
+    ['Yidi Bialistozky','Hershy Weinberger'].forEach(n=>addSingerRow(n));
+  } else {
+    renderBandRows();
+    renderSingerRows();
+  }
+
+  renderPreview();
+  updateRecipients();
+});
+</script>
+
+</body>
+</html>
