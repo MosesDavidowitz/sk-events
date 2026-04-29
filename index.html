@@ -259,9 +259,9 @@ PREVIEW / PDF
 .btn-email-crew{background:#2eaa7a;color:#fff;box-shadow:0 3px 10px rgba(46,170,122,.3);}
 .preview-scaler{width:100%;overflow:hidden;border-radius:4px;box-shadow:0 2px 16px rgba(0,0,0,.12);}
 .preview-wrapper{background:#fff;color:#222;font-family:‘Times New Roman’,Times,serif;width:750px;transform-origin:top left;}
-.preview-inner{padding:22px 30px;position:relative;overflow:hidden;}
+.preview-inner{padding:22px 30px;position:relative;overflow:hidden;min-height:900px;}
 .prev-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
-.prev-logo img{height:76px;width:auto;object-fit:contain;}
+.prev-logo img{height:110px;width:auto;object-fit:contain;}
 .prev-info{text-align:right;font-size:12px;line-height:1.55;font-family:‘Lato’,sans-serif;padding-top:4px;}
 .prev-info .co{color:#1a5fa8;font-size:15px;font-weight:700;display:block;margin-bottom:3px;}
 .prev-info a{color:#1a5fa8;text-decoration:none;}
@@ -271,8 +271,14 @@ PREVIEW / PDF
 .prev-body ul{margin:1px 0 5px 26px;}
 .prev-body li{margin-bottom:1px;}
 .prev-divider{border:none;border-top:1px solid #e0e0e0;margin:8px 0;}
-.prev-watermark{position:absolute;bottom:16px;right:16px;pointer-events:none;z-index:0;}
-.prev-watermark img{width:180px;height:auto;opacity:0.20;}
+.prev-watermark{
+position:absolute;
+bottom:24px;right:24px;
+width:220px;height:220px;
+pointer-events:none;z-index:0;
+display:flex;align-items:flex-end;justify-content:flex-end;
+}
+.prev-watermark img{width:220px;height:220px;object-fit:contain;opacity:0.18;}
 
 /* ═══════════════════════════════════════════
 TOAST
@@ -294,7 +300,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
 #screen-home,#screen-settings,
 #tab-details-content,
 #btn-print-main,#btn-email-main,
-#print-tip-div,#home-footer{display:none!important;}
+#home-footer{display:none!important;}
 /* Show event screen and preview tab */
 #screen-event{display:block!important;height:auto!important;overflow:visible!important;}
 #tab-preview-content{display:block!important;height:auto!important;overflow:visible!important;padding:0!important;}
@@ -417,7 +423,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
 </div>
 
 <!-- Event Types -->
-<div class="stoggle" onclick="toggleSec('sc-evtypes',this)"><span>&#127917; Event Types</span><span class="sarrow">&#8250;</span></div>
+<div class="stoggle" onclick="toggleSec('sc-evtypes',this)"><span>&#127926; Event Types</span><span class="sarrow">&#8250;</span></div>
 <div class="sbody" id="sc-evtypes">
   <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Manage the Type of Event dropdown.</p>
   <div class="type-chips" id="type-chips-list"></div>
@@ -516,14 +522,8 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   <!-- Preview tab -->
   <div id="tab-preview-content" class="scroll-area" style="display:none;">
     <div class="preview-outer">
+      <button id="btn-print-main" class="btn-block btn-print" onclick="doSaveAsPDF()">&#11123; Download PDF</button>
       <button id="btn-email-main" class="btn-block btn-email-crew" onclick="emailCrew()">&#9993; Email Crew</button>
-      <button id="btn-print-main" class="btn-block btn-print" onclick="doPrint()">&#128424; Save as PDF</button>
-      <div id="print-tip-div" style="font-size:13px;color:#1a1d2e;background:#fff;border:1px solid #dde1ec;border-radius:10px;padding:12px 14px;margin-bottom:14px;line-height:1.7;">
-        <div style="font-weight:700;margin-bottom:6px;">&#128247; How to save a clean PDF on iPhone:</div>
-        <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:3px;"><span style="background:#4a5da8;color:#fff;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">1</span><span>Tap <strong>Save as PDF</strong> above</span></div>
-        <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:3px;"><span style="background:#4a5da8;color:#fff;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">2</span><span>Long-press the page thumbnail that appears</span></div>
-        <div style="display:flex;align-items:baseline;gap:6px;"><span style="background:#4a5da8;color:#fff;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">3</span><span>Tap <strong>Share</strong> &#8594; <strong>Save to Files</strong> — clean PDF, no URL!</span></div>
-      </div>
       <div class="preview-scaler" id="pscaler">
         <div class="preview-wrapper" id="pwrapper">
           <div class="preview-inner" id="doc-preview"></div>
@@ -834,8 +834,9 @@ function autoSave() {
 function readFormIntoCurrentEvent() {
   if (!currentEvent) return;
   currentEvent.date        = gv('f-date');
-  currentEvent.type        = gv('f-type');
-  currentEvent.typeCustom  = gv('f-type-custom');
+  var typeVal = gv('f-type');
+  currentEvent.type       = typeVal;
+  currentEvent.typeCustom = (typeVal === 'Other') ? gv('f-type-custom') : '';
   currentEvent.venueName    = gv('f-venue');
   currentEvent.venueAddress = gv('f-address');
   currentEvent.venueRaw     = gv('f-venue-search');
@@ -1317,133 +1318,183 @@ function scalePreview() {
 }
 window.addEventListener('resize',scalePreview);
 
-function doPrint() {
+function doSaveAsPDF() {
   renderPreview();
-  window.print();
+
+  var docInner = document.getElementById('doc-preview');
+  if (!docInner) { window.print(); return; }
+
+  var base = window.location.href.replace(/\/[^\/]*$/, '/');
+
+  var previewStyles = [
+    '*{box-sizing:border-box;margin:0;padding:0;}',
+    'body{background:#fff;font-family:"Times New Roman",Times,serif;padding:18px 22px;position:relative;min-height:96vh;}',
+    '.prev-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}',
+    '.prev-logo img{height:110px;width:auto;object-fit:contain;}',
+    '.prev-info{text-align:right;font-size:12px;line-height:1.55;font-family:Lato,sans-serif;padding-top:4px;}',
+    '.prev-info .co{color:#1a5fa8;font-size:14px;font-weight:700;display:block;margin-bottom:2px;}',
+    '.prev-info a{color:#1a5fa8;text-decoration:none;}',
+    '.prev-title{text-align:center;color:#1a5fa8;font-weight:700;font-size:18px;margin-bottom:10px;font-family:Lato,sans-serif;letter-spacing:.03em;}',
+    '.prev-body{font-size:12.5px;line-height:1.55;position:relative;z-index:1;}',
+    '.prev-body p{margin-bottom:5px;}',
+    '.prev-body ul{margin:1px 0 5px 26px;}',
+    '.prev-body li{margin-bottom:1px;}',
+    '.prev-divider{border:none;border-top:1px solid #e0e0e0;margin:8px 0;}',
+    '.prev-watermark{position:fixed;bottom:24px;right:24px;width:220px;height:220px;pointer-events:none;z-index:0;}',
+    '.prev-watermark img{width:220px;height:220px;object-fit:contain;opacity:0.18;}',
+    '@media print{@page{margin:8mm;size:A4 portrait;}body{padding:0;}}'
+  ].join('');
+
+  var html = '<!DOCTYPE html><html><head>' +
+    '<meta charset="UTF-8"><meta name="viewport" content="width=device-width">' +
+    '<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">' +
+    '<base href="' + base + '">' +
+    '<style>' + previewStyles + '</style>' +
+
+```
+'</head><body>' + docInner.innerHTML + '</body></html>';
+```
+
+var blob = new Blob([html], {type:‘text/html’});
+var url  = URL.createObjectURL(blob);
+
+// On iOS Safari: open in same tab temporarily, print, then go back
+// This avoids popup blocker AND removes the app URL from print footer
+var a = document.createElement(‘a’);
+a.href = url;
+a.target = ‘_blank’;
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+setTimeout(function(){ URL.revokeObjectURL(url); }, 60000);
 }
 
 function renderPreview() {
-  var ev = currentEvent;
-  if (!ev) return;
-  var date    = fmtDate(ev.date||gv('f-date'));
-  var venue   = ev.venueName || gv('f-venue') || '';
-  var address = ev.venueAddress || gv('f-address') || '';
-  var type = ev.typeCustom || (ev.type === 'Other' ? ev.typeCustom : ev.type) || gv('f-type') || '';
-  if (!type || type === 'Other') type = ev.typeCustom || gv('f-type-custom') || '';
-  var band    = ev.band    || [];
-  var singers = ev.singers || [];
-  var choir   = ev.choir   || [];
-  var dc      = ev.dresscode || gv('f-dresscode') || '';
-  var notes   = ev.notes   || gv('f-notes')       || '';
-  var scR = ev.scRhythm||gv('f-sc-rhythm')||'';
-  var scH = ev.scHorns||gv('f-sc-horns')||'';
-  var kpS = ev.kpStart||gv('f-kp-start')||'';
-  var kpN = ev.kpNote||gv('f-kp-note')||'';
-  var chu = ev.chuppah||gv('f-chuppah')||'';
+var ev = currentEvent;
+if (!ev) return;
+var date    = fmtDate(ev.date||gv(‘f-date’));
+var venue   = ev.venueName || gv(‘f-venue’) || ‘’;
+var address = ev.venueAddress || gv(‘f-address’) || ‘’;
+var type = ‘’;
+if (ev.type === ‘Other’ || ev.type === ‘’) {
+type = ev.typeCustom || gv(‘f-type-custom’) || ‘’;
+} else {
+type = ev.type || gv(‘f-type’) || ‘’;
+}
+var band    = ev.band    || [];
+var singers = ev.singers || [];
+var choir   = ev.choir   || [];
+var dc      = ev.dresscode || gv(‘f-dresscode’) || ‘’;
+var notes   = ev.notes   || gv(‘f-notes’)       || ‘’;
+var scR = ev.scRhythm||gv(‘f-sc-rhythm’)||’’;
+var scH = ev.scHorns||gv(‘f-sc-horns’)||’’;
+var kpS = ev.kpStart||gv(‘f-kp-start’)||’’;
+var kpN = ev.kpNote||gv(‘f-kp-note’)||’’;
+var chu = ev.chuppah||gv(‘f-chuppah’)||’’;
 
-  var bandH = band.length
-    ? band.map(function(m){return '<li>'+(m.role?'<strong>'+esc(m.role)+':</strong> ':'')+esc(m.name)+'</li>';}).join('')
-    : '<li style="color:#999">N/A</li>';
+var bandH = band.length
+? band.map(function(m){return ‘<li>’+(m.role?’<strong>’+esc(m.role)+’:</strong> ‘:’’)+esc(m.name)+’</li>’;}).join(’’)
+: ‘<li style="color:#999">N/A</li>’;
 
-  var singerH = singers.length
-    ? singers.map(function(m){return '<li>'+esc(m.name)+'</li>';}).join('')
-    : '<li style="color:#999">N/A</li>';
+var singerH = singers.length
+? singers.map(function(m){return ‘<li>’+esc(m.name)+’</li>’;}).join(’’)
+: ‘<li style="color:#999">N/A</li>’;
 
-  var choirH = choir.length ? choir.map(function(m){
-    var label = esc(m.name);
-    if (m.count) label += ' \u2013 ' + m.count + ' Members';
-    return '<li>'+label+'</li>';
-  }).join('') : '';
+var choirH = choir.length ? choir.map(function(m){
+var label = esc(m.name);
+if (m.count) label += ’ \u2013 ’ + m.count + ’ Members’;
+return ‘<li>’+label+’</li>’;
+}).join(’’) : ‘’;
 
-  var dp = document.getElementById('doc-preview');
-  if (!dp) return;
-  dp.innerHTML =
-    '<div class="prev-header">' +
-      '<div class="prev-logo"><img src="images/logo.png" alt="Shea Kaller" onerror="this.style.display=\'none\'"></div>' +
-      '<div class="prev-info"><span class="co">SK Music Production Inc</span>845-445-6100<br><a href="mailto:Info@Sheakallerband.com">Info@Sheakallerband.com</a></div>' +
-    '</div>' +
-    '<div class="prev-title">Event Details</div>' +
-    '<div class="prev-body">' +
-      '<p>Dear Crew,</p>' +
-      '<p>Please find below the schedule and band lineup for the event on <strong>'+esc(date)+'</strong>'+(venue?', at <strong>'+esc(venue)+'</strong>':'')+'.</p>' +
-      '<p><strong>Type of Event:</strong> '+esc(type||'___')+'<br><strong>Location:</strong> '+esc(venue||'___')+(address?' \u2013 '+esc(address):'')+'</p>' +
-      '<hr class="prev-divider">' +
-      '<p><strong>Sound Check Schedule:</strong></p><ul><li>Rhythm: '+esc(scR)+'</li><li>Horns: '+esc(scH)+'</li></ul>' +
-      '<p><strong>Event Schedule:</strong></p><ul><li>KP Start time: '+esc(kpS)+(kpN?' ('+esc(kpN)+')':'')+'</li><li>Chuppah: '+esc(chu)+'</li></ul>' +
-      '<p><strong>Band Members:</strong></p><ul>'+bandH+'</ul>' +
-      '<p><strong>Singers:</strong></p><ul>'+singerH+'</ul>' +
-      (choirH ? '<p><strong>Groups / Choirs:</strong></p><ul>'+choirH+'</ul>' : '') +
-      '<p><strong>Dress Code:</strong></p><ul><li>'+esc(dc)+'</li></ul>' +
-      (notes?'<p>'+esc(notes)+'</p>':'') +
-      '<p style="margin-top:22px;">We\'ll Keep you updated if anything changes</p>' +
-    '</div>' +
-    '<div class="prev-watermark"><img src="images/logo.png" alt="" onerror="this.style.display=\'none\'"></div>';
-  setTimeout(scalePreview, 50);
+var dp = document.getElementById(‘doc-preview’);
+if (!dp) return;
+dp.innerHTML =
+‘<div class="prev-header">’ +
+‘<div class="prev-logo"><img src="images/logo.png" alt="Shea Kaller" onerror="this.style.display=\'none\'"></div>’ +
+‘<div class="prev-info"><span class="co">SK Music Production Inc</span>845-445-6100<br><a href="mailto:Info@Sheakallerband.com">Info@Sheakallerband.com</a></div>’ +
+‘</div>’ +
+‘<div class="prev-title">Event Details</div>’ +
+‘<div class="prev-body">’ +
+‘<p>Dear Crew,</p>’ +
+‘<p>Please find below the schedule and band lineup for the event on <strong>’+esc(date)+’</strong>’+(venue?’, at <strong>’+esc(venue)+’</strong>’:’’)+’.</p>’ +
+‘<p><strong>Type of Event:</strong> ‘+esc(type||’***’)+’<br><strong>Location:</strong> ‘+esc(venue||’***’)+(address?’ \u2013 ‘+esc(address):’’)+’</p>’ +
+‘<hr class="prev-divider">’ +
+‘<p><strong>Sound Check Schedule:</strong></p><ul><li>Rhythm: ‘+esc(scR)+’</li><li>Horns: ‘+esc(scH)+’</li></ul>’ +
+‘<p><strong>Event Schedule:</strong></p><ul><li>KP Start time: ‘+esc(kpS)+(kpN?’ (’+esc(kpN)+’)’:’’)+’</li><li>Chuppah: ‘+esc(chu)+’</li></ul>’ +
+‘<p><strong>Band Members:</strong></p><ul>’+bandH+’</ul>’ +
+‘<p><strong>Singers:</strong></p><ul>’+singerH+’</ul>’ +
+(choirH ? ‘<p><strong>Groups / Choirs:</strong></p><ul>’+choirH+’</ul>’ : ‘’) +
+‘<p><strong>Dress Code:</strong></p><ul><li>’+esc(dc)+’</li></ul>’ +
+(notes?’<p>’+esc(notes)+’</p>’:’’) +
+‘<p style="margin-top:22px;">We'll Keep you updated if anything changes</p>’ +
+‘</div>’ +
+‘<div class="prev-watermark"><img src="images/logo.png" alt="" onerror="this.style.display=\'none\'"></div>’;
+setTimeout(scalePreview, 50);
 }
 
 // ═══════════════════════════════════════════════════════════════
 // EMAIL CREW
 // ═══════════════════════════════════════════════════════════════
 function gatherEmails() {
-  var ev = currentEvent; if (!ev) return [];
-  var memberIds = [];
-  (ev.band||[]).forEach(function(m){memberIds.push(m.id);});
-  (ev.singers||[]).forEach(function(m){memberIds.push(m.id);});
-  (ev.choir||[]).forEach(function(m){memberIds.push(m.id);});
-  var emails = [];
-  memberIds.forEach(function(id){
-    var c = contacts.find(function(c){return c.id===id;});
-    if (c&&c.email&&emails.indexOf(c.email)<0) emails.push(c.email);
-  });
-  return emails;
+var ev = currentEvent; if (!ev) return [];
+var memberIds = [];
+(ev.band||[]).forEach(function(m){memberIds.push(m.id);});
+(ev.singers||[]).forEach(function(m){memberIds.push(m.id);});
+(ev.choir||[]).forEach(function(m){memberIds.push(m.id);});
+var emails = [];
+memberIds.forEach(function(id){
+var c = contacts.find(function(c){return c.id===id;});
+if (c&&c.email&&emails.indexOf(c.email)<0) emails.push(c.email);
+});
+return emails;
 }
 function emailCrew() {
-  if (!validateEvent()) { toast('Please fill in required fields first', true); return; }
-  var cc = gatherEmails();
-  if (!cc.length) { toast('No emails found. Check contacts.', true); return; }
-  var date  = fmtDate(currentEvent.date||gv('f-date'));
-  var venue = currentEvent.venueName||gv('f-venue')||'';
-  var subj  = encodeURIComponent('Event Details'+(date?' \u2013 '+date:'')+(venue?' at '+venue:''));
-  var bodyText = 'Dear Crew,\n\nPlease find attached the event details'+(date?' for '+date:'')+(venue?' at '+venue:'')+
-    '.\n\nPlease review the schedule and lineup carefully.\n\nThank you,\nSK Music Production Inc\n845-445-6100\nInfo@Sheakallerband.com';
-  var body = encodeURIComponent(bodyText);
-  var a=document.createElement('a');
-  a.href='mailto:Info@Sheakallerband.com?cc='+encodeURIComponent(cc.join(','))+'&subject='+subj+'&body='+body;
-  a.style.display='none'; document.body.appendChild(a); a.click();
-  setTimeout(function(){document.body.removeChild(a);},300);
-  toast('Email opened to ' + cc.length + ' recipients', false);
+if (!validateEvent()) { toast(‘Please fill in required fields first’, true); return; }
+var cc = gatherEmails();
+if (!cc.length) { toast(‘No emails found. Check contacts.’, true); return; }
+var date  = fmtDate(currentEvent.date||gv(‘f-date’));
+var venue = currentEvent.venueName||gv(‘f-venue’)||’’;
+var subj  = encodeURIComponent(‘Event Details’+(date?’ \u2013 ‘+date:’’)+(venue?’ at ‘+venue:’’));
+var bodyText = ‘Dear Crew,\n\nPlease find attached the event details’+(date?’ for ‘+date:’’)+(venue?’ at ‘+venue:’’)+
+‘.\n\nPlease review the schedule and lineup carefully.\n\nThank you,\nSK Music Production Inc\n845-445-6100\nInfo@Sheakallerband.com’;
+var body = encodeURIComponent(bodyText);
+var a=document.createElement(‘a’);
+a.href=‘mailto:Info@Sheakallerband.com?cc=’+encodeURIComponent(cc.join(’,’))+’&subject=’+subj+’&body=’+body;
+a.style.display=‘none’; document.body.appendChild(a); a.click();
+setTimeout(function(){document.body.removeChild(a);},300);
+toast(‘Email opened to ’ + cc.length + ’ recipients’, false);
 }
 
 // ═══════════════════════════════════════════════════════════════
 // UTILITIES
 // ═══════════════════════════════════════════════════════════════
-function gv(id){ var el=document.getElementById(id); return el?el.value:''; }
-function sv(id,val){ var el=document.getElementById(id); if(el) el.value=val||''; }
-function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function gv(id){ var el=document.getElementById(id); return el?el.value:’’; }
+function sv(id,val){ var el=document.getElementById(id); if(el) el.value=val||’’; }
+function esc(s){ return (s||’’).replace(/&/g,’&’).replace(/</g,’<’).replace(/>/g,’>’).replace(/”/g,’"’); }
 function fmtDate(val){
-  if(!val)return'';
-  var p=val.split('-'); if(p.length!==3)return val;
-  var y=parseInt(p[0]),m=parseInt(p[1]),d=parseInt(p[2]);
-  if(!y||!m||!d)return val;
-  return['January','February','March','April','May','June','July','August','September','October','November','December'][m-1]+' '+d+', '+y;
+if(!val)return’’;
+var p=val.split(’-’); if(p.length!==3)return val;
+var y=parseInt(p[0]),m=parseInt(p[1]),d=parseInt(p[2]);
+if(!y||!m||!d)return val;
+return[‘January’,‘February’,‘March’,‘April’,‘May’,‘June’,‘July’,‘August’,‘September’,‘October’,‘November’,‘December’][m-1]+’ ‘+d+’, ’+y;
 }
-function isValidEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+function isValidEmail(e){ return /^[^\s@]+@[^\s@]+.[^\s@]+$/.test(e); }
 function toast(msg,isErr){
-  var t=document.getElementById('toast');
-  t.textContent=msg;
-  if(isErr)t.classList.add('err');else t.classList.remove('err');
-  t.classList.add('show');
-  setTimeout(function(){t.classList.remove('show');},3000);
+var t=document.getElementById(‘toast’);
+t.textContent=msg;
+if(isErr)t.classList.add(‘err’);else t.classList.remove(‘err’);
+t.classList.add(‘show’);
+setTimeout(function(){t.classList.remove(‘show’);},3000);
 }
 
 // ═══════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════
-window.addEventListener('DOMContentLoaded', function() {
-  loadAll();
-  rebuildTypeSelect();
-  showScreen('home');
-  updateHomeTopbar();
+window.addEventListener(‘DOMContentLoaded’, function() {
+loadAll();
+rebuildTypeSelect();
+showScreen(‘home’);
+updateHomeTopbar();
 });
 </script>
 
