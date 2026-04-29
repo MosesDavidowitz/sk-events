@@ -11,6 +11,8 @@
 <link rel="apple-touch-icon" href="images/favicon.jpg">
 <title>SK Music – Event Builder</title>
 <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 /* ═══════════════════════════════════════════
    RESET & ROOT
@@ -516,7 +518,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   <!-- Preview tab -->
   <div id="tab-preview-content" class="scroll-area" style="display:none;">
     <div class="preview-outer">
-      <button id="btn-print-main" class="btn-block btn-print" onclick="doSaveAsPDF()">&#128424; Save as PDF</button>
+      <button id="btn-print-main" class="btn-block btn-print" onclick="doSaveAsPDF()">&#11123; Download PDF</button>
       <button id="btn-email-main" class="btn-block btn-email-crew" onclick="emailCrew()">&#9993; Email Crew</button>
       <div class="preview-scaler" id="pscaler">
         <div class="preview-wrapper" id="pwrapper">
@@ -1314,10 +1316,91 @@ window.addEventListener('resize',scalePreview);
 
 function doSaveAsPDF() {
   renderPreview();
-  // On iPhone Safari, window.print() opens the print/share sheet
-  // User can then tap the Share icon (top right) -> Save to Files -> clean PDF
-  // OR tap Print and use the preview thumbnail -> Share -> Save to Files
-  setTimeout(function() { window.print(); }, 300);
+  var btn = document.getElementById('btn-print-main');
+  var origText = btn.innerHTML;
+  btn.innerHTML = '&#9203; Generating PDF...';
+  btn.disabled = true;
+
+  setTimeout(function() {
+    var wrapper = document.getElementById('pwrapper');
+    if (!wrapper) { btn.innerHTML = origText; btn.disabled = false; return; }
+
+    // Temporarily make wrapper full-size for capture
+    var origTransform = wrapper.style.transform;
+    var origWidth     = wrapper.style.width;
+    wrapper.style.transform = 'none';
+    wrapper.style.width     = '750px';
+
+    html2canvas(wrapper, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ffffff',
+      logging: false,
+      imageTimeout: 15000,
+      onclone: function(doc) {
+        var el = doc.getElementById('pwrapper');
+        if (el) { el.style.transform = 'none'; el.style.width = '750px'; }
+      }
+    }).then(function(canvas) {
+      // Restore wrapper
+      wrapper.style.transform = origTransform;
+      wrapper.style.width     = origWidth;
+
+      var imgData = canvas.toDataURL('image/jpeg', 0.95);
+      var pdf     = new jspdf.jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      var pageW = 210; // A4 width mm
+      var pageH = 297; // A4 height mm
+      var margin = 10;
+      var usableW = pageW - margin * 2;
+
+      // Scale image to fit width
+      var imgW = canvas.width;
+      var imgH = canvas.height;
+      var ratio = usableW / (imgW / (canvas.width / usableW));
+      var pdfW  = usableW;
+      var pdfH  = (imgH / imgW) * pdfW;
+
+      // If taller than one page, scale down to fit
+      var usableH = pageH - margin * 2;
+      if (pdfH > usableH) {
+        var scale = usableH / pdfH;
+        pdfW = pdfW * scale;
+        pdfH = pdfH * scale;
+      }
+
+      // Center on page
+      var x = (pageW - pdfW) / 2;
+      var y = margin;
+
+      pdf.addImage(imgData, 'JPEG', x, y, pdfW, pdfH);
+
+      // Build filename from event data
+      var ev = currentEvent || {};
+      var dateStr = (ev.date || '').replace(/-/g,'') || 'event';
+      var venue   = (ev.venueName || 'event').replace(/[^a-zA-Z0-9]/g,'-').toLowerCase();
+      var filename = 'SK-Event-' + dateStr + '-' + venue + '.pdf';
+
+      pdf.save(filename);
+
+      btn.innerHTML = origText;
+      btn.disabled  = false;
+      toast('PDF downloaded to your Files!', false);
+    }).catch(function(err) {
+      wrapper.style.transform = origTransform;
+      wrapper.style.width     = origWidth;
+      console.error('PDF error:', err);
+      btn.innerHTML = origText;
+      btn.disabled  = false;
+      // Fallback to print if html2canvas fails
+      window.print();
+    });
+  }, 300);
 }
 
 function renderPreview() {
