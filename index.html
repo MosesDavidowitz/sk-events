@@ -286,40 +286,30 @@ PRINT
 ═══════════════════════════════════════════ */
 @media print{
 *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
-@page{margin:10mm;size:A4 portrait;}
-html,body{
-background:#fff!important;
-height:auto!important;overflow:visible!important;
-margin:0!important;padding:0!important;
-font-size:11pt!important;
-}
-/* Hide the entire app shell */
+@page{margin:12mm;size:A4 portrait;}
+html,body{background:#fff!important;height:auto!important;overflow:visible!important;margin:0!important;padding:0!important;}
 #app{display:block!important;height:auto!important;overflow:visible!important;}
+/* Hide everything except event screen preview tab */
 .topbar,.tabs,.tabs-event,
-.screen,.preview-outer>.btn-print,.preview-outer>.btn-email-crew,
-#home-footer,#print-tip{display:none!important;}
-/* Show ONLY the preview doc */
-#print-doc{
-display:block!important;
-position:fixed!important;
-top:0!important;left:0!important;
-width:100%!important;height:auto!important;
-background:#fff!important;
-z-index:99999!important;
+#screen-home,#screen-settings,
+#tab-details-content,
+.preview-outer>.btn-print,
+.preview-outer>.btn-email-crew,
+#print-tip,#home-footer,#print-doc{display:none!important;}
+/* Show event screen and preview tab */
+#screen-event{display:block!important;height:auto!important;overflow:visible!important;}
+#tab-preview-content{display:block!important;height:auto!important;overflow:visible!important;padding:0!important;}
+.preview-outer{padding:0!important;}
+/* Scale preview to fill page */
+.preview-scaler{width:100%!important;overflow:visible!important;}
+.preview-wrapper{
+width:100%!important;
+transform:none!important;
+box-shadow:none!important;
+border-radius:0!important;
 }
-.pdoc-inner{padding:16px 20px!important;}
-.pdoc-inner .prev-header{margin-bottom:10px!important;}
-.pdoc-inner .prev-logo img{height:80px!important;}
-.pdoc-inner .prev-title{font-size:16pt!important;margin-bottom:14px!important;}
-.pdoc-inner .prev-body{font-size:10pt!important;line-height:1.5!important;}
-.pdoc-inner .prev-body p{margin-bottom:6px!important;}
-.pdoc-inner .prev-body ul{margin:2px 0 6px 20px!important;}
-.pdoc-inner .prev-body li{margin-bottom:2px!important;}
-.pdoc-inner .prev-divider{margin:8px 0!important;}
-.pdoc-inner .prev-watermark img{
-width:200px!important;opacity:0.18!important;
-position:absolute!important;bottom:10px!important;right:10px!important;
-}
+.preview-inner{padding:16px 20px!important;}
+.prev-watermark img{opacity:0.18!important;}
 }
 </style>
 
@@ -559,12 +549,6 @@ position:absolute!important;bottom:10px!important;right:10px!important;
 
 </div><!-- /app -->
 <div id="toast"></div>
-<!-- Print-only document: hidden normally, shown on print -->
-<div id="print-doc" style="display:none;background:#fff;font-family:'Times New Roman',Times,serif;color:#222;">
-  <div class="pdoc-inner" id="print-doc-inner" style="padding:16px 20px;position:relative;">
-    <!-- filled by renderPreview() -->
-  </div>
-</div>
 
 <script>
 // ═══════════════════════════════════════════════════════════════
@@ -1397,9 +1381,6 @@ function renderPreview() {
       '<p style="margin-top:22px;">We\'ll Keep you updated if anything changes</p>' +
     '</div>' +
     '<div class="prev-watermark"><img src="images/logo.png" alt="" onerror="this.style.display=\'none\'"></div>';
-  // Also fill the print-only doc (same content, no scaling needed)
-  var pd = document.getElementById('print-doc-inner');
-  if (pd) pd.innerHTML = dp.innerHTML;
   setTimeout(scalePreview, 50);
 }
 
