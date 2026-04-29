@@ -92,7 +92,7 @@ flex-shrink:0;
 .home-hero img{height:90px;width:auto;margin-bottom:12px;}
 .home-hero h1{color:#fff;font-size:22px;font-weight:900;letter-spacing:.02em;}
 .home-hero p{color:rgba(255,255,255,.5);font-size:13px;margin-top:6px;}
-.home-actions{display:flex;flex-direction:column;gap:12px;padding:20px 14px;}
+.home-actions{display:flex;flex-direction:column;gap:12px;padding:20px 14px;} /* legacy */
 .home-btn{
 display:flex;align-items:center;gap:14px;
 background:#fff;border:1px solid var(–border);border-radius:16px;
@@ -360,7 +360,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
 
 <!-- ═══════════ HOME SCREEN ═══════════ -->
 
-<div class="screen active" id="screen-home" style="overflow-y:auto;">
+<div class="screen active" id="screen-home" style="display:flex;flex-direction:column;overflow:hidden;">
   <div class="home-hero" style="position:relative;">
   <button onclick="openSettings()" title="Settings" style="position:absolute;top:10px;left:10px;z-index:10;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.3);border-radius:50%;width:36px;height:36px;font-size:17px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;" aria-label="Settings">&#9881;</button>
   <button onclick="location.reload()" title="Refresh" style="position:absolute;top:10px;right:10px;z-index:10;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.3);border-radius:50%;width:36px;height:36px;font-size:17px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;" aria-label="Refresh">&#8635;</button>
@@ -368,7 +368,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
     <h1>Event Builder</h1>
     <p>SK Music Production Inc</p>
   </div>
-  <div class="home-actions">
+  <div style="flex-shrink:0;padding:16px 14px 0;">
     <div class="home-btn" onclick="startNewEvent()">
       <div class="home-btn-icon blue">&#10133;</div>
       <div class="home-btn-text">
@@ -377,21 +377,18 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
       </div>
       <div class="home-btn-arrow">&#8250;</div>
     </div>
-
-```
-<div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.06);" id="existing-events-section">
-  <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;">&#128197; Saved Events</div>
-  <div style="display:flex;gap:8px;margin-bottom:10px;">
-    <input type="date" id="events-date-filter" style="flex:1;font-size:13px;padding:9px 10px;border:1.5px solid var(--inp-border);border-radius:10px;background:var(--bg);color:var(--text);outline:none;-webkit-appearance:none;">
-    <button onclick="searchEvents()" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:9px 16px;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0;">Search</button>
   </div>
-  <div id="events-list"><div class="events-list-empty" style="padding:8px 0 2px;">Select a date or press Search to find events.</div></div>
-</div>
-```
-
+  <div style="flex:1;min-height:0;padding:12px 14px 0;display:flex;flex-direction:column;" id="existing-events-section">
+    <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.06);flex:1;min-height:0;display:flex;flex-direction:column;">
+      <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;">&#128197; Saved Events</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px;">
+        <input type="date" id="events-date-filter" style="flex:1;font-size:13px;padding:9px 10px;border:1.5px solid var(--inp-border);border-radius:10px;background:var(--bg);color:var(--text);outline:none;-webkit-appearance:none;">
+        <button onclick="searchEvents()" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:9px 16px;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0;">Search</button>
+      </div>
+      <div id="events-list" style="flex:1;overflow-y:auto;min-height:0;padding-bottom:60px;"><div class="events-list-empty" style="padding:8px 0 2px;">Select a date or press Search to find events.</div></div>
+    </div>
   </div>
-  <!-- Spacer so content doesn't hide behind footer -->
-  <div style="height:56px;flex-shrink:0;"></div>
+
 </div>
 <!-- Home footer - sticky dark banner, only shows on home screen -->
 <div id="home-footer" style="
@@ -404,7 +401,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v6.1
+  A Davidowitz Project &copy; 2026 - v6.2
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
