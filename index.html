@@ -259,18 +259,18 @@ PREVIEW / PDF
 .btn-email-crew{background:#2eaa7a;color:#fff;box-shadow:0 3px 10px rgba(46,170,122,.3);}
 .preview-scaler{width:100%;overflow:hidden;border-radius:4px;box-shadow:0 2px 16px rgba(0,0,0,.12);}
 .preview-wrapper{background:#fff;color:#222;font-family:‘Times New Roman’,Times,serif;width:750px;transform-origin:top left;}
-.preview-inner{padding:40px 48px;position:relative;overflow:hidden;}
-.prev-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
-.prev-logo img{height:120px;width:auto;object-fit:contain;}
+.preview-inner{padding:28px 36px;position:relative;overflow:hidden;}
+.prev-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
+.prev-logo img{height:90px;width:auto;object-fit:contain;}
 .prev-info{text-align:right;font-size:13px;line-height:1.65;font-family:‘Lato’,sans-serif;padding-top:8px;}
 .prev-info .co{color:#1a5fa8;font-size:15px;font-weight:700;display:block;margin-bottom:3px;}
 .prev-info a{color:#1a5fa8;text-decoration:none;}
-.prev-title{text-align:center;color:#1a5fa8;font-weight:700;font-size:22px;margin-bottom:22px;font-family:‘Lato’,sans-serif;letter-spacing:.03em;}
-.prev-body{font-size:14px;line-height:1.8;position:relative;z-index:1;}
-.prev-body p{margin-bottom:10px;}
-.prev-body ul{margin:3px 0 10px 32px;}
-.prev-body li{margin-bottom:4px;}
-.prev-divider{border:none;border-top:1px solid #e0e0e0;margin:14px 0;}
+.prev-title{text-align:center;color:#1a5fa8;font-weight:700;font-size:19px;margin-bottom:14px;font-family:‘Lato’,sans-serif;letter-spacing:.03em;}
+.prev-body{font-size:13px;line-height:1.65;position:relative;z-index:1;}
+.prev-body p{margin-bottom:7px;}
+.prev-body ul{margin:2px 0 7px 28px;}
+.prev-body li{margin-bottom:2px;}
+.prev-divider{border:none;border-top:1px solid #e0e0e0;margin:10px 0;}
 .prev-watermark{position:absolute;bottom:20px;right:20px;pointer-events:none;z-index:0;}
 .prev-watermark img{width:260px;height:auto;opacity:0.22;}
 
@@ -285,25 +285,41 @@ TOAST
 PRINT
 ═══════════════════════════════════════════ */
 @media print{
-*{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-html,body{background:#fff!important;height:auto;overflow:visible;margin:0;padding:0;}
-#app{height:auto;overflow:visible;}
-/* Hide everything except the preview content */
+*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+@page{margin:10mm;size:A4 portrait;}
+html,body{
+background:#fff!important;
+height:auto!important;overflow:visible!important;
+margin:0!important;padding:0!important;
+font-size:11pt!important;
+}
+/* Hide the entire app shell */
+#app{display:block!important;height:auto!important;overflow:visible!important;}
 .topbar,.tabs,.tabs-event,
-#screen-home,#screen-settings,
-#tab-details-content,
-.preview-outer>.btn-print,
-.preview-outer>.btn-email-crew,
-#home-footer{display:none!important;}
-#screen-event{display:block!important;height:auto;overflow:visible;}
-#tab-preview-content{display:block!important;height:auto;overflow:visible;padding:0!important;}
-.preview-outer{padding:0!important;}
-.preview-scaler{width:100%!important;overflow:visible!important;}
-.preview-wrapper{width:100%!important;transform:none!important;box-shadow:none!important;border-radius:0!important;}
-.preview-inner{padding:20px 28px!important;}
-.prev-watermark img{opacity:0.18!important;}
-/* Remove browser-added URL and page number */
-@page{margin:0.5cm;size:A4;}
+.screen,.preview-outer>.btn-print,.preview-outer>.btn-email-crew,
+#home-footer,#print-tip{display:none!important;}
+/* Show ONLY the preview doc */
+#print-doc{
+display:block!important;
+position:fixed!important;
+top:0!important;left:0!important;
+width:100%!important;height:auto!important;
+background:#fff!important;
+z-index:99999!important;
+}
+.pdoc-inner{padding:16px 20px!important;}
+.pdoc-inner .prev-header{margin-bottom:10px!important;}
+.pdoc-inner .prev-logo img{height:80px!important;}
+.pdoc-inner .prev-title{font-size:16pt!important;margin-bottom:14px!important;}
+.pdoc-inner .prev-body{font-size:10pt!important;line-height:1.5!important;}
+.pdoc-inner .prev-body p{margin-bottom:6px!important;}
+.pdoc-inner .prev-body ul{margin:2px 0 6px 20px!important;}
+.pdoc-inner .prev-body li{margin-bottom:2px!important;}
+.pdoc-inner .prev-divider{margin:8px 0!important;}
+.pdoc-inner .prev-watermark img{
+width:200px!important;opacity:0.18!important;
+position:absolute!important;bottom:10px!important;right:10px!important;
+}
 }
 </style>
 
@@ -516,8 +532,11 @@ html,body{background:#fff!important;height:auto;overflow:visible;margin:0;paddin
   <!-- Preview tab -->
   <div id="tab-preview-content" class="scroll-area" style="display:none;">
     <div class="preview-outer">
-      <button class="btn-block btn-print" onclick="window.print()">&#128424; Print / Save as PDF</button>
+      <button class="btn-block btn-print" onclick="doPrint()">&#128424; Print / Save as PDF</button>
       <button class="btn-block btn-email-crew" onclick="emailCrew()">&#9993; Email Crew</button>
+      <div id="print-tip" style="font-size:12px;color:#6b7280;background:#f8f9fc;border:1px solid #dde1ec;border-radius:8px;padding:10px 12px;margin-bottom:14px;line-height:1.5;">
+        &#128247; <strong>iPhone tip:</strong> In the print dialog, tap <strong>Options</strong> and turn off <strong>Headers &amp; Footers</strong> to remove the URL and page numbers.
+      </div>
       <div class="preview-scaler" id="pscaler">
         <div class="preview-wrapper" id="pwrapper">
           <div class="preview-inner" id="doc-preview"></div>
@@ -540,6 +559,12 @@ html,body{background:#fff!important;height:auto;overflow:visible;margin:0;paddin
 
 </div><!-- /app -->
 <div id="toast"></div>
+<!-- Print-only document: hidden normally, shown on print -->
+<div id="print-doc" style="display:none;background:#fff;font-family:'Times New Roman',Times,serif;color:#222;">
+  <div class="pdoc-inner" id="print-doc-inner" style="padding:16px 20px;position:relative;">
+    <!-- filled by renderPreview() -->
+  </div>
+</div>
 
 <script>
 // ═══════════════════════════════════════════════════════════════
@@ -1311,14 +1336,19 @@ function scalePreview() {
 }
 window.addEventListener('resize',scalePreview);
 
+function doPrint() {
+  renderPreview();
+  window.print();
+}
+
 function renderPreview() {
   var ev = currentEvent;
   if (!ev) return;
   var date    = fmtDate(ev.date||gv('f-date'));
   var venue   = ev.venueName || gv('f-venue') || '';
   var address = ev.venueAddress || gv('f-address') || '';
-  var type    = ev.typeCustom || ev.type || gv('f-type') || '';
-  if (!type && gv('f-type')==='Other') type = gv('f-type-custom');
+  var type = ev.typeCustom || (ev.type === 'Other' ? ev.typeCustom : ev.type) || gv('f-type') || '';
+  if (!type || type === 'Other') type = ev.typeCustom || gv('f-type-custom') || '';
   var band    = ev.band    || [];
   var singers = ev.singers || [];
   var choir   = ev.choir   || [];
@@ -1367,6 +1397,9 @@ function renderPreview() {
       '<p style="margin-top:22px;">We\'ll Keep you updated if anything changes</p>' +
     '</div>' +
     '<div class="prev-watermark"><img src="images/logo.png" alt="" onerror="this.style.display=\'none\'"></div>';
+  // Also fill the print-only doc (same content, no scaling needed)
+  var pd = document.getElementById('print-doc-inner');
+  if (pd) pd.innerHTML = dp.innerHTML;
   setTimeout(scalePreview, 50);
 }
 
