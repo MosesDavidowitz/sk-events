@@ -11,8 +11,6 @@
 <link rel="apple-touch-icon" href="images/favicon.jpg">
 <title>SK Music – Event Builder</title>
 <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 /* ═══════════════════════════════════════════
    RESET & ROOT
@@ -425,7 +423,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
 </div>
 
 <!-- Event Types -->
-<div class="stoggle" onclick="toggleSec('sc-evtypes',this)"><span>&#127917; Event Types</span><span class="sarrow">&#8250;</span></div>
+<div class="stoggle" onclick="toggleSec('sc-evtypes',this)"><span>&#127926; Event Types</span><span class="sarrow">&#8250;</span></div>
 <div class="sbody" id="sc-evtypes">
   <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Manage the Type of Event dropdown.</p>
   <div class="type-chips" id="type-chips-list"></div>
@@ -1322,231 +1320,181 @@ window.addEventListener('resize',scalePreview);
 
 function doSaveAsPDF() {
   renderPreview();
-  var btn = document.getElementById('btn-print-main');
-  var origText = btn.innerHTML;
-  btn.innerHTML = '&#9203; Generating PDF...';
-  btn.disabled = true;
 
-  setTimeout(function() {
-    var wrapper = document.getElementById('pwrapper');
-    if (!wrapper) { btn.innerHTML = origText; btn.disabled = false; return; }
+  var docInner = document.getElementById('doc-preview');
+  if (!docInner) { window.print(); return; }
 
-    // Temporarily make wrapper full-size for capture
-    var origTransform = wrapper.style.transform;
-    var origWidth     = wrapper.style.width;
-    wrapper.style.transform = 'none';
-    wrapper.style.width     = '750px';
+  var base = window.location.href.replace(/\/[^\/]*$/, '/');
 
-    html2canvas(wrapper, {
-      scale: 2,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#ffffff',
-      logging: false,
-      imageTimeout: 15000,
-      onclone: function(doc) {
-        var el = doc.getElementById('pwrapper');
-        if (el) { el.style.transform = 'none'; el.style.width = '750px'; }
-      }
-    }).then(function(canvas) {
-      // Restore wrapper
-      wrapper.style.transform = origTransform;
-      wrapper.style.width     = origWidth;
+  var previewStyles = [
+    '*{box-sizing:border-box;margin:0;padding:0;}',
+    'body{background:#fff;font-family:"Times New Roman",Times,serif;padding:18px 22px;position:relative;min-height:96vh;}',
+    '.prev-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}',
+    '.prev-logo img{height:110px;width:auto;object-fit:contain;}',
+    '.prev-info{text-align:right;font-size:12px;line-height:1.55;font-family:Lato,sans-serif;padding-top:4px;}',
+    '.prev-info .co{color:#1a5fa8;font-size:14px;font-weight:700;display:block;margin-bottom:2px;}',
+    '.prev-info a{color:#1a5fa8;text-decoration:none;}',
+    '.prev-title{text-align:center;color:#1a5fa8;font-weight:700;font-size:18px;margin-bottom:10px;font-family:Lato,sans-serif;letter-spacing:.03em;}',
+    '.prev-body{font-size:12.5px;line-height:1.55;position:relative;z-index:1;}',
+    '.prev-body p{margin-bottom:5px;}',
+    '.prev-body ul{margin:1px 0 5px 26px;}',
+    '.prev-body li{margin-bottom:1px;}',
+    '.prev-divider{border:none;border-top:1px solid #e0e0e0;margin:8px 0;}',
+    '.prev-watermark{position:fixed;bottom:24px;right:24px;width:220px;height:220px;pointer-events:none;z-index:0;}',
+    '.prev-watermark img{width:220px;height:220px;object-fit:contain;opacity:0.18;}',
+    '@media print{@page{margin:8mm;size:A4 portrait;}body{padding:0;}}'
+  ].join('');
 
-      var imgData = canvas.toDataURL('image/jpeg', 0.95);
-      var pdf     = new jspdf.jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
+  var html = '<!DOCTYPE html><html><head>' +
+    '<meta charset="UTF-8"><meta name="viewport" content="width=device-width">' +
+    '<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">' +
+    '<base href="' + base + '">' +
+    '<style>' + previewStyles + '</style>' +
 
-      var pageW = 210; // A4 width mm
-      var pageH = 297; // A4 height mm
-      var margin = 10;
-      var usableW = pageW - margin * 2;
+```
+'</head><body>' + docInner.innerHTML + '</body></html>';
+```
 
-      // Scale image to fit width
-      var imgW = canvas.width;
-      var imgH = canvas.height;
-      var ratio = usableW / (imgW / (canvas.width / usableW));
-      var pdfW  = usableW;
-      var pdfH  = (imgH / imgW) * pdfW;
+var blob = new Blob([html], {type:‘text/html’});
+var url  = URL.createObjectURL(blob);
 
-      // If taller than one page, scale down to fit
-      var usableH = pageH - margin * 2;
-      if (pdfH > usableH) {
-        var scale = usableH / pdfH;
-        pdfW = pdfW * scale;
-        pdfH = pdfH * scale;
-      }
-
-      // Center on page
-      var x = (pageW - pdfW) / 2;
-      var y = margin;
-
-      pdf.addImage(imgData, 'JPEG', x, y, pdfW, pdfH);
-
-      // Build filename from event data
-      var ev = currentEvent || {};
-      var dateStr = (ev.date || '').replace(/-/g,'') || 'event';
-      var venue   = (ev.venueName || 'event').replace(/[^a-zA-Z0-9]/g,'-').toLowerCase();
-      var filename = 'SK-Event-' + dateStr + '-' + venue + '.pdf';
-
-      // iOS Safari fix: use blob URL with anchor click
-      var pdfBlob = pdf.output('blob');
-      var blobUrl = URL.createObjectURL(pdfBlob);
-      var a = document.createElement('a');
-      a.href = blobUrl;
-      a.download = filename;
-      a.target = '_blank'; // fallback for browsers that don't support download attr
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(function() {
-        document.body.removeChild(a);
-        URL.revokeObjectURL(blobUrl);
-      }, 1000);
-
-      btn.innerHTML = origText;
-      btn.disabled  = false;
-      toast('PDF saved! Check your Downloads folder.', false);
-    }).catch(function(err) {
-      wrapper.style.transform = origTransform;
-      wrapper.style.width     = origWidth;
-      console.error('PDF error:', err);
-      btn.innerHTML = origText;
-      btn.disabled  = false;
-      // Fallback to print if html2canvas fails
-      window.print();
-    });
-  }, 300);
+// On iOS Safari: open in same tab temporarily, print, then go back
+// This avoids popup blocker AND removes the app URL from print footer
+var a = document.createElement(‘a’);
+a.href = url;
+a.target = ‘_blank’;
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+setTimeout(function(){ URL.revokeObjectURL(url); }, 60000);
 }
 
 function renderPreview() {
-  var ev = currentEvent;
-  if (!ev) return;
-  var date    = fmtDate(ev.date||gv('f-date'));
-  var venue   = ev.venueName || gv('f-venue') || '';
-  var address = ev.venueAddress || gv('f-address') || '';
-  var type = '';
-  if (ev.type === 'Other' || ev.type === '') {
-    type = ev.typeCustom || gv('f-type-custom') || '';
-  } else {
-    type = ev.type || gv('f-type') || '';
-  }
-  var band    = ev.band    || [];
-  var singers = ev.singers || [];
-  var choir   = ev.choir   || [];
-  var dc      = ev.dresscode || gv('f-dresscode') || '';
-  var notes   = ev.notes   || gv('f-notes')       || '';
-  var scR = ev.scRhythm||gv('f-sc-rhythm')||'';
-  var scH = ev.scHorns||gv('f-sc-horns')||'';
-  var kpS = ev.kpStart||gv('f-kp-start')||'';
-  var kpN = ev.kpNote||gv('f-kp-note')||'';
-  var chu = ev.chuppah||gv('f-chuppah')||'';
+var ev = currentEvent;
+if (!ev) return;
+var date    = fmtDate(ev.date||gv(‘f-date’));
+var venue   = ev.venueName || gv(‘f-venue’) || ‘’;
+var address = ev.venueAddress || gv(‘f-address’) || ‘’;
+var type = ‘’;
+if (ev.type === ‘Other’ || ev.type === ‘’) {
+type = ev.typeCustom || gv(‘f-type-custom’) || ‘’;
+} else {
+type = ev.type || gv(‘f-type’) || ‘’;
+}
+var band    = ev.band    || [];
+var singers = ev.singers || [];
+var choir   = ev.choir   || [];
+var dc      = ev.dresscode || gv(‘f-dresscode’) || ‘’;
+var notes   = ev.notes   || gv(‘f-notes’)       || ‘’;
+var scR = ev.scRhythm||gv(‘f-sc-rhythm’)||’’;
+var scH = ev.scHorns||gv(‘f-sc-horns’)||’’;
+var kpS = ev.kpStart||gv(‘f-kp-start’)||’’;
+var kpN = ev.kpNote||gv(‘f-kp-note’)||’’;
+var chu = ev.chuppah||gv(‘f-chuppah’)||’’;
 
-  var bandH = band.length
-    ? band.map(function(m){return '<li>'+(m.role?'<strong>'+esc(m.role)+':</strong> ':'')+esc(m.name)+'</li>';}).join('')
-    : '<li style="color:#999">N/A</li>';
+var bandH = band.length
+? band.map(function(m){return ‘<li>’+(m.role?’<strong>’+esc(m.role)+’:</strong> ‘:’’)+esc(m.name)+’</li>’;}).join(’’)
+: ‘<li style="color:#999">N/A</li>’;
 
-  var singerH = singers.length
-    ? singers.map(function(m){return '<li>'+esc(m.name)+'</li>';}).join('')
-    : '<li style="color:#999">N/A</li>';
+var singerH = singers.length
+? singers.map(function(m){return ‘<li>’+esc(m.name)+’</li>’;}).join(’’)
+: ‘<li style="color:#999">N/A</li>’;
 
-  var choirH = choir.length ? choir.map(function(m){
-    var label = esc(m.name);
-    if (m.count) label += ' \u2013 ' + m.count + ' Members';
-    return '<li>'+label+'</li>';
-  }).join('') : '';
+var choirH = choir.length ? choir.map(function(m){
+var label = esc(m.name);
+if (m.count) label += ’ \u2013 ’ + m.count + ’ Members’;
+return ‘<li>’+label+’</li>’;
+}).join(’’) : ‘’;
 
-  var dp = document.getElementById('doc-preview');
-  if (!dp) return;
-  dp.innerHTML =
-    '<div class="prev-header">' +
-      '<div class="prev-logo"><img src="images/logo.png" alt="Shea Kaller" onerror="this.style.display=\'none\'"></div>' +
-      '<div class="prev-info"><span class="co">SK Music Production Inc</span>845-445-6100<br><a href="mailto:Info@Sheakallerband.com">Info@Sheakallerband.com</a></div>' +
-    '</div>' +
-    '<div class="prev-title">Event Details</div>' +
-    '<div class="prev-body">' +
-      '<p>Dear Crew,</p>' +
-      '<p>Please find below the schedule and band lineup for the event on <strong>'+esc(date)+'</strong>'+(venue?', at <strong>'+esc(venue)+'</strong>':'')+'.</p>' +
-      '<p><strong>Type of Event:</strong> '+esc(type||'___')+'<br><strong>Location:</strong> '+esc(venue||'___')+(address?' \u2013 '+esc(address):'')+'</p>' +
-      '<hr class="prev-divider">' +
-      '<p><strong>Sound Check Schedule:</strong></p><ul><li>Rhythm: '+esc(scR)+'</li><li>Horns: '+esc(scH)+'</li></ul>' +
-      '<p><strong>Event Schedule:</strong></p><ul><li>KP Start time: '+esc(kpS)+(kpN?' ('+esc(kpN)+')':'')+'</li><li>Chuppah: '+esc(chu)+'</li></ul>' +
-      '<p><strong>Band Members:</strong></p><ul>'+bandH+'</ul>' +
-      '<p><strong>Singers:</strong></p><ul>'+singerH+'</ul>' +
-      (choirH ? '<p><strong>Groups / Choirs:</strong></p><ul>'+choirH+'</ul>' : '') +
-      '<p><strong>Dress Code:</strong></p><ul><li>'+esc(dc)+'</li></ul>' +
-      (notes?'<p>'+esc(notes)+'</p>':'') +
-      '<p style="margin-top:22px;">We\'ll Keep you updated if anything changes</p>' +
-    '</div>' +
-    '<div class="prev-watermark"><img src="images/logo.png" alt="" onerror="this.style.display=\'none\'"></div>';
-  setTimeout(scalePreview, 50);
+var dp = document.getElementById(‘doc-preview’);
+if (!dp) return;
+dp.innerHTML =
+‘<div class="prev-header">’ +
+‘<div class="prev-logo"><img src="images/logo.png" alt="Shea Kaller" onerror="this.style.display=\'none\'"></div>’ +
+‘<div class="prev-info"><span class="co">SK Music Production Inc</span>845-445-6100<br><a href="mailto:Info@Sheakallerband.com">Info@Sheakallerband.com</a></div>’ +
+‘</div>’ +
+‘<div class="prev-title">Event Details</div>’ +
+‘<div class="prev-body">’ +
+‘<p>Dear Crew,</p>’ +
+‘<p>Please find below the schedule and band lineup for the event on <strong>’+esc(date)+’</strong>’+(venue?’, at <strong>’+esc(venue)+’</strong>’:’’)+’.</p>’ +
+‘<p><strong>Type of Event:</strong> ‘+esc(type||’***’)+’<br><strong>Location:</strong> ‘+esc(venue||’***’)+(address?’ \u2013 ‘+esc(address):’’)+’</p>’ +
+‘<hr class="prev-divider">’ +
+‘<p><strong>Sound Check Schedule:</strong></p><ul><li>Rhythm: ‘+esc(scR)+’</li><li>Horns: ‘+esc(scH)+’</li></ul>’ +
+‘<p><strong>Event Schedule:</strong></p><ul><li>KP Start time: ‘+esc(kpS)+(kpN?’ (’+esc(kpN)+’)’:’’)+’</li><li>Chuppah: ‘+esc(chu)+’</li></ul>’ +
+‘<p><strong>Band Members:</strong></p><ul>’+bandH+’</ul>’ +
+‘<p><strong>Singers:</strong></p><ul>’+singerH+’</ul>’ +
+(choirH ? ‘<p><strong>Groups / Choirs:</strong></p><ul>’+choirH+’</ul>’ : ‘’) +
+‘<p><strong>Dress Code:</strong></p><ul><li>’+esc(dc)+’</li></ul>’ +
+(notes?’<p>’+esc(notes)+’</p>’:’’) +
+‘<p style="margin-top:22px;">We'll Keep you updated if anything changes</p>’ +
+‘</div>’ +
+‘<div class="prev-watermark"><img src="images/logo.png" alt="" onerror="this.style.display=\'none\'"></div>’;
+setTimeout(scalePreview, 50);
 }
 
 // ═══════════════════════════════════════════════════════════════
 // EMAIL CREW
 // ═══════════════════════════════════════════════════════════════
 function gatherEmails() {
-  var ev = currentEvent; if (!ev) return [];
-  var memberIds = [];
-  (ev.band||[]).forEach(function(m){memberIds.push(m.id);});
-  (ev.singers||[]).forEach(function(m){memberIds.push(m.id);});
-  (ev.choir||[]).forEach(function(m){memberIds.push(m.id);});
-  var emails = [];
-  memberIds.forEach(function(id){
-    var c = contacts.find(function(c){return c.id===id;});
-    if (c&&c.email&&emails.indexOf(c.email)<0) emails.push(c.email);
-  });
-  return emails;
+var ev = currentEvent; if (!ev) return [];
+var memberIds = [];
+(ev.band||[]).forEach(function(m){memberIds.push(m.id);});
+(ev.singers||[]).forEach(function(m){memberIds.push(m.id);});
+(ev.choir||[]).forEach(function(m){memberIds.push(m.id);});
+var emails = [];
+memberIds.forEach(function(id){
+var c = contacts.find(function(c){return c.id===id;});
+if (c&&c.email&&emails.indexOf(c.email)<0) emails.push(c.email);
+});
+return emails;
 }
 function emailCrew() {
-  if (!validateEvent()) { toast('Please fill in required fields first', true); return; }
-  var cc = gatherEmails();
-  if (!cc.length) { toast('No emails found. Check contacts.', true); return; }
-  var date  = fmtDate(currentEvent.date||gv('f-date'));
-  var venue = currentEvent.venueName||gv('f-venue')||'';
-  var subj  = encodeURIComponent('Event Details'+(date?' \u2013 '+date:'')+(venue?' at '+venue:''));
-  var bodyText = 'Dear Crew,\n\nPlease find attached the event details'+(date?' for '+date:'')+(venue?' at '+venue:'')+
-    '.\n\nPlease review the schedule and lineup carefully.\n\nThank you,\nSK Music Production Inc\n845-445-6100\nInfo@Sheakallerband.com';
-  var body = encodeURIComponent(bodyText);
-  var a=document.createElement('a');
-  a.href='mailto:Info@Sheakallerband.com?cc='+encodeURIComponent(cc.join(','))+'&subject='+subj+'&body='+body;
-  a.style.display='none'; document.body.appendChild(a); a.click();
-  setTimeout(function(){document.body.removeChild(a);},300);
-  toast('Email opened to ' + cc.length + ' recipients', false);
+if (!validateEvent()) { toast(‘Please fill in required fields first’, true); return; }
+var cc = gatherEmails();
+if (!cc.length) { toast(‘No emails found. Check contacts.’, true); return; }
+var date  = fmtDate(currentEvent.date||gv(‘f-date’));
+var venue = currentEvent.venueName||gv(‘f-venue’)||’’;
+var subj  = encodeURIComponent(‘Event Details’+(date?’ \u2013 ‘+date:’’)+(venue?’ at ‘+venue:’’));
+var bodyText = ‘Dear Crew,\n\nPlease find attached the event details’+(date?’ for ‘+date:’’)+(venue?’ at ‘+venue:’’)+
+‘.\n\nPlease review the schedule and lineup carefully.\n\nThank you,\nSK Music Production Inc\n845-445-6100\nInfo@Sheakallerband.com’;
+var body = encodeURIComponent(bodyText);
+var a=document.createElement(‘a’);
+a.href=‘mailto:Info@Sheakallerband.com?cc=’+encodeURIComponent(cc.join(’,’))+’&subject=’+subj+’&body=’+body;
+a.style.display=‘none’; document.body.appendChild(a); a.click();
+setTimeout(function(){document.body.removeChild(a);},300);
+toast(‘Email opened to ’ + cc.length + ’ recipients’, false);
 }
 
 // ═══════════════════════════════════════════════════════════════
 // UTILITIES
 // ═══════════════════════════════════════════════════════════════
-function gv(id){ var el=document.getElementById(id); return el?el.value:''; }
-function sv(id,val){ var el=document.getElementById(id); if(el) el.value=val||''; }
-function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function gv(id){ var el=document.getElementById(id); return el?el.value:’’; }
+function sv(id,val){ var el=document.getElementById(id); if(el) el.value=val||’’; }
+function esc(s){ return (s||’’).replace(/&/g,’&’).replace(/</g,’<’).replace(/>/g,’>’).replace(/”/g,’"’); }
 function fmtDate(val){
-  if(!val)return'';
-  var p=val.split('-'); if(p.length!==3)return val;
-  var y=parseInt(p[0]),m=parseInt(p[1]),d=parseInt(p[2]);
-  if(!y||!m||!d)return val;
-  return['January','February','March','April','May','June','July','August','September','October','November','December'][m-1]+' '+d+', '+y;
+if(!val)return’’;
+var p=val.split(’-’); if(p.length!==3)return val;
+var y=parseInt(p[0]),m=parseInt(p[1]),d=parseInt(p[2]);
+if(!y||!m||!d)return val;
+return[‘January’,‘February’,‘March’,‘April’,‘May’,‘June’,‘July’,‘August’,‘September’,‘October’,‘November’,‘December’][m-1]+’ ‘+d+’, ’+y;
 }
-function isValidEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+function isValidEmail(e){ return /^[^\s@]+@[^\s@]+.[^\s@]+$/.test(e); }
 function toast(msg,isErr){
-  var t=document.getElementById('toast');
-  t.textContent=msg;
-  if(isErr)t.classList.add('err');else t.classList.remove('err');
-  t.classList.add('show');
-  setTimeout(function(){t.classList.remove('show');},3000);
+var t=document.getElementById(‘toast’);
+t.textContent=msg;
+if(isErr)t.classList.add(‘err’);else t.classList.remove(‘err’);
+t.classList.add(‘show’);
+setTimeout(function(){t.classList.remove(‘show’);},3000);
 }
 
 // ═══════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════
-window.addEventListener('DOMContentLoaded', function() {
-  loadAll();
-  rebuildTypeSelect();
-  showScreen('home');
-  updateHomeTopbar();
+window.addEventListener(‘DOMContentLoaded’, function() {
+loadAll();
+rebuildTypeSelect();
+showScreen(‘home’);
+updateHomeTopbar();
 });
 </script>
 
