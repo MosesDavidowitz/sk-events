@@ -72,7 +72,7 @@ border-bottom:3px solid transparent;margin-bottom:-1px;
 /* ═══════════════════════════════════════════
 SCREENS
 ═══════════════════════════════════════════ */
-.screen{display:none;height:calc(100vh - 68px);overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.screen{display:none;overflow-y:auto;-webkit-overflow-scrolling:touch;position:absolute;top:0;left:0;right:0;bottom:0;}
 .screen.active{display:block;}
 .scroll-area{flex:1;overflow-y:auto;padding:16px 14px 80px;-webkit-overflow-scrolling:touch;}
 
@@ -321,7 +321,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
 
 <div class="topbar" id="topbar">
   <button class="btn-top btn-navy" id="topbar-back" onclick="topbarBack()" style="display:none;font-size:13px;">&#8249; Back</button>
-  <div class="topbar-title" id="topbar-title" style="flex:1;text-align:center;"></div>
+  <div class="topbar-title" id="topbar-title" style="flex:1;text-align:center;">SK Events</div>
   <button class="btn-top btn-save" id="topbar-btn" onclick="topbarAction()" style="display:none">Save</button>
 </div>
 
@@ -368,7 +368,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   </div>
   <!-- Footer inside home screen -->
   <div style="background:#1a1d2e;text-align:center;padding:16px 14px;margin-top:auto;border-top:1px solid rgba(255,255,255,.08);flex-shrink:0;">
-    <span style="color:rgba(255,255,255,.45);font-size:12px;font-family:'Lato',sans-serif;letter-spacing:.03em;">A Davidowitz Project &copy; 2026 &nbsp;&bull;&nbsp; v3.4</span>
+    <span style="color:rgba(255,255,255,.45);font-size:12px;font-family:'Lato',sans-serif;letter-spacing:.03em;">A Davidowitz Project &copy; 2026 &nbsp;&bull;&nbsp; v3.5</span>
   </div>
 </div>
 <!-- Home footer - sticky dark banner, only shows on home screen -->
@@ -620,10 +620,10 @@ function showScreen(name) {
   });
   var topbar = document.getElementById('topbar');
   if (name === 'home') {
-    topbar.style.display = 'none';
+    topbar.style.cssText = 'background:#1a1d2e;display:flex;align-items:center;gap:10px;flex-shrink:0;min-height:0;height:0;padding:0;overflow:hidden;';
     document.getElementById('existing-events-section').style.display = 'none';
   } else {
-    topbar.style.display = 'flex';
+    topbar.style.cssText = 'background:#1a1d2e;padding:8px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.3);min-height:68px;';
     if (name === 'settings') {
       setTopbar('App Settings', '\u2190 Back', null, null);
       document.getElementById('topbar-back').setAttribute('data-back','goHome');
@@ -684,8 +684,8 @@ function openSettings() {
 
 // home screen settings button (top right on home)
 function updateHomeTopbar() {
-  // On home screen: hide topbar completely (hero has logo+title)
-  document.getElementById('topbar').style.display = 'none';
+  var topbar = document.getElementById('topbar');
+  topbar.style.cssText = 'background:#1a1d2e;display:flex;align-items:center;gap:10px;flex-shrink:0;min-height:0;height:0;padding:0;overflow:hidden;';
 }
 // Settings is now a home button, no override needed
 
