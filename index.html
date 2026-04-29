@@ -420,7 +420,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v3.9
+  A Davidowitz Project &copy; 2026 - v4.0
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -1716,10 +1716,14 @@ function filterBroadcast(){
     item.className='bcast-item';
     item.setAttribute('data-id', c.id);
     var isChk=broadcastSelected.indexOf(c.id)>=0;
+    // Check if already confirmed on this event
+    var eventList = broadcastType === 'band' ? (currentEvent.band||[]) : (currentEvent.singers||[]);
+    var isConfirmed = eventList.some(function(m){ return m.id === c.id; });
+    var confirmedBadge = isConfirmed ? '<span style="display:inline-block;background:#fff3cd;color:#856404;border:1px solid #ffc107;border-radius:12px;padding:1px 8px;font-size:10px;font-weight:700;margin-left:6px;">&#10003; Confirmed</span>' : '';
     item.innerHTML=
-      '<div class="bcast-check'+(isChk?' checked':'')+'" id="bchk-'+c.id+'">'+(isChk?'&#10004;':'')+'</div>'+
+      '<div class="bcast-check'+(isChk?' checked':'')+'" id="bchk-'+c.id+'">'+( isChk?'&#10004;':'')+' </div>'+
       '<div class="bcast-item-info">'+
-        '<div class="bcast-item-name">'+esc(c.name)+'</div>'+
+        '<div class="bcast-item-name">'+esc(c.name)+confirmedBadge+'</div>'+
         '<div class="bcast-item-sub">'+esc(c.role||'')+(c.email?' · '+esc(c.email):'')+(c.phone?' · '+esc(c.phone):'')+'</div>'+
       '</div>';
     // Use closure to capture c.id
