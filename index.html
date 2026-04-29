@@ -306,11 +306,9 @@ html,body{background:#fff!important;height:auto;overflow:visible;}
 <!-- ═══════════ TOPBAR ═══════════ -->
 
 <div class="topbar" id="topbar">
-  <div class="topbar-logo">
-    <img src="images/logo-W.png" alt="Shea Kaller" onerror="this.style.display='none'">
-  </div>
-  <div class="topbar-title" id="topbar-title">SK Events</div>
-  <button class="btn-top btn-green" id="topbar-btn" onclick="topbarAction()" style="display:none">Action</button>
+  <button class="btn-top btn-navy" id="topbar-back" onclick="topbarBack()" style="display:none;font-size:13px;">&#8249; Home</button>
+  <div class="topbar-title" id="topbar-title" style="flex:1;text-align:center;"></div>
+  <button class="btn-top btn-save" id="topbar-btn" onclick="topbarAction()" style="display:none">Save</button>
 </div>
 
 <!-- ═══════════ HOME SCREEN ═══════════ -->
@@ -338,6 +336,18 @@ html,body{background:#fff!important;height:auto;overflow:visible;}
       </div>
       <div class="home-btn-arrow">&#8250;</div>
     </div>
+    <div class="home-btn" onclick="openSettings()">
+      <div class="home-btn-icon" style="background:#f3f0ff;">&#9881;&#65039;</div>
+      <div class="home-btn-text">
+        <strong>App Settings</strong>
+        <span>Contacts, event types, defaults</span>
+      </div>
+      <div class="home-btn-arrow">&#8250;</div>
+    </div>
+  </div>
+  <!-- Footer -->
+  <div style="text-align:center;padding:24px 14px 32px;color:#aab0c0;font-size:12px;flex-shrink:0;">
+    A Deverowitz Project &copy; 2026
   </div>
   <!-- Existing events list (shown after tapping Open) -->
   <div id="existing-events-section" style="display:none;padding:0 14px 80px;">
@@ -572,66 +582,75 @@ function showScreen(name) {
     var el = document.getElementById('screen-' + s);
     if (el) el.classList.toggle('active', s === name);
   });
-  var tabs = document.querySelector('.topbar + .tabs, .tabs-event');
-  // Topbar config per screen
+  var topbar = document.getElementById('topbar');
   if (name === 'home') {
-    setTopbar('SK Events', null, null);
+    topbar.style.display = 'none';
     document.getElementById('existing-events-section').style.display = 'none';
-  } else if (name === 'settings') {
-    setTopbar('Settings', '\u2190 Back', 'goHome');
-  } else if (name === 'event') {
-    updateEventTopbar();
+  } else {
+    topbar.style.display = 'flex';
+    if (name === 'settings') {
+      setTopbar('Settings', '\u2190 Back', 'goHome');
+    } else if (name === 'event') {
+      updateEventTopbar();
+    }
   }
 }
-function setTopbar(title, btnLabel, btnAction) {
-  document.getElementById('topbar-title').textContent = title;
-  var btn = document.getElementById('topbar-btn');
-  if (btnLabel) {
-    btn.textContent = btnLabel;
-    btn.setAttribute('data-action', btnAction || '');
+function setTopbar(title, backLabel, actionLabel, actionFn) {
+  document.getElementById('topbar-title').textContent = title || '';
+  var back = document.getElementById('topbar-back');
+  var btn  = document.getElementById('topbar-btn');
+  if (backLabel) {
+    back.textContent = backLabel;
+    back.style.display = 'block';
+  } else {
+    back.style.display = 'none';
+  }
+  if (actionLabel) {
+    btn.textContent = actionLabel;
+    btn.setAttribute('data-action', actionFn || '');
     btn.style.display = 'block';
-    // style
-    if (btnAction === 'goHome') {
-      btn.className = 'btn-top btn-navy';
-    } else if (btnAction === 'saveEvent') {
-      btn.className = 'btn-top btn-save';
-    } else {
-      btn.className = 'btn-top btn-green';
-    }
+    btn.className = 'btn-top btn-save';
   } else {
     btn.style.display = 'none';
   }
 }
+function topbarBack() {
+  var action = document.getElementById('topbar-back').getAttribute('data-back') || 'goHome';
+  if (action === 'goHome') goHome();
+}
 function topbarAction() {
   var action = document.getElementById('topbar-btn').getAttribute('data-action');
-  if (action === 'goHome') goHome();
-  else if (action === 'saveEvent') saveCurrentEvent();
+  if (action === 'saveEvent') saveCurrentEvent();
   else if (action === 'editEvent') enterEditMode();
 }
 function goHome() {
+  // Check for unsaved changes on new events
+  if (isNewEvent && isEditMode && currentEvent) {
+    // Check if any data has been entered
+    var hasData = currentEvent.date || currentEvent.venueName || (currentEvent.band||[]).length || (currentEvent.singers||[]).length;
+    if (hasData) {
+      if (!confirm('You have unsaved changes. Go back to home without saving?')) {
+        return;
+      }
+    }
+  }
+  currentEvent = null;
   showScreen('home');
+  updateHomeTopbar();
 }
 function openSettings() {
   showScreen('settings');
   renderContacts();
   renderTypeChips();
+  renderTypeChips();
 }
 
 // home screen settings button (top right on home)
 function updateHomeTopbar() {
-  setTopbar('SK Events', '&#9881; Settings', 'openSettingsAction');
-  document.getElementById('topbar-btn').className = 'btn-top btn-navy';
-  document.getElementById('topbar-btn').innerHTML = '&#9881;&#65039;';
-  document.getElementById('topbar-btn').setAttribute('data-action','openSettingsAction');
-  document.getElementById('topbar-btn').style.display = 'block';
+  // On home screen: hide topbar completely (hero has logo+title)
+  document.getElementById('topbar').style.display = 'none';
 }
-// override topbarAction to handle settings
-var _topbarAction = topbarAction;
-topbarAction = function() {
-  var action = document.getElementById('topbar-btn').getAttribute('data-action');
-  if (action === 'openSettingsAction') { openSettings(); return; }
-  _topbarAction();
-};
+// Settings is now a home button, no override needed
 
 // ═══════════════════════════════════════════════════════════════
 // HOME / EVENTS
@@ -719,17 +738,12 @@ function openExistingEvent(id) {
 }
 function updateEventTopbar() {
   if (isEditMode) {
-    setTopbar(isNewEvent ? 'New Event' : 'Edit Event', isNewEvent ? '\u2190 Home' : 'Save', isNewEvent ? 'goHome' : 'saveEvent');
-    if (!isNewEvent) document.getElementById('topbar-btn').className = 'btn-top btn-save';
-    else {
-      // for new event show Home button
-      document.getElementById('topbar-btn').textContent = '\u2190 Home';
-      document.getElementById('topbar-btn').className = 'btn-top btn-navy';
-      document.getElementById('topbar-btn').setAttribute('data-action','goHome');
-    }
+    setTopbar(isNewEvent ? 'New Event' : 'Edit Event', '\u2190 Home', 'Save', 'saveEvent');
+    document.getElementById('topbar-back').setAttribute('data-back','goHome');
   } else {
-    setTopbar('Event Details', 'Edit', 'editEvent');
-    document.getElementById('topbar-btn').className = 'btn-top btn-save';
+    setTopbar('Event Details', '\u2190 Home', 'Edit', 'editEvent');
+    document.getElementById('topbar-back').setAttribute('data-back','goHome');
+    document.getElementById('topbar-btn').className = 'btn-top btn-navy';
   }
 }
 function enterEditMode() {
@@ -768,7 +782,7 @@ function saveCurrentEvent() {
   isEditMode = false;
   setEventEditMode(false);
   updateEventTopbar();
-  toast('Event saved!', false);
+  toast('Event saved! ✓', false);
 }
 function autoSave() {
   if (!currentEvent || !isEditMode) return;
@@ -1323,9 +1337,8 @@ function toast(msg,isErr){
 window.addEventListener('DOMContentLoaded', function() {
   loadAll();
   rebuildTypeSelect();
-  // Home screen: settings button in topbar
-  updateHomeTopbar();
   showScreen('home');
+  updateHomeTopbar();
 });
 </script>
 
