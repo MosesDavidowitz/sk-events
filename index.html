@@ -382,7 +382,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v2.4
+  A Davidowitz Project &copy; 2026 - v2.5
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -1413,19 +1413,25 @@ function doSaveAsPDF() {
       var venue   = (ev.venueName || 'event').replace(/[^a-zA-Z0-9]/g,'-').toLowerCase();
       var filename = 'SK-Event-' + dateStr + '-' + venue + '.pdf';
 
-      // iOS Safari fix: use blob URL with anchor click
-      var pdfBlob = pdf.output('blob');
+      // iOS Safari fix: force download via blob URI
+      // iOS Safari does not honour the `download` attr on blob: URLs opened in _blank.
+      // Solution: output as arraybuffer, wrap in Blob with explicit application/pdf MIME,
+      // create an object URL and trigger click synchronously (no setTimeout delay on the click).
+      var pdfArrayBuf = pdf.output('arraybuffer');
+      var pdfBlob = new Blob([pdfArrayBuf], { type: 'application/pdf' });
       var blobUrl = URL.createObjectURL(pdfBlob);
       var a = document.createElement('a');
+      a.style.display = 'none';
       a.href = blobUrl;
       a.download = filename;
-      a.target = '_blank'; // fallback for browsers that don't support download attr
+      // Do NOT set target=_blank — it causes Safari to open in browser tab instead of download
       document.body.appendChild(a);
       a.click();
+      // Revoke after a short delay to allow download to start
       setTimeout(function() {
         document.body.removeChild(a);
         URL.revokeObjectURL(blobUrl);
-      }, 1000);
+      }, 2000);
 
       btn.innerHTML = origText;
       btn.disabled  = false;
@@ -1527,7 +1533,14 @@ function emailCrew() {
   if (!cc.length) { toast('No emails found. Check contacts.', true); return; }
   var date  = fmtDate(currentEvent.date||gv('f-date'));
   var venue = currentEvent.venueName||gv('f-venue')||'';
-  var subj  = encodeURIComponent('Event Details'+(date?' \u2013 '+date:'')+(venue?' at '+venue:''));
+  var dateShort = fmtDateShort(currentEvent.date||gv('f-date'));
+  var evType = '';
+  if (currentEvent.type === 'Other' || currentEvent.type === '') {
+    evType = currentEvent.typeCustom || gv('f-type-custom') || '';
+  } else {
+    evType = currentEvent.type || gv('f-type') || '';
+  }
+  var subj  = encodeURIComponent('Event Details - ' + (evType||'Event') + ' on ' + (dateShort||date) + (venue?' at '+venue:''));
   var bodyText = 'Dear Crew,\n\nPlease find attached the event details'+(date?' for '+date:'')+(venue?' at '+venue:'')+
     '.\n\nPlease review the schedule and lineup carefully.\n\nThank you,\nSK Music Production Inc\n845-445-6100\nInfo@Sheakallerband.com';
   var body = encodeURIComponent(bodyText);
@@ -1550,6 +1563,14 @@ function fmtDate(val){
   var y=parseInt(p[0]),m=parseInt(p[1]),d=parseInt(p[2]);
   if(!y||!m||!d)return val;
   return['January','February','March','April','May','June','July','August','September','October','November','December'][m-1]+' '+d+', '+y;
+}
+function fmtDateShort(val){
+  if(!val)return'';
+  var p=val.split('-'); if(p.length!==3)return val;
+  var y=parseInt(p[0]),m=parseInt(p[1]),d=parseInt(p[2]);
+  if(!y||!m||!d)return val;
+  var yy=String(y).slice(-2);
+  return (m<10?'0':'')+m+'/'+(d<10?'0':'')+d+'/'+yy;
 }
 function isValidEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
 function fmtTime(val) {
