@@ -135,6 +135,27 @@ padding:13px 14px;font-size:15px;font-family:‘Lato’,sans-serif;
 outline:none;-webkit-appearance:none;appearance:none;
 }
 input[type=date]::-webkit-calendar-picker-indicator{filter:opacity(.5);cursor:pointer;}
+input[type=time]{
+-webkit-appearance:none;appearance:none;
+width:auto;
+display:inline-block;
+background:var(–inp);
+border:1.5px solid var(–inp-border);
+border-radius:10px;
+padding:11px 14px;
+font-size:15px;
+font-family:‘Lato’,sans-serif;
+color:var(–text);
+min-width:130px;
+max-width:160px;
+cursor:pointer;
+}
+input[type=time]::-webkit-date-and-time-value{text-align:left;}
+input[type=time]::-webkit-datetime-edit{color:var(–text);}
+input[type=time]::-webkit-datetime-edit-fields-wrapper{padding:0;}
+input[type=time]::-webkit-datetime-edit-hour-field,
+input[type=time]::-webkit-datetime-edit-minute-field,
+input[type=time]::-webkit-datetime-edit-ampm-field{color:var(–text);}
 input:focus,textarea:focus,select:focus{border-color:var(–accent);box-shadow:0 0 0 3px rgba(74,93,168,.1);}
 input::placeholder,textarea::placeholder{color:#b0b8cc;}
 textarea{resize:vertical;min-height:70px;}
@@ -282,21 +303,6 @@ pointer-events:none;z-index:0;
 .prev-watermark img{width:210px;height:210px;object-fit:contain;opacity:0.18;display:block;}
 
 /* ═══════════════════════════════════════════
-TIME PICKER
-═══════════════════════════════════════════ */
-.time-picker-wrap{display:flex;align-items:center;gap:4px;}
-.time-sel{
-background:var(–inp);color:var(–text);
-border:1.5px solid var(–inp-border);border-radius:10px;
-padding:13px 8px;font-size:15px;font-family:‘Lato’,sans-serif;
-outline:none;-webkit-appearance:none;appearance:none;
-text-align:center;cursor:pointer;flex:1;
-background-image:none;
-}
-.time-sel:focus{border-color:var(–accent);box-shadow:0 0 0 3px rgba(74,93,168,.1);}
-.time-sep{font-size:18px;font-weight:700;color:var(–text);flex-shrink:0;margin:0 1px;}
-
-/* ═══════════════════════════════════════════
 TOAST
 ═══════════════════════════════════════════ */
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1d2e;color:#fff;border-radius:12px;padding:12px 22px;font-size:14px;font-weight:700;box-shadow:0 4px 20px rgba(0,0,0,.2);z-index:9999;transition:transform .3s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center;}
@@ -400,7 +406,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v3.3
+  A Davidowitz Project &copy; 2026 - v3.5
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -458,11 +464,11 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
 <div class="stoggle" onclick="toggleSec('sc-defaults',this)"><span>&#9881;&#65039; Default Values</span><span class="sarrow">&#8250;</span></div>
 <div class="sbody" id="sc-defaults">
   <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Pre-fill values for every new event.</p>
-  <div class="field"><label>Sound Check – Rhythm</label><div class="time-picker-wrap" id="tp-def-sc-rhythm"><select class="time-sel" id="tp-def-sc-rhythm-h" onchange="syncTimePicker('def-sc-rhythm');saveDefs()"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select><span class="time-sep">:</span><select class="time-sel" id="tp-def-sc-rhythm-m" onchange="syncTimePicker('def-sc-rhythm');saveDefs()"><option value="00">00</option><option value="15">15</option><option value="30">30</option><option value="45">45</option></select><select class="time-sel" id="tp-def-sc-rhythm-ap" onchange="syncTimePicker('def-sc-rhythm');saveDefs()"><option value="AM">AM</option><option value="PM">PM</option></select><input type="hidden" id="def-sc-rhythm"></div></div>
-  <div class="field"><label>Sound Check – Horns</label><div class="time-picker-wrap" id="tp-def-sc-horns"><select class="time-sel" id="tp-def-sc-horns-h" onchange="syncTimePicker('def-sc-horns');saveDefs()"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select><span class="time-sep">:</span><select class="time-sel" id="tp-def-sc-horns-m" onchange="syncTimePicker('def-sc-horns');saveDefs()"><option value="00">00</option><option value="15">15</option><option value="30">30</option><option value="45">45</option></select><select class="time-sel" id="tp-def-sc-horns-ap" onchange="syncTimePicker('def-sc-horns');saveDefs()"><option value="AM">AM</option><option value="PM">PM</option></select><input type="hidden" id="def-sc-horns"></div></div>
-  <div class="field"><label>KP Start</label><div class="time-picker-wrap" id="tp-def-kp-start"><select class="time-sel" id="tp-def-kp-start-h" onchange="syncTimePicker('def-kp-start');saveDefs()"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select><span class="time-sep">:</span><select class="time-sel" id="tp-def-kp-start-m" onchange="syncTimePicker('def-kp-start');saveDefs()"><option value="00">00</option><option value="15">15</option><option value="30">30</option><option value="45">45</option></select><select class="time-sel" id="tp-def-kp-start-ap" onchange="syncTimePicker('def-kp-start');saveDefs()"><option value="AM">AM</option><option value="PM">PM</option></select><input type="hidden" id="def-kp-start"></div></div>
+  <div class="field"><label>Sound Check – Rhythm</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="def-sc-rhythm" oninput="saveDefs()"><button type="button" onclick="clearTimeField('def-sc-rhythm')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
+  <div class="field"><label>Sound Check – Horns</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="def-sc-horns" oninput="saveDefs()"><button type="button" onclick="clearTimeField('def-sc-horns')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
+  <div class="field"><label>KP Start</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="def-kp-start" oninput="saveDefs()"><button type="button" onclick="clearTimeField('def-kp-start')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
   <div class="field"><label>KP Note</label><input type="text" id="def-kp-note" oninput="saveDefs()"></div>
-  <div class="field"><label>Chuppah / Main Event Time</label><div class="time-picker-wrap" id="tp-def-chuppah"><select class="time-sel" id="tp-def-chuppah-h" onchange="syncTimePicker('def-chuppah');saveDefs()"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select><span class="time-sep">:</span><select class="time-sel" id="tp-def-chuppah-m" onchange="syncTimePicker('def-chuppah');saveDefs()"><option value="00">00</option><option value="15">15</option><option value="30">30</option><option value="45">45</option></select><select class="time-sel" id="tp-def-chuppah-ap" onchange="syncTimePicker('def-chuppah');saveDefs()"><option value="AM">AM</option><option value="PM">PM</option></select><input type="hidden" id="def-chuppah"></div></div>
+  <div class="field"><label>Chuppah / Main Event Time</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="def-chuppah" oninput="saveDefs()"><button type="button" onclick="clearTimeField('def-chuppah')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
   <div class="field"><label>Dress Code</label><input type="text" id="def-dresscode" oninput="saveDefs()"></div>
   <div class="field"><label>Additional Notes</label><textarea id="def-notes" oninput="saveDefs()"></textarea></div>
 </div>
@@ -511,11 +517,11 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
     </div>
     <div class="card">
       <div class="card-title">Schedule</div>
-      <div class="field"><label>Sound Check – Rhythm</label><div class="time-picker-wrap" id="tp-f-sc-rhythm"><select class="time-sel" id="tp-f-sc-rhythm-h" onchange="syncTimePicker('f-sc-rhythm');autoSave()"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select><span class="time-sep">:</span><select class="time-sel" id="tp-f-sc-rhythm-m" onchange="syncTimePicker('f-sc-rhythm');autoSave()"><option value="00">00</option><option value="15">15</option><option value="30">30</option><option value="45">45</option></select><select class="time-sel" id="tp-f-sc-rhythm-ap" onchange="syncTimePicker('f-sc-rhythm');autoSave()"><option value="AM">AM</option><option value="PM">PM</option></select><input type="hidden" id="f-sc-rhythm"></div></div>
-      <div class="field"><label>Sound Check – Horns</label><div class="time-picker-wrap" id="tp-f-sc-horns"><select class="time-sel" id="tp-f-sc-horns-h" onchange="syncTimePicker('f-sc-horns');autoSave()"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select><span class="time-sep">:</span><select class="time-sel" id="tp-f-sc-horns-m" onchange="syncTimePicker('f-sc-horns');autoSave()"><option value="00">00</option><option value="15">15</option><option value="30">30</option><option value="45">45</option></select><select class="time-sel" id="tp-f-sc-horns-ap" onchange="syncTimePicker('f-sc-horns');autoSave()"><option value="AM">AM</option><option value="PM">PM</option></select><input type="hidden" id="f-sc-horns"></div></div>
-      <div class="field"><label>KP Start Time</label><div class="time-picker-wrap" id="tp-f-kp-start"><select class="time-sel" id="tp-f-kp-start-h" onchange="syncTimePicker('f-kp-start');autoSave()"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select><span class="time-sep">:</span><select class="time-sel" id="tp-f-kp-start-m" onchange="syncTimePicker('f-kp-start');autoSave()"><option value="00">00</option><option value="15">15</option><option value="30">30</option><option value="45">45</option></select><select class="time-sel" id="tp-f-kp-start-ap" onchange="syncTimePicker('f-kp-start');autoSave()"><option value="AM">AM</option><option value="PM">PM</option></select><input type="hidden" id="f-kp-start"></div></div>
+      <div class="field"><label>Sound Check – Rhythm</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-rhythm" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-sc-rhythm')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
+      <div class="field"><label>Sound Check – Horns</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-horns" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-sc-horns')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
+      <div class="field"><label>KP Start Time</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-kp-start" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-kp-start')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
       <div class="field"><label>KP Note</label><input type="text" id="f-kp-note" oninput="autoSave()"></div>
-      <div class="field"><label>Chuppah / Main Event Time</label><div class="time-picker-wrap" id="tp-f-chuppah"><select class="time-sel" id="tp-f-chuppah-h" onchange="syncTimePicker('f-chuppah');autoSave()"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select><span class="time-sep">:</span><select class="time-sel" id="tp-f-chuppah-m" onchange="syncTimePicker('f-chuppah');autoSave()"><option value="00">00</option><option value="15">15</option><option value="30">30</option><option value="45">45</option></select><select class="time-sel" id="tp-f-chuppah-ap" onchange="syncTimePicker('f-chuppah');autoSave()"><option value="AM">AM</option><option value="PM">PM</option></select><input type="hidden" id="f-chuppah"></div></div>
+      <div class="field"><label>Chuppah / Main Event Time</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-chuppah" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-chuppah')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
     </div>
     <div class="card">
       <div class="card-title">Band Members</div>
@@ -624,11 +630,6 @@ function loadAll() {
   var defs = lsGet(LS.defs, SEED_DEFS);
   Object.keys(defs).forEach(function(k) { var el = document.getElementById(k); if (el) el.value = defs[k]; });
   Object.keys(SEED_DEFS).forEach(function(k) { var el = document.getElementById(k); if (el && !el.value) el.value = SEED_DEFS[k]; });
-  // Sync all time pickers after loading defaults
-  ['def-sc-rhythm','def-sc-horns','def-kp-start','def-chuppah','f-sc-rhythm','f-sc-horns','f-kp-start','f-chuppah'].forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el && el.value) loadTimePicker(id, el.value);
-  });
 }
 function saveDefs() {
   var d = {};
@@ -1596,12 +1597,7 @@ function emailCrew() {
 // UTILITIES
 // ═══════════════════════════════════════════════════════════════
 function gv(id){ var el=document.getElementById(id); return el?el.value:''; }
-function sv(id,val){
-  var el=document.getElementById(id);
-  if(el) el.value=val||'';
-  // If this is a time picker field, also update the visible selects
-  if(document.getElementById('tp-'+id+'-h')) loadTimePicker(id, val||'');
-}
+function sv(id,val){ var el=document.getElementById(id); if(el) el.value=val||''; }
 function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function fmtDate(val){
   if(!val)return'';
@@ -1619,6 +1615,10 @@ function fmtDateShort(val){
   return (m<10?'0':'')+m+'/'+(d<10?'0':'')+d+'/'+yy;
 }
 function isValidEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+function clearTimeField(id) {
+  var el = document.getElementById(id);
+  if (el) { el.value = ''; el.dispatchEvent(new Event('input')); }
+}
 function formatPhoneInput(input) {
   // Strip everything except digits
   var digits = input.value.replace(/\D/g, '').substring(0, 10);
@@ -1652,52 +1652,6 @@ function toast(msg,isErr){
   if(isErr)t.classList.add('err');else t.classList.remove('err');
   t.classList.add('show');
   setTimeout(function(){t.classList.remove('show');},3000);
-}
-
-// ═══════════════════════════════════════════════════════════════
-// TIME PICKER HELPERS
-// ═══════════════════════════════════════════════════════════════
-function syncTimePicker(id) {
-  // Read the three selects and write HH:MM (24h) to the hidden input
-  var h  = document.getElementById('tp-' + id + '-h');
-  var m  = document.getElementById('tp-' + id + '-m');
-  var ap = document.getElementById('tp-' + id + '-ap');
-  if (!h || !m || !ap) return;
-  var hVal = parseInt(h.value, 10);
-  var apVal = ap.value;
-  // Convert to 24h
-  if (apVal === 'AM') {
-    if (hVal === 12) hVal = 0;
-  } else {
-    if (hVal !== 12) hVal += 12;
-  }
-  var hh = (hVal < 10 ? '0' : '') + hVal;
-  var hidden = document.getElementById(id);
-  if (hidden) hidden.value = hh + ':' + m.value;
-}
-function loadTimePicker(id, val) {
-  // val is HH:MM (24h) — populate the three selects
-  if (!val) return;
-  var parts = val.split(':');
-  if (parts.length < 2) return;
-  var h24 = parseInt(parts[0], 10);
-  var mVal = parts[1];
-  // Snap minutes to nearest 15
-  var mInt = parseInt(mVal, 10);
-  mInt = Math.round(mInt / 15) * 15;
-  if (mInt === 60) mInt = 45;
-  mVal = (mInt < 10 ? '0' : '') + mInt;
-  // Convert to 12h
-  var apVal = h24 >= 12 ? 'PM' : 'AM';
-  var h12 = h24 % 12; if (h12 === 0) h12 = 12;
-  var hSel  = document.getElementById('tp-' + id + '-h');
-  var mSel  = document.getElementById('tp-' + id + '-m');
-  var apSel = document.getElementById('tp-' + id + '-ap');
-  if (hSel)  hSel.value  = String(h12);
-  if (mSel)  mSel.value  = mVal;
-  if (apSel) apSel.value = apVal;
-  // Also sync hidden input
-  syncTimePicker(id);
 }
 
 // ═══════════════════════════════════════════════════════════════
