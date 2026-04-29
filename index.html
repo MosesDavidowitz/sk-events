@@ -612,7 +612,8 @@ function showScreen(name) {
     if (footer) footer.style.display = 'none';
     topbar.style.display = 'flex';
     if (name === 'settings') {
-      setTopbar('Settings', '\u2190 Back', 'goHome');
+      setTopbar('App Settings', '\u2190 Back', null, null);
+      document.getElementById('topbar-back').setAttribute('data-back','goHome');
     } else if (name === 'event') {
       updateEventTopbar();
     }
