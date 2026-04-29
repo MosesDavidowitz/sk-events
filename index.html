@@ -518,11 +518,10 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
     <div class="preview-outer">
       <button id="btn-email-main" class="btn-block btn-email-crew" onclick="emailCrew()">&#9993; Email Crew</button>
       <button id="btn-print-main" class="btn-block btn-print" onclick="doPrint()">&#128424; Save as PDF</button>
-      <div id="print-tip-div" style="font-size:13px;color:#1a1d2e;background:#fff;border:1px solid #dde1ec;border-radius:10px;padding:12px 14px;margin-bottom:14px;line-height:1.7;">
-        <div style="font-weight:700;margin-bottom:6px;">&#128247; How to save a clean PDF on iPhone:</div>
-        <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:3px;"><span style="background:#4a5da8;color:#fff;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">1</span><span>Tap <strong>Save as PDF</strong> above</span></div>
-        <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:3px;"><span style="background:#4a5da8;color:#fff;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">2</span><span>Long-press the page thumbnail that appears</span></div>
-        <div style="display:flex;align-items:baseline;gap:6px;"><span style="background:#4a5da8;color:#fff;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">3</span><span>Tap <strong>Share</strong> &#8594; <strong>Save to Files</strong> — clean PDF, no URL!</span></div>
+      <div id="print-tip-div" style="font-size:13px;color:#1a1d2e;background:#fef9ec;border:1px solid #f0d080;border-radius:10px;padding:12px 14px;margin-bottom:14px;line-height:1.7;">
+        <div style="font-weight:700;margin-bottom:6px;color:#8a6000;">&#9888;&#65039; To remove the URL &amp; page numbers from the PDF:</div>
+        <div style="margin-bottom:3px;">&#8250; In the print dialog, tap <strong>Options</strong></div>
+        <div>&#8250; Turn off <strong>Headers &amp; Footers</strong></div>
       </div>
       <div class="preview-scaler" id="pscaler">
         <div class="preview-wrapper" id="pwrapper">
@@ -834,8 +833,9 @@ function autoSave() {
 function readFormIntoCurrentEvent() {
   if (!currentEvent) return;
   currentEvent.date        = gv('f-date');
-  currentEvent.type        = gv('f-type');
-  currentEvent.typeCustom  = gv('f-type-custom');
+  var typeVal = gv('f-type');
+  currentEvent.type       = typeVal;
+  currentEvent.typeCustom = (typeVal === 'Other') ? gv('f-type-custom') : '';
   currentEvent.venueName    = gv('f-venue');
   currentEvent.venueAddress = gv('f-address');
   currentEvent.venueRaw     = gv('f-venue-search');
@@ -1328,8 +1328,12 @@ function renderPreview() {
   var date    = fmtDate(ev.date||gv('f-date'));
   var venue   = ev.venueName || gv('f-venue') || '';
   var address = ev.venueAddress || gv('f-address') || '';
-  var type = ev.typeCustom || (ev.type === 'Other' ? ev.typeCustom : ev.type) || gv('f-type') || '';
-  if (!type || type === 'Other') type = ev.typeCustom || gv('f-type-custom') || '';
+  var type = '';
+  if (ev.type === 'Other' || ev.type === '') {
+    type = ev.typeCustom || gv('f-type-custom') || '';
+  } else {
+    type = ev.type || gv('f-type') || '';
+  }
   var band    = ev.band    || [];
   var singers = ev.singers || [];
   var choir   = ev.choir   || [];
