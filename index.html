@@ -1,1554 +1,498 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="SK Events">
-<link rel="icon" type="image/jpeg" href="images/favicon.jpg">
-<link rel="apple-touch-icon" href="images/favicon.jpg">
-<title>SK Music – Event Builder</title>
-<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<style>
-/* ═══════════════════════════════════════════
-   RESET & ROOT
-═══════════════════════════════════════════ */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-:root{
-  --navy:#1a1d2e;
-  --navy2:#252840;
-  --bg:#f0f2f7;
-  --card:#ffffff;
-  --border:#dde1ec;
-  --accent:#4a5da8;
-  --green:#2eaa7a;
-  --text:#1a1d2e;
-  --muted:#6b7280;
-  --danger:#d93025;
-  --inp:#f8f9fc;
-  --inp-border:#cdd1e0;
-}
-html,body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;font-size:16px;-webkit-text-size-adjust:100%;height:100%;overflow:hidden;}
-#app{display:flex;flex-direction:column;height:100%;overflow:hidden;}
-
-/* ═══════════════════════════════════════════
-TOPBAR (dark navy, always visible)
-═══════════════════════════════════════════ */
-.topbar{
-background:#1a1d2e;
-padding:8px 14px;
-display:flex;align-items:center;gap:10px;flex-shrink:0;
-box-shadow:0 2px 8px rgba(0,0,0,.3);
-min-height:68px;
-}
-.topbar-logo{display:flex;align-items:center;}
-.topbar-logo img{height:52px;width:auto;object-fit:contain;}
-.topbar-title{flex:1;font-size:17px;font-weight:900;color:#ffffff;text-align:center;letter-spacing:.02em;}
-.btn-top{border:none;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;}
-.btn-green{background:#2eaa7a;color:#fff;box-shadow:0 2px 6px rgba(46,170,122,.4);}
-.btn-navy{background:#252840;color:#fff;border:1px solid rgba(255,255,255,.15);}
-.btn-save{background:#e8a020;color:#fff;box-shadow:0 2px 6px rgba(232,160,32,.4);}
-
-/* ═══════════════════════════════════════════
-TABS (dark navy)
-═══════════════════════════════════════════ */
-.tabs{
-background:#1a1d2e;
-display:flex;flex-shrink:0;
-border-bottom:1px solid rgba(255,255,255,.1);
-}
-.tab{
-flex:1;padding:12px 4px;border:none;
-font-size:13px;font-weight:700;cursor:pointer;
-background:#1a1d2e;color:rgba(255,255,255,.45);
-border-bottom:3px solid transparent;margin-bottom:-1px;
--webkit-tap-highlight-color:transparent;
--webkit-user-select:none;user-select:none;
-}
-.tab.active{color:#ffffff;border-bottom-color:#4a9edd;}
-
-/* ═══════════════════════════════════════════
-SCREENS
-═══════════════════════════════════════════ */
-.screen{display:none;flex:1;overflow:hidden;flex-direction:column;}
-.screen.active{display:flex;}
-.scroll-area{flex:1;overflow-y:auto;padding:16px 14px 80px;-webkit-overflow-scrolling:touch;}
-
-/* ═══════════════════════════════════════════
-HOME SCREEN
-═══════════════════════════════════════════ */
-.home-hero{
-background:#1a1d2e;
-padding:32px 24px 28px;
-text-align:center;
-flex-shrink:0;
-}
-.home-hero img{height:90px;width:auto;margin-bottom:12px;}
-.home-hero h1{color:#fff;font-size:22px;font-weight:900;letter-spacing:.02em;}
-.home-hero p{color:rgba(255,255,255,.5);font-size:13px;margin-top:6px;}
-.home-actions{display:flex;flex-direction:column;gap:12px;padding:20px 14px;}
-.home-btn{
-display:flex;align-items:center;gap:14px;
-background:#fff;border:1px solid var(–border);border-radius:16px;
-padding:18px 20px;cursor:pointer;-webkit-tap-highlight-color:transparent;
-box-shadow:0 2px 8px rgba(0,0,0,.06);transition:transform .1s;
-}
-.home-btn:active{transform:scale(.98);}
-.home-btn-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
-.home-btn-icon.blue{background:#eef1fb;}
-.home-btn-icon.green{background:#e8f7f1;}
-.home-btn-text{flex:1;text-align:left;}
-.home-btn-text strong{display:block;font-size:16px;font-weight:700;color:var(–text);}
-.home-btn-text span{font-size:13px;color:var(–muted);margin-top:2px;display:block;}
-.home-btn-arrow{color:var(–muted);font-size:20px;}
-.events-list-empty{text-align:center;padding:40px 20px;color:var(–muted);font-size:14px;}
-.event-card{
-background:#fff;border:1px solid var(–border);border-radius:14px;
-padding:14px 16px;margin-bottom:10px;cursor:pointer;
-box-shadow:0 1px 4px rgba(0,0,0,.05);
-display:flex;align-items:center;gap:12px;
--webkit-tap-highlight-color:transparent;
-}
-.event-card:active{background:#f5f7ff;}
-.event-card-info{flex:1;}
-.event-card-title{font-size:15px;font-weight:700;}
-.event-card-sub{font-size:12px;color:var(–muted);margin-top:3px;}
-.event-card-arrow{color:var(–muted);font-size:18px;}
-
-/* ═══════════════════════════════════════════
-CARDS & FORMS
-═══════════════════════════════════════════ */
-.card{background:#fff;border:1px solid var(–border);border-radius:14px;padding:16px 14px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
-.card-title{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(–accent);text-transform:uppercase;margin-bottom:14px;}
-.field{margin-bottom:13px;position:relative;}
-.field:last-child{margin-bottom:0;}
-label{display:block;font-size:12px;color:var(–muted);font-weight:700;letter-spacing:.04em;margin-bottom:5px;}
-.req-label::after{content:” *”;color:var(–danger);}
-input[type=text],input[type=email],input[type=date],textarea,select{
-width:100%;background:var(–inp);color:var(–text);
-border:1.5px solid var(–inp-border);border-radius:10px;
-padding:13px 14px;font-size:15px;font-family:‘Lato’,sans-serif;
-outline:none;-webkit-appearance:none;appearance:none;
-}
-input[type=date]::-webkit-calendar-picker-indicator{filter:opacity(.5);cursor:pointer;}
-input:focus,textarea:focus,select:focus{border-color:var(–accent);box-shadow:0 0 0 3px rgba(74,93,168,.1);}
-input::placeholder,textarea::placeholder{color:#b0b8cc;}
-textarea{resize:vertical;min-height:70px;}
-select{
-background-image:url(“data:image/svg+xml,%3Csvg xmlns=‘http://www.w3.org/2000/svg’ width=‘12’ height=‘8’ viewBox=‘0 0 12 8’%3E%3Cpath d=‘M1 1l5 5 5-5’ stroke=’%236b7280’ stroke-width=‘2’ fill=‘none’ stroke-linecap=‘round’/%3E%3C/svg%3E”);
-background-repeat:no-repeat;background-position:right 14px center;padding-right:38px;
-}
-.field-err input,.field-err select,.field-err textarea{border-color:var(–danger)!important;box-shadow:0 0 0 3px rgba(217,48,37,.1)!important;}
-.err-msg{display:none;font-size:11px;color:var(–danger);font-weight:700;margin-top:5px;}
-.field-err .err-msg{display:block;}
-
-/* read-only field */
-.field-readonly input,.field-readonly textarea,.field-readonly select{
-background:#f3f4f8;color:#888;pointer-events:none;
-}
-
-/* venue location */
-.venue-wrap{position:relative;}
-.venue-clear{
-position:absolute;right:12px;top:50%;transform:translateY(-50%);
-background:none;border:none;color:var(–muted);font-size:18px;cursor:pointer;
--webkit-tap-highlight-color:transparent;padding:4px;
-}
-.loc-drop{
-position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:700;
-background:#fff;border:1.5px solid var(–accent);border-radius:12px;
-overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.14);
-max-height:240px;overflow-y:auto;
-}
-.loc-item{padding:12px 14px;cursor:pointer;border-bottom:1px solid var(–border);}
-.loc-item:last-child{border-bottom:none;}
-.loc-item:active,.loc-item:hover{background:#f0f4ff;}
-.loc-name{font-size:14px;font-weight:700;}
-.loc-addr{font-size:12px;color:var(–muted);margin-top:2px;}
-
-/* member list */
-.member-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
-.member-tag{
-display:flex;align-items:center;gap:8px;
-background:#f0f4ff;border:1px solid #c8d0f0;border-radius:10px;
-padding:10px 12px;
-}
-.member-tag-info{flex:1;}
-.member-tag-name{font-size:14px;font-weight:700;color:var(–text);}
-.member-tag-role{font-size:11px;color:var(–muted);margin-top:2px;}
-.member-tag-del{background:none;border:none;color:var(–danger);font-size:20px;cursor:pointer;padding:0 2px;-webkit-tap-highlight-color:transparent;}
-
-/* choir row */
-.choir-row{display:flex;align-items:center;gap:8px;background:#f0f4ff;border:1px solid #c8d0f0;border-radius:10px;padding:10px 12px;margin-bottom:8px;}
-.choir-info{flex:1;}
-.choir-name{font-size:14px;font-weight:700;}
-.choir-count-wrap{display:flex;align-items:center;gap:6px;flex-shrink:0;}
-.choir-count-wrap select{width:70px;padding:6px 8px;font-size:14px;padding-right:28px;}
-.choir-count-wrap label{font-size:12px;color:var(–muted);white-space:nowrap;margin:0;}
-
-.btn-add-member{
-display:flex;align-items:center;justify-content:center;gap:8px;
-background:#f0f4ff;color:var(–accent);border:1.5px dashed #b0bcec;
-border-radius:10px;padding:11px;width:100%;font-size:13px;font-weight:700;
-cursor:pointer;-webkit-tap-highlight-color:transparent;margin-top:4px;
-}
-
-/* popup */
-.popup-overlay{
-display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);
-z-index:800;align-items:flex-end;justify-content:center;
-}
-.popup-overlay.open{display:flex;}
-.popup-sheet{
-background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:600px;
-padding:20px 16px 40px;max-height:80vh;display:flex;flex-direction:column;
-}
-.popup-title{font-size:17px;font-weight:700;margin-bottom:14px;text-align:center;}
-.popup-search{width:100%;margin-bottom:12px;}
-.popup-list{overflow-y:auto;flex:1;}
-.popup-item{
-display:flex;align-items:center;gap:10px;padding:12px 0;
-border-bottom:1px solid var(–border);cursor:pointer;
--webkit-tap-highlight-color:transparent;
-}
-.popup-item:active{background:#f5f7ff;}
-.popup-item:last-child{border-bottom:none;}
-.popup-item-name{font-size:15px;font-weight:700;}
-.popup-item-sub{font-size:12px;color:var(–muted);margin-top:2px;}
-.popup-close{
-display:block;width:100%;margin-top:12px;
-background:#f0f2f7;color:var(–muted);border:1px solid var(–border);
-border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;
-}
-.popup-empty{text-align:center;color:var(–muted);font-size:14px;padding:20px;}
-
-/* ═══════════════════════════════════════════
-SETTINGS SCREEN
-═══════════════════════════════════════════ */
-.stoggle{display:flex;align-items:center;justify-content:space-between;padding:15px 16px;background:#fff;border:1px solid var(–border);border-radius:12px;cursor:pointer;font-weight:700;font-size:15px;margin-bottom:6px;box-shadow:0 1px 4px rgba(0,0,0,.05);-webkit-tap-highlight-color:transparent;}
-.stoggle:active{background:#f5f7ff;}
-.sarrow{color:var(–muted);font-size:20px;transition:transform .25s;display:inline-block;}
-.stoggle.open .sarrow{transform:rotate(90deg);}
-.sbody{display:none;background:#fff;border:1px solid var(–border);border-radius:12px;padding:16px 14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
-.sbody.open{display:block;}
-.type-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
-.type-chip{background:#eef1fb;color:var(–accent);border:1px solid #c8d0f0;border-radius:20px;padding:6px 14px;font-size:13px;display:flex;align-items:center;gap:6px;font-weight:600;}
-.type-chip .del{color:var(–danger);cursor:pointer;font-size:17px;background:none;border:none;padding:0;}
-.contact-row{display:flex;align-items:center;gap:8px;padding:11px 0;border-bottom:1px solid var(–border);}
-.contact-row:last-child{border-bottom:none;}
-.contact-info{flex:1;}
-.contact-name-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:2px;}
-.badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;}
-.badge-band{background:#e8ecff;color:#3347a0;}
-.badge-singer{background:#e8f7f1;color:#1e8a5a;}
-.badge-choir{background:#fef3e0;color:#b07800;}
-.badge-default{background:#fff8e0;color:#b07800;}
-.contact-meta{font-size:11px;color:var(–muted);}
-.btn-icon{background:none;border:1px solid var(–border);border-radius:8px;width:36px;height:36px;font-size:14px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;}
-.btn-icon.edit{background:#f0f4ff;border-color:#c8d0f0;color:#3347a0;}
-.btn-icon.del{background:#fff0f0;border-color:#fdd;color:#d93025;}
-
-/* ═══════════════════════════════════════════
-PREVIEW / PDF
-═══════════════════════════════════════════ */
-.preview-outer{padding:14px;}
-.btn-block{display:block;width:100%;margin-bottom:12px;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;}
-.btn-print{background:#4a5da8;color:#fff;box-shadow:0 3px 10px rgba(74,93,168,.3);}
-.btn-email-crew{background:#2eaa7a;color:#fff;box-shadow:0 3px 10px rgba(46,170,122,.3);}
-.preview-scaler{width:100%;overflow:hidden;border-radius:4px;box-shadow:0 2px 16px rgba(0,0,0,.12);}
-.preview-wrapper{background:#fff;color:#222;font-family:‘Times New Roman’,Times,serif;width:750px;transform-origin:top left;}
-.preview-inner{padding:22px 30px;position:relative;overflow:hidden;min-height:900px;}
-.prev-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
-.prev-logo img{height:110px;width:auto;object-fit:contain;}
-.prev-info{text-align:right;font-size:12px;line-height:1.55;font-family:‘Lato’,sans-serif;padding-top:4px;}
-.prev-info .co{color:#1a5fa8;font-size:15px;font-weight:700;display:block;margin-bottom:3px;}
-.prev-info a{color:#1a5fa8;text-decoration:none;}
-.prev-title{text-align:center;color:#1a5fa8;font-weight:700;font-size:18px;margin-bottom:10px;font-family:‘Lato’,sans-serif;letter-spacing:.03em;}
-.prev-body{font-size:12.5px;line-height:1.55;position:relative;z-index:1;}
-.prev-body p{margin-bottom:5px;}
-.prev-body ul{margin:1px 0 5px 26px;}
-.prev-body li{margin-bottom:1px;}
-.prev-divider{border:none;border-top:1px solid #e0e0e0;margin:8px 0;}
-.prev-watermark{
-position:absolute;
-bottom:24px;right:24px;
-width:220px;height:220px;
-pointer-events:none;z-index:0;
-display:flex;align-items:flex-end;justify-content:flex-end;
-}
-.prev-watermark img{width:220px;height:220px;object-fit:contain;opacity:0.18;}
-
-/* ═══════════════════════════════════════════
-TOAST
-═══════════════════════════════════════════ */
-#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1d2e;color:#fff;border-radius:12px;padding:12px 22px;font-size:14px;font-weight:700;box-shadow:0 4px 20px rgba(0,0,0,.2);z-index:9999;transition:transform .3s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center;}
-#toast.show{transform:translateX(-50%) translateY(0);}
-#toast.err{background:#d93025;}
-
-/* ═══════════════════════════════════════════
-PRINT
-═══════════════════════════════════════════ */
-@media print{
-*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
-@page{margin:8mm;size:A4 portrait;}
-html,body{background:#fff!important;height:auto!important;overflow:visible!important;margin:0!important;padding:0!important;}
-#app{display:block!important;height:auto!important;overflow:visible!important;}
-/* Hide everything except event screen preview tab */
-.topbar,.tabs,.tabs-event,
-#screen-home,#screen-settings,
-#tab-details-content,
-#btn-print-main,#btn-email-main,
-#home-footer{display:none!important;}
-/* Show event screen and preview tab */
-#screen-event{display:block!important;height:auto!important;overflow:visible!important;}
-#tab-preview-content{display:block!important;height:auto!important;overflow:visible!important;padding:0!important;}
-.preview-outer{padding:0!important;margin:0!important;}
-.preview-scaler{width:100%!important;overflow:visible!important;}
-.preview-wrapper{width:100%!important;transform:none!important;box-shadow:none!important;border-radius:0!important;}
-.preview-inner{padding:12px 16px!important;}
-.prev-watermark{bottom:8px!important;right:8px!important;}
-.prev-watermark img{width:160px!important;opacity:0.18!important;}
-}
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SK Events - Event Builder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            filter: invert(0.5);
+        }
+    </style>
 </head>
-<body>
-<div id="app">
+<body class="bg-gray-50 font-sans text-gray-900">
 
-<!-- ═══════════ TOPBAR ═══════════ -->
+    <div class="max-w-2xl mx-auto p-4 pb-20">
+        <header class="flex items-center justify-between mb-8">
+            <div id="nav-back" class="cursor-pointer text-blue-600 hidden" onclick="showView('home')">
+                <span class="text-xl">‹</span> Back
+            </div>
+            <div class="flex-grow text-center">
+                <img src="images/logo-W.png" alt="Shea Kaller" class="h-12 mx-auto mb-2 bg-black p-2 rounded" onerror="this.style.display='none'">
+                <h1 class="text-2xl font-bold">Event Builder</h1>
+                <p class="text-xs text-gray-500 uppercase tracking-widest">SK Music Production Inc</p>
+            </div>
+            <div id="nav-save" class="text-blue-600 font-semibold cursor-pointer hidden" onclick="saveCurrentEvent()">Save</div>
+        </header>
 
-<div class="topbar" id="topbar">
-  <button class="btn-top btn-navy" id="topbar-back" onclick="topbarBack()" style="display:none;font-size:13px;">&#8249; Back</button>
-  <div class="topbar-title" id="topbar-title" style="flex:1;text-align:center;"></div>
-  <button class="btn-top btn-save" id="topbar-btn" onclick="topbarAction()" style="display:none">Save</button>
-</div>
+        <div id="view-home" class="view-section active space-y-4">
+            <div onclick="createNewEvent()" class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center cursor-pointer hover:bg-gray-50 transition">
+                <div class="bg-blue-100 p-3 rounded-lg mr-4 text-2xl">➕</div>
+                <div class="flex-grow">
+                    <h3 class="font-bold text-lg">New Event</h3>
+                    <p class="text-sm text-gray-500">Create a fresh event details sheet</p>
+                </div>
+                <div class="text-gray-300">›</div>
+            </div>
 
-<!-- ═══════════ HOME SCREEN ═══════════ -->
+            <div onclick="showView('existing')" class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center cursor-pointer hover:bg-gray-50 transition">
+                <div class="bg-green-100 p-3 rounded-lg mr-4 text-2xl">📄</div>
+                <div class="flex-grow">
+                    <h3 class="font-bold text-lg">Open Existing Event</h3>
+                    <p class="text-sm text-gray-500">Edit or resend a previous event</p>
+                </div>
+                <div class="text-gray-300">›</div>
+            </div>
 
-<div class="screen active" id="screen-home" style="flex-direction:column;overflow-y:auto;">
-  <div class="home-hero">
-    <img src="images/logo-W.png" alt="Shea Kaller" onerror="this.style.display='none'">
-    <h1>Event Builder</h1>
-    <p>SK Music Production Inc</p>
-  </div>
-  <div class="home-actions">
-    <div class="home-btn" onclick="startNewEvent()">
-      <div class="home-btn-icon blue">&#10133;</div>
-      <div class="home-btn-text">
-        <strong>New Event</strong>
-        <span>Create a fresh event details sheet</span>
-      </div>
-      <div class="home-btn-arrow">&#8250;</div>
-    </div>
-    <div class="home-btn" onclick="showExistingEvents()">
-      <div class="home-btn-icon green">&#128196;</div>
-      <div class="home-btn-text">
-        <strong>Open Existing Event</strong>
-        <span>Edit or resend a previous event</span>
-      </div>
-      <div class="home-btn-arrow">&#8250;</div>
-    </div>
-    <div class="home-btn" onclick="openSettings()">
-      <div class="home-btn-icon" style="background:#f3f0ff;">&#9881;&#65039;</div>
-      <div class="home-btn-text">
-        <strong>App Settings</strong>
-        <span>Contacts, event types, defaults</span>
-      </div>
-      <div class="home-btn-arrow">&#8250;</div>
-    </div>
-  </div>
-
-  <!-- Existing events list (shown after tapping Open) -->
-
-  <div id="existing-events-section" style="display:none;padding:0 14px 20px;">
-    <div style="font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;">Saved Events</div>
-    <div id="events-list"></div>
-  </div>
-  <!-- Spacer so content doesn't hide behind footer -->
-  <div style="height:56px;flex-shrink:0;"></div>
-</div>
-<!-- Home footer - sticky dark banner, only shows on home screen -->
-<div id="home-footer" style="
-  display:none;
-  position:fixed;bottom:0;left:0;right:0;
-  background:#1a1d2e;
-  text-align:center;padding:14px;
-  color:rgba(255,255,255,.45);font-size:12px;
-  font-family:'Lato',sans-serif;letter-spacing:.03em;
-  z-index:50;
-  border-top:1px solid rgba(255,255,255,.08);
-">
-  A Davidowitz Project &copy; 2026
-</div>
-
-<!-- ═══════════ SETTINGS SCREEN ═══════════ -->
-
-<div class="screen" id="screen-settings" style="flex-direction:column;">
-  <div class="tabs" id="tabs-settings" style="display:none;"><!-- hidden, settings has its own back --></div>
-  <div class="scroll-area" id="settings-scroll">
-
-```
-<!-- Contacts -->
-<div class="stoggle" onclick="toggleSec('sc-contacts',this)"><span>&#128203; Contacts</span><span class="sarrow">&#8250;</span></div>
-<div class="sbody" id="sc-contacts">
-  <div id="contact-form-wrap" style="background:#f8f9fc;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px;">
-    <div style="font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;" id="cf-title">Add New Contact</div>
-    <input type="hidden" id="nc-id">
-    <div class="field" id="fd-nc-name"><label class="req-label">Full Name</label><input type="text" id="nc-name" placeholder="e.g. John Smith"><div class="err-msg">Name is required</div></div>
-    <div class="field" id="fd-nc-email"><label class="req-label">Email Address</label><input type="email" id="nc-email" placeholder="john@example.com"><div class="err-msg">Valid email is required</div></div>
-    <div class="field"><label>Role / Instrument</label><input type="text" id="nc-role" placeholder="e.g. Trumpet 1"></div>
-    <div class="field" id="fd-nc-type"><label class="req-label">Contact Type</label>
-      <select id="nc-type">
-        <option value="">Select type...</option>
-        <option value="band">Band Member</option>
-        <option value="singer">Singer</option>
-        <option value="choir">Choir / Group</option>
-      </select>
-      <div class="err-msg">Please select a type</div>
-    </div>
-    <div class="field" style="display:flex;align-items:center;gap:10px;">
-      <input type="checkbox" id="nc-default" style="width:20px;height:20px;cursor:pointer;accent-color:var(--accent);flex-shrink:0;">
-      <label for="nc-default" style="font-size:14px;color:var(--text);font-weight:600;letter-spacing:0;cursor:pointer;margin:0;">Default (auto-add to every new event)</label>
-    </div>
-    <div style="display:flex;gap:8px;margin-top:12px;">
-      <button onclick="saveContact()" style="flex:1;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;">&#10003; Save Contact</button>
-      <button onclick="cancelContactEdit()" id="nc-cancel" style="display:none;background:#f0f2f7;color:var(--muted);border:1px solid var(--border);border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;">Cancel</button>
-    </div>
-  </div>
-  <input type="text" id="contact-search" placeholder="Search contacts..." oninput="renderContacts()" style="margin-bottom:10px;">
-  <div style="font-size:11px;color:var(--muted);margin-bottom:8px;"><span id="contact-count">0</span> contacts saved</div>
-  <div id="contact-list"></div>
-</div>
-
-<!-- Event Types -->
-<div class="stoggle" onclick="toggleSec('sc-evtypes',this)"><span>&#127917; Event Types</span><span class="sarrow">&#8250;</span></div>
-<div class="sbody" id="sc-evtypes">
-  <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Manage the Type of Event dropdown.</p>
-  <div class="type-chips" id="type-chips-list"></div>
-  <div style="display:flex;gap:8px;">
-    <input type="text" id="new-event-type" placeholder="e.g. Sheva Brachos" style="flex:1;">
-    <button onclick="addEventType()" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:0 16px;font-weight:700;cursor:pointer;font-size:15px;flex-shrink:0;">Add</button>
-  </div>
-</div>
-
-<!-- Default Values -->
-<div class="stoggle" onclick="toggleSec('sc-defaults',this)"><span>&#9881;&#65039; Default Values</span><span class="sarrow">&#8250;</span></div>
-<div class="sbody" id="sc-defaults">
-  <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Pre-fill values for every new event.</p>
-  <div class="field"><label>Sound Check – Rhythm</label><input type="text" id="def-sc-rhythm" oninput="saveDefs()"></div>
-  <div class="field"><label>Sound Check – Horns</label><input type="text" id="def-sc-horns" oninput="saveDefs()"></div>
-  <div class="field"><label>KP Start</label><input type="text" id="def-kp-start" oninput="saveDefs()"></div>
-  <div class="field"><label>KP Note</label><input type="text" id="def-kp-note" oninput="saveDefs()"></div>
-  <div class="field"><label>Chuppah Time</label><input type="text" id="def-chuppah" oninput="saveDefs()"></div>
-  <div class="field"><label>Dress Code</label><input type="text" id="def-dresscode" oninput="saveDefs()"></div>
-  <div class="field"><label>Additional Notes</label><textarea id="def-notes" oninput="saveDefs()"></textarea></div>
-</div>
-```
-
-  </div>
-</div>
-
-<!-- ═══════════ EVENT SCREEN ═══════════ -->
-
-<div class="screen" id="screen-event" style="flex-direction:column;">
-  <div class="tabs tabs-event">
-    <button class="tab active" id="tab-details" onclick="switchEventTab('details')">&#9999;&#65038; Details</button>
-    <button class="tab" id="tab-preview" onclick="switchEventTab('preview')">&#128065; Preview</button>
-  </div>
-  <!-- Details tab -->
-  <div id="tab-details-content" class="scroll-area" style="display:block;">
-    <div class="card">
-      <div class="card-title">Event Info</div>
-      <div class="field" id="fd-date"><label class="req-label">Date</label><input type="date" id="f-date" oninput="clearErr('fd-date');autoSave()"><div class="err-msg">Date is required</div></div>
-      <div class="field" id="fd-type"><label class="req-label">Type of Event</label><select id="f-type" onchange="onTypeChange()"></select><div class="err-msg">Please select a type</div></div>
-      <div class="field" id="fd-custom" style="display:none;"><label>Custom Event Type</label><input type="text" id="f-type-custom" placeholder="Describe the event..." oninput="autoSave()"></div>
-      <!-- Venue search field - always a search box -->
-      <div class="field" id="fd-venue-search">
-        <label class="req-label">Venue / Location</label>
-        <div class="venue-wrap">
-          <input type="text" id="f-venue-search" placeholder="Search venue name or address..." oninput="onVenueInput()" autocomplete="off">
-          <div class="loc-drop" id="loc-drop" style="display:none;"></div>
+            <div onclick="showView('settings')" class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center cursor-pointer hover:bg-gray-50 transition">
+                <div class="bg-purple-100 p-3 rounded-lg mr-4 text-2xl">⚙️</div>
+                <div class="flex-grow">
+                    <h3 class="font-bold text-lg">App Settings</h3>
+                    <p class="text-sm text-gray-500">Contacts, event types, defaults</p>
+                </div>
+                <div class="text-gray-300">›</div>
+            </div>
         </div>
-        <div class="err-msg">Venue is required</div>
-      </div>
-      <!-- Populated after selection - editable name + address -->
-      <div id="fd-venue-populated" style="display:none;">
-        <div class="field" id="fd-venue-name">
-          <label>Venue Name</label>
-          <div style="display:flex;gap:8px;align-items:center;">
-            <input type="text" id="f-venue" placeholder="Venue name" oninput="autoSave()" style="flex:1;">
-            <button onclick="clearVenue()" id="venue-clear-btn" style="background:#fff0f0;color:#d93025;border:1px solid #fdd;border-radius:8px;width:38px;height:46px;font-size:16px;cursor:pointer;flex-shrink:0;">&#10005;</button>
-          </div>
+
+        <div id="view-existing" class="view-section">
+            <h2 class="text-xl font-bold mb-4">Saved Events</h2>
+            <div class="bg-white p-4 rounded-xl shadow-sm border mb-6 flex flex-wrap gap-3 items-end">
+                <div class="flex-grow">
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Filter by Date</label>
+                    <input type="date" id="search-date-filter" class="w-full border-gray-200 rounded-lg p-2 bg-gray-50">
+                </div>
+                <button onclick="performEventSearch()" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition">Search</button>
+            </div>
+            <div id="saved-events-list" class="space-y-3">
+                <p class="text-center text-gray-400 py-10">Select a date or click search to view events.</p>
+            </div>
         </div>
-        <div class="field" id="fd-venue-addr">
-          <label>Venue Address</label>
-          <input type="text" id="f-address" placeholder="Street, City, State ZIP" oninput="autoSave()">
+
+        <div id="view-settings" class="view-section space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border">
+                <h3 class="font-bold text-lg mb-4 flex items-center">📋 Contacts</h3>
+                <div id="settings-contact-list" class="space-y-2 mb-4"></div>
+                <button onclick="openContactModal()" class="w-full py-2 border-2 border-dashed border-gray-200 rounded-lg text-gray-500 text-sm font-medium hover:bg-gray-50">+ Add New Contact</button>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-sm border">
+                <h3 class="font-bold text-lg mb-4 flex items-center">⚙️ Event Types</h3>
+                <div id="settings-event-types" class="flex flex-wrap gap-2"></div>
+                <div class="mt-3 flex gap-2">
+                    <input type="text" id="new-type-input" placeholder="Add Type..." class="flex-grow border-gray-200 rounded-lg p-2 text-sm">
+                    <button onclick="addEventType()" class="bg-blue-600 text-white px-4 rounded-lg text-sm font-bold">Add</button>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-sm border">
+                <h3 class="font-bold text-lg mb-4 flex items-center">⚙️ Default Values</h3>
+                <div class="space-y-3 text-sm">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Sound Check – Rhythm</label>
+                            <input type="time" id="default-sc-rhythm" class="w-full border rounded p-2">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Sound Check – Horns</label>
+                            <input type="time" id="default-sc-horns" class="w-full border rounded p-2">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">KP Start</label>
+                            <input type="time" id="default-kp-start" class="w-full border rounded p-2">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Chuppah / Main Event Time</label>
+                            <input type="time" id="default-chuppah" class="w-full border rounded p-2">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title">Schedule</div>
-      <div class="field"><label>Sound Check – Rhythm</label><input type="text" id="f-sc-rhythm" oninput="autoSave()"></div>
-      <div class="field"><label>Sound Check – Horns</label><input type="text" id="f-sc-horns" oninput="autoSave()"></div>
-      <div class="field"><label>KP Start Time</label><input type="text" id="f-kp-start" oninput="autoSave()"></div>
-      <div class="field"><label>KP Note</label><input type="text" id="f-kp-note" oninput="autoSave()"></div>
-      <div class="field"><label>Chuppah / Main Event Time</label><input type="text" id="f-chuppah" oninput="autoSave()"></div>
-    </div>
-    <div class="card">
-      <div class="card-title">Band Members</div>
-      <div id="band-list" class="member-list"></div>
-      <div id="band-na" style="font-size:13px;color:var(--muted);margin-bottom:8px;display:none;">N/A</div>
-      <button class="btn-add-member" id="btn-add-band" onclick="openPopup('band')">&#43; Add Band Member</button>
-    </div>
-    <div class="card">
-      <div class="card-title">Singers</div>
-      <div id="singer-list" class="member-list"></div>
-      <div id="singer-na" style="font-size:13px;color:var(--muted);margin-bottom:8px;display:none;">N/A</div>
-      <button class="btn-add-member" id="btn-add-singer" onclick="openPopup('singer')">&#43; Add Singer</button>
-    </div>
-    <div class="card">
-      <div class="card-title">Choir / Group <span style="font-weight:400;font-size:11px;color:var(--muted);">(optional)</span></div>
-      <div id="choir-list" class="member-list"></div>
-      <button class="btn-add-member" id="btn-add-choir" onclick="openPopup('choir')">&#43; Add Choir / Group</button>
-    </div>
-    <div class="card">
-      <div class="card-title">Dress Code &amp; Notes</div>
-      <div class="field"><label>Dress Code</label><input type="text" id="f-dresscode" oninput="autoSave()"></div>
-      <div class="field"><label>Additional Notes</label><textarea id="f-notes" oninput="autoSave()"></textarea></div>
-    </div>
-  </div>
-  <!-- Preview tab -->
-  <div id="tab-preview-content" class="scroll-area" style="display:none;">
-    <div class="preview-outer">
-      <button id="btn-print-main" class="btn-block btn-print" onclick="doSaveAsPDF()">&#11123; Download PDF</button>
-      <button id="btn-email-main" class="btn-block btn-email-crew" onclick="emailCrew()">&#9993; Email Crew</button>
-      <div class="preview-scaler" id="pscaler">
-        <div class="preview-wrapper" id="pwrapper">
-          <div class="preview-inner" id="doc-preview"></div>
+
+        <div id="view-details" class="view-section space-y-4">
+            <div class="bg-white p-6 rounded-xl shadow-sm border space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Date</label>
+                        <input type="date" id="event-date" class="w-full border-gray-200 rounded-lg p-2 bg-gray-50" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Type of Event</label>
+                        <select id="event-type" onchange="handleEventTypeChange()" class="w-full border-gray-200 rounded-lg p-2 bg-gray-50">
+                            </select>
+                    </div>
+                </div>
+                
+                <div id="custom-type-container" class="hidden">
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Custom Event Type</label>
+                    <input type="text" id="event-type-custom" class="w-full border-gray-200 rounded-lg p-2 bg-gray-50" placeholder="Specify event type">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Venue Name</label>
+                    <input type="text" id="venue-name" class="w-full border-gray-200 rounded-lg p-2 bg-gray-50" placeholder="Venue Name" required>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Sound Check – Rhythm</label>
+                        <input type="time" id="time-sc-rhythm" class="w-full border-gray-200 rounded-lg p-2 bg-gray-50">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Sound Check – Horns</label>
+                        <input type="time" id="time-sc-horns" class="w-full border-gray-200 rounded-lg p-2 bg-gray-50">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">KP Start Time</label>
+                        <input type="time" id="time-kp-start" class="w-full border-gray-200 rounded-lg p-2 bg-gray-50">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Chuppah / Main Event Time</label>
+                        <input type="time" id="time-chuppah" class="w-full border-gray-200 rounded-lg p-2 bg-gray-50">
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-sm border">
+                <h3 class="font-bold mb-3">Band & Crew</h3>
+                <div id="event-members-list" class="space-y-2 mb-4"></div>
+                <button onclick="openMemberPicker()" class="w-full py-2 border border-blue-200 rounded-lg text-blue-600 text-sm font-bold">+ Add Members</button>
+            </div>
+
+            <div class="flex gap-4">
+                <button onclick="downloadEventPDF()" class="flex-grow bg-black text-white p-4 rounded-xl font-bold flex items-center justify-center">
+                    <span class="mr-2">⭳</span> Download PDF
+                </button>
+                <button onclick="emailCrew()" class="flex-grow bg-blue-600 text-white p-4 rounded-xl font-bold flex items-center justify-center">
+                    <span class="mr-2">✉</span> Email Crew
+                </button>
+            </div>
         </div>
-      </div>
+
+        <footer class="mt-12 text-center text-gray-400 text-xs">
+            A Davidowitz Project © 2026 - v2.1
+        </footer>
     </div>
-  </div>
-</div>
 
-<!-- ═══════════ CONTACT POPUP ═══════════ -->
+    <div id="modal-contact" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl w-full max-w-md p-6">
+            <h3 class="font-bold text-xl mb-4">Add New Contact</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Full Name</label>
+                    <input type="text" id="contact-name" class="w-full border rounded-lg p-3">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Email Address</label>
+                    <input type="email" id="contact-email" class="w-full border rounded-lg p-3">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Contact Type</label>
+                    <select id="contact-type" onchange="toggleInstrumentVisibility()" class="w-full border rounded-lg p-3">
+                        <option value="Band Member">Band Member</option>
+                        <option value="Singer">Singer</option>
+                        <option value="Choir / Group">Choir / Group</option>
+                    </select>
+                </div>
+                <div id="instrument-field-group" class="hidden">
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Instrument</label>
+                    <input type="text" id="contact-instrument" class="w-full border rounded-lg p-3" placeholder="e.g. Trumpet">
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" id="contact-default" class="mr-2">
+                    <label class="text-sm">Default (Add to every new event)</label>
+                </div>
+                <div class="flex gap-3 pt-4">
+                    <button onclick="closeContactModal()" class="flex-grow py-3 text-gray-500 font-bold">Cancel</button>
+                    <button onclick="saveContact()" class="flex-grow py-3 bg-blue-600 text-white rounded-xl font-bold">Save Contact</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<div class="popup-overlay" id="member-popup">
-  <div class="popup-sheet">
-    <div class="popup-title" id="popup-title">Select Contact</div>
-    <input type="text" class="popup-search" id="popup-search" placeholder="Search..." oninput="filterPopup()">
-    <div class="popup-list" id="popup-list"></div>
-    <button class="popup-close" onclick="closePopup()">Cancel</button>
-  </div>
-</div>
+    <script>
+        // --- DATA STATE ---
+        let state = {
+            contacts: JSON.parse(localStorage.getItem('sk_contacts') || '[]'),
+            eventTypes: JSON.parse(localStorage.getItem('sk_types') || '["Wedding", "Bar Mitzvah", "Corporate", "Other"]'),
+            defaults: JSON.parse(localStorage.getItem('sk_defaults') || '{"scRhythm": "16:00", "scHorns": "16:30", "kpStart": "18:00", "chuppah": "19:00"}'),
+            savedEvents: JSON.parse(localStorage.getItem('sk_events') || '[]'),
+            currentEvent: null
+        };
 
-</div><!-- /app -->
-<div id="toast"></div>
+        // --- NAVIGATION ---
+        function showView(viewId) {
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+            document.getElementById(`view-${viewId}`).classList.add('active');
+            
+            document.getElementById('nav-back').classList.toggle('hidden', viewId === 'home');
+            document.getElementById('nav-save').classList.toggle('hidden', viewId !== 'details');
 
-<script>
-// ═══════════════════════════════════════════════════════════════
-// DATA & STORAGE
-// localStorage keys — these persist independently of index.html updates
-// ═══════════════════════════════════════════════════════════════
-var LS = {
-  contacts: 'sk_contacts_v2',
-  events:   'sk_events_v2',
-  etypes:   'sk_etypes_v2',
-  defs:     'sk_defs_v2'
-};
+            if (viewId === 'settings') renderSettings();
+            if (viewId === 'details') renderDetails();
+            if (viewId === 'existing') renderSavedEventsList(true); // true means reset/hide
+        }
 
-function lsGet(k, fb) {
-  try { var r = localStorage.getItem(k); return r !== null ? JSON.parse(r) : fb; } catch(e) { return fb; }
-}
-function lsSet(k, v) {
-  try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {}
-}
+        // --- CONTACTS LOGIC ---
+        function openContactModal() {
+            document.getElementById('modal-contact').classList.remove('hidden');
+            document.getElementById('modal-contact').classList.add('flex');
+            toggleInstrumentVisibility();
+        }
 
-// ── Default seed data ──────────────────────────────────────────
-var SEED_CONTACTS = [
-  {id:1, name:"Eli Rosenberg",     email:"eli@example.com",     role:"Drums",                       ctype:"band",   isDefault:true},
-  {id:2, name:"Yossi Moseson",     email:"yossi@example.com",   role:"Bass",                        ctype:"band",   isDefault:true},
-  {id:3, name:"Yechiel Rosenberg", email:"yechiel@example.com", role:"Guitar",                      ctype:"band",   isDefault:true},
-  {id:4, name:"Shea Kaller",       email:"shea@example.com",    role:"Keys",                        ctype:"band",   isDefault:true},
-  {id:5, name:"Cliff Lions",       email:"cliff@example.com",   role:"Alto Saxophone / Flute",      ctype:"band",   isDefault:true},
-  {id:6, name:"Morgen Price",      email:"morgen@example.com",  role:"Tenor Saxophone / Clarinet",  ctype:"band",   isDefault:true},
-  {id:7, name:"Nolan Tsang",       email:"nolan@example.com",   role:"Trumpet 1",                   ctype:"band",   isDefault:true},
-  {id:8, name:"Ben Holmes",        email:"ben.h@example.com",   role:"Trumpet 2",                   ctype:"band",   isDefault:true},
-  {id:9, name:"Adam Dotson",       email:"adam@example.com",    role:"Trombone",                    ctype:"band",   isDefault:true},
-  {id:10,name:"Ben Crowder",       email:"ben.c@example.com",   role:"Trombone 2",                  ctype:"band",   isDefault:true},
-  {id:11,name:"Yidi Bialistozky",  email:"yidi@example.com",    role:"Singer",                      ctype:"singer", isDefault:true},
-  {id:12,name:"Hershy Weinberger", email:"hershy@example.com",  role:"Singer",                      ctype:"singer", isDefault:true},
-  {id:13,name:"Yedidim Choir",     email:"yedidim@example.com", role:"Choir",                       ctype:"choir",  isDefault:false}
-];
-var SEED_ETYPES = ['Wedding','Bar Mitzvah','Bat Mitzvah','Corporate Event','Birthday Party','Anniversary','Concert'];
-var SEED_DEFS   = {'def-sc-rhythm':'6:00','def-sc-horns':'6:45','def-kp-start':'6:45','def-kp-note':'Only Choir','def-chuppah':'7:45','def-dresscode':'White Shirt / Black Jacket, Yarmulka & Necktie.','def-notes':'Horn Players Should bring clip-on mics.'};
+        function closeContactModal() {
+            document.getElementById('modal-contact').classList.add('hidden');
+            document.getElementById('modal-contact').classList.remove('flex');
+        }
 
-// ── Live state ────────────────────────────────────────────────
-var contacts    = [];
-var savedEvents = [];
-var eventTypes  = [];
-var currentEvent = null; // the event being edited {id, ...fields}
-var isNewEvent   = true;
-var isEditMode   = true; // for existing events: start in view mode = false
-var popupType    = ''; // 'band','singer','choir'
+        function toggleInstrumentVisibility() {
+            const type = document.getElementById('contact-type').value;
+            const instrumentGroup = document.getElementById('instrument-field-group');
+            instrumentGroup.classList.toggle('hidden', type !== 'Band Member');
+        }
 
-// ── Load ─────────────────────────────────────────────────────
-function loadAll() {
-  contacts    = lsGet(LS.contacts, JSON.parse(JSON.stringify(SEED_CONTACTS)));
-  savedEvents = lsGet(LS.events,   []);
-  eventTypes  = lsGet(LS.etypes,   SEED_ETYPES.slice());
-  // Load defaults into settings form
-  var defs = lsGet(LS.defs, SEED_DEFS);
-  Object.keys(defs).forEach(function(k) { var el = document.getElementById(k); if (el) el.value = defs[k]; });
-  Object.keys(SEED_DEFS).forEach(function(k) { var el = document.getElementById(k); if (el && !el.value) el.value = SEED_DEFS[k]; });
-}
-function saveDefs() {
-  var d = {};
-  ['def-sc-rhythm','def-sc-horns','def-kp-start','def-kp-note','def-chuppah','def-dresscode','def-notes'].forEach(function(k) {
-    var el = document.getElementById(k); if (el) d[k] = el.value;
-  });
-  lsSet(LS.defs, d);
-}
+        function saveContact() {
+            const name = document.getElementById('contact-name').value;
+            const email = document.getElementById('contact-email').value;
+            const type = document.getElementById('contact-type').value;
+            const instrument = document.getElementById('contact-instrument').value;
+            const isDefault = document.getElementById('contact-default').checked;
 
-// ═══════════════════════════════════════════════════════════════
-// NAVIGATION
-// ═══════════════════════════════════════════════════════════════
-function showScreen(name) {
-  ['home','settings','event'].forEach(function(s) {
-    var el = document.getElementById('screen-' + s);
-    if (el) el.classList.toggle('active', s === name);
-  });
-  var topbar = document.getElementById('topbar');
-  var footer = document.getElementById('home-footer');
-  if (name === 'home') {
-    topbar.style.display = 'none';
-    document.getElementById('existing-events-section').style.display = 'none';
-    if (footer) footer.style.display = 'block';
-  } else {
-    if (footer) footer.style.display = 'none';
-    topbar.style.display = 'flex';
-    if (name === 'settings') {
-      setTopbar('App Settings', '\u2190 Back', null, null);
-      document.getElementById('topbar-back').setAttribute('data-back','goHome');
-    } else if (name === 'event') {
-      updateEventTopbar();
-    }
-  }
-}
-function setTopbar(title, backLabel, actionLabel, actionFn) {
-  document.getElementById('topbar-title').textContent = title || '';
-  var back = document.getElementById('topbar-back');
-  var btn  = document.getElementById('topbar-btn');
-  if (backLabel) {
-    back.innerHTML = backLabel;
-    back.style.display = 'block';
-  } else {
-    back.style.display = 'none';
-  }
-  if (actionLabel) {
-    btn.textContent = actionLabel;
-    btn.setAttribute('data-action', actionFn || '');
-    btn.style.display = 'block';
-    btn.className = 'btn-top btn-save';
-  } else {
-    btn.style.display = 'none';
-  }
-}
-function topbarBack() {
-  var action = document.getElementById('topbar-back').getAttribute('data-back') || 'goHome';
-  if (action === 'goHome') goHome();
-}
-function topbarAction() {
-  var action = document.getElementById('topbar-btn').getAttribute('data-action');
-  if (action === 'saveEvent') saveCurrentEvent();
-  else if (action === 'editEvent') enterEditMode();
-}
-function goHome() {
-  // Check for unsaved changes on new events
-  if (isNewEvent && isEditMode && currentEvent) {
-    // Check if any data has been entered
-    var hasData = currentEvent.date || currentEvent.venueName || (currentEvent.band||[]).length || (currentEvent.singers||[]).length;
-    if (hasData) {
-      if (!confirm('You have unsaved changes. Go back to home without saving?')) {
-        return;
-      }
-    }
-  }
-  currentEvent = null;
-  showScreen('home');
-  updateHomeTopbar();
-}
-function openSettings() {
-  showScreen('settings');
-  renderContacts();
-  renderTypeChips();
-  renderTypeChips();
-}
+            if(!name || !email) return alert("Name and Email required");
 
-// home screen settings button (top right on home)
-function updateHomeTopbar() {
-  // On home screen: hide topbar completely (hero has logo+title)
-  document.getElementById('topbar').style.display = 'none';
-}
-// Settings is now a home button, no override needed
+            state.contacts.push({ id: Date.now(), name, email, type, instrument: type === 'Band Member' ? instrument : '', isDefault });
+            localStorage.setItem('sk_contacts', JSON.stringify(state.contacts));
+            closeContactModal();
+            renderSettings();
+        }
 
-// ═══════════════════════════════════════════════════════════════
-// HOME / EVENTS
-// ═══════════════════════════════════════════════════════════════
-function startNewEvent() {
-  isNewEvent = true;
-  isEditMode = true;
-  currentEvent = {
-    id: 'evt_' + Date.now(),
-    date:'', type:'', typeCustom:'', venueName:'', venueAddress:'',
-    scRhythm:'', scHorns:'', kpStart:'', kpNote:'', chuppah:'',
-    band:[], singers:[], choir:[], choirCount:'',
-    dresscode:'', notes:'', venueRaw:''
-  };
-  // Apply defaults
-  var defs = lsGet(LS.defs, SEED_DEFS);
-  currentEvent.scRhythm  = defs['def-sc-rhythm']  || '';
-  currentEvent.scHorns   = defs['def-sc-horns']   || '';
-  currentEvent.kpStart   = defs['def-kp-start']   || '';
-  currentEvent.kpNote    = defs['def-kp-note']     || '';
-  currentEvent.chuppah   = defs['def-chuppah']     || '';
-  currentEvent.dresscode = defs['def-dresscode']   || '';
-  currentEvent.notes     = defs['def-notes']       || '';
-  // Apply default contacts
-  currentEvent.band    = contacts.filter(function(c){return c.ctype==='band'   && c.isDefault;}).map(function(c){return {id:c.id,name:c.name,role:c.role};});
-  currentEvent.singers = contacts.filter(function(c){return c.ctype==='singer' && c.isDefault;}).map(function(c){return {id:c.id,name:c.name};});
-  populateEventForm();
-  showScreen('event');
-  switchEventTab('details');
-  setEventEditMode(true);
-}
-function showExistingEvents() {
-  var sec = document.getElementById('existing-events-section');
-  sec.style.display = 'block';
-  renderEventsList();
-  sec.scrollIntoView({behavior:'smooth'});
-}
-function renderEventsList() {
-  var list = document.getElementById('events-list');
-  if (!savedEvents.length) {
-    list.innerHTML = '<div class="events-list-empty">No saved events yet.<br>Create your first event above.</div>';
-    return;
-  }
-  // Sort newest first
-  var sorted = savedEvents.slice().sort(function(a,b){ return (b.date||'') > (a.date||'') ? 1 : -1; });
-  list.innerHTML = '';
-  sorted.forEach(function(ev) {
-    var card = document.createElement('div');
-    card.className = 'event-card';
-    var dateStr = fmtDate(ev.date) || 'No date';
-    var typeStr = ev.typeCustom || ev.type || 'Event';
-    var venueStr = ev.venueName || 'No venue';
-    card.innerHTML = '<div class="event-card-info">' +
-      '<div class="event-card-title">' + esc(typeStr) + ' \u2013 ' + esc(venueStr) + '</div>' +
-      '<div class="event-card-sub">' + esc(dateStr) + '</div>' +
-      '</div>' +
-      '<div style="display:flex;gap:6px;align-items:center;">' +
-      '<button onclick="deleteEvent(\'' + ev.id + '\',event)" style="background:#fff0f0;color:#d93025;border:1px solid #fdd;border-radius:8px;width:32px;height:32px;font-size:14px;cursor:pointer;flex-shrink:0;">&#128465;</button>' +
-      '<div class="event-card-arrow">&#8250;</div>' +
-      '</div>';
-    card.addEventListener('click', function(e) {
-      if (e.target.tagName === 'BUTTON') return;
-      openExistingEvent(ev.id);
-    });
-    list.appendChild(card);
-  });
-}
-function deleteEvent(id, e) {
-  if (e) e.stopPropagation();
-  savedEvents = savedEvents.filter(function(ev){ return ev.id !== id; });
-  lsSet(LS.events, savedEvents);
-  renderEventsList();
-  toast('Event deleted', false);
-}
-function openExistingEvent(id) {
-  var ev = savedEvents.find(function(e){ return e.id === id; });
-  if (!ev) return;
-  isNewEvent  = false;
-  isEditMode  = false;
-  currentEvent = JSON.parse(JSON.stringify(ev));
-  populateEventForm();
-  showScreen('event');
-  switchEventTab('details');
-  setEventEditMode(false);
-}
-function updateEventTopbar() {
-  if (isEditMode) {
-    setTopbar(isNewEvent ? 'New Event' : 'Edit Event', '\u2190 Home', 'Save', 'saveEvent');
-    document.getElementById('topbar-back').setAttribute('data-back','goHome');
-  } else {
-    setTopbar('Event Details', '\u2190 Home', 'Edit', 'editEvent');
-    document.getElementById('topbar-back').setAttribute('data-back','goHome');
-    document.getElementById('topbar-btn').className = 'btn-top btn-navy';
-  }
-}
-function enterEditMode() {
-  isEditMode = true;
-  setEventEditMode(true);
-  updateEventTopbar();
-}
-function setEventEditMode(editable) {
-  var fields = document.querySelectorAll('#tab-details-content input, #tab-details-content textarea, #tab-details-content select');
-  fields.forEach(function(el) {
-    if (editable) {
-      el.removeAttribute('disabled');
-      el.style.background = '';
-      el.style.color = '';
-    } else {
-      el.setAttribute('disabled','true');
-      el.style.background = '#f3f4f8';
-      el.style.color = '#888';
-    }
-  });
-  // Always disable readonly venue fields
-  ['f-venue','f-address'].forEach(function(id){ var el=document.getElementById(id); if(el){el.setAttribute('disabled','true');el.style.background='#f3f4f8';el.style.color='#888';}});
-  var addBtns = document.querySelectorAll('.btn-add-member');
-  addBtns.forEach(function(b){ b.style.display = editable ? 'flex' : 'none'; });
-  var delBtns = document.querySelectorAll('.member-tag-del');
-  delBtns.forEach(function(b){ b.style.display = editable ? 'block' : 'none'; });
-}
-function saveCurrentEvent() {
-  if (!validateEvent()) { toast('Please fill in all required fields', true); return; }
-  readFormIntoCurrentEvent();
-  var idx = savedEvents.findIndex(function(e){ return e.id === currentEvent.id; });
-  if (idx >= 0) savedEvents[idx] = currentEvent;
-  else savedEvents.push(currentEvent);
-  lsSet(LS.events, savedEvents);
-  isNewEvent = false;
-  isEditMode = false;
-  setEventEditMode(false);
-  updateEventTopbar();
-  toast('Event saved! ✓', false);
-}
-function autoSave() {
-  if (!currentEvent || !isEditMode) return;
-  readFormIntoCurrentEvent();
-  renderPreview();
-}
-function readFormIntoCurrentEvent() {
-  if (!currentEvent) return;
-  currentEvent.date        = gv('f-date');
-  var typeVal = gv('f-type');
-  currentEvent.type       = typeVal;
-  currentEvent.typeCustom = (typeVal === 'Other') ? gv('f-type-custom') : '';
-  currentEvent.venueName    = gv('f-venue');
-  currentEvent.venueAddress = gv('f-address');
-  currentEvent.venueRaw     = gv('f-venue-search');
-  currentEvent.scRhythm    = gv('f-sc-rhythm');
-  currentEvent.scHorns     = gv('f-sc-horns');
-  currentEvent.kpStart     = gv('f-kp-start');
-  currentEvent.kpNote      = gv('f-kp-note');
-  currentEvent.chuppah     = gv('f-chuppah');
-  currentEvent.dresscode   = gv('f-dresscode');
-  currentEvent.notes       = gv('f-notes');
-}
-function populateEventForm() {
-  if (!currentEvent) return;
-  rebuildTypeSelect();
-  sv('f-date',         currentEvent.date        || '');
-  sv('f-type',         currentEvent.type        || '');
-  sv('f-type-custom',  currentEvent.typeCustom  || '');
-  sv('f-venue-search', currentEvent.venueRaw    || currentEvent.venueName || '');
-  sv('f-venue',        currentEvent.venueName   || '');
-  sv('f-address',      currentEvent.venueAddress|| '');
-  sv('f-sc-rhythm',    currentEvent.scRhythm    || '');
-  sv('f-sc-horns',     currentEvent.scHorns     || '');
-  sv('f-kp-start',     currentEvent.kpStart     || '');
-  sv('f-kp-note',      currentEvent.kpNote      || '');
-  sv('f-chuppah',      currentEvent.chuppah     || '');
-  sv('f-dresscode',    currentEvent.dresscode   || '');
-  sv('f-notes',        currentEvent.notes       || '');
-  // Restore venue fields
-  sv('f-venue-search', ''); // search is always blank on load
-  if (currentEvent.venueName) {
-    venueSelected = true;
-    showVenuePopulated(false); // read-only until edit mode
-  } else {
-    document.getElementById('fd-venue-populated').style.display = 'none';
-  }
-  // Custom type field
-  document.getElementById('fd-custom').style.display = (currentEvent.type === 'Other') ? 'block' : 'none';
-  renderBandList();
-  renderSingerList();
-  renderChoirList();
-  renderPreview();
-}
+        // --- EVENT LOGIC ---
+        function createNewEvent() {
+            state.currentEvent = {
+                id: Date.now(),
+                date: '',
+                type: 'Wedding',
+                customType: '',
+                venueName: '',
+                times: { ...state.defaults },
+                members: state.contacts.filter(c => c.isDefault).map(c => ({...c}))
+            };
+            showView('details');
+        }
 
-// ═══════════════════════════════════════════════════════════════
-// EVENT TABS
-// ═══════════════════════════════════════════════════════════════
-function switchEventTab(name) {
-  document.getElementById('tab-details-content').style.display = (name==='details') ? 'block' : 'none';
-  document.getElementById('tab-preview-content').style.display  = (name==='preview')  ? 'block' : 'none';
-  document.getElementById('tab-details').className  = 'tab' + (name==='details' ? ' active' : '');
-  document.getElementById('tab-preview').className  = 'tab' + (name==='preview'  ? ' active' : '');
-  if (name === 'preview') { renderPreview(); setTimeout(scalePreview, 100); }
-}
-function toggleSec(id, el) {
-  var b = document.getElementById(id);
-  if (!b) return;
-  var open = b.classList.toggle('open');
-  if (el) el.classList.toggle('open', open);
-}
+        function handleEventTypeChange() {
+            const val = document.getElementById('event-type').value;
+            const customContainer = document.getElementById('custom-type-container');
+            const customInput = document.getElementById('event-type-custom');
+            
+            if(val === 'Other') {
+                customContainer.classList.remove('hidden');
+                customInput.required = true;
+            } else {
+                customContainer.classList.add('hidden');
+                customInput.required = false;
+            }
+        }
 
-// ═══════════════════════════════════════════════════════════════
-// VENUE LOCATION SEARCH
-// ═══════════════════════════════════════════════════════════════
-var venueSearchTimer = null;
-var venueSelected = false;
+        function renderDetails() {
+            const e = state.currentEvent;
+            document.getElementById('event-date').value = e.date;
+            
+            const typeSelect = document.getElementById('event-type');
+            typeSelect.innerHTML = state.eventTypes.map(t => `<option value="${t}" ${e.type === t ? 'selected' : ''}>${t}</option>`).join('');
+            
+            document.getElementById('event-type-custom').value = e.customType || '';
+            handleEventTypeChange();
 
-function onVenueInput() {
-  clearErr('fd-venue-search');
-  var q = gv('f-venue-search').trim();
-  hideLoc();
-  if (!q) return;
-  clearTimeout(venueSearchTimer);
-  venueSearchTimer = setTimeout(function() { searchVenue(q); }, 500);
-}
+            document.getElementById('venue-name').value = e.venueName;
+            document.getElementById('time-sc-rhythm').value = e.times.scRhythm;
+            document.getElementById('time-sc-horns').value = e.times.scHorns;
+            document.getElementById('time-kp-start').value = e.times.kpStart;
+            document.getElementById('time-chuppah').value = e.times.chuppah;
 
-function searchVenue(q) {
-  var url = 'https://nominatim.openstreetmap.org/search?format=json&limit=6&addressdetails=1&q=' + encodeURIComponent(q);
-  fetch(url, {headers:{'Accept-Language':'en','User-Agent':'SK-Events/1.0'}})
-    .then(function(r){ return r.json(); })
-    .then(function(data){ showLocDrop(data, q); })
-    .catch(function(){ showLocDrop([], q); });
-}
+            renderEventMembers();
+        }
 
-function buildAddress(a) {
-  var parts = [];
-  if (a.house_number && a.road) parts.push(a.house_number + ' ' + a.road);
-  else if (a.road) parts.push(a.road);
-  var city = a.city || a.town || a.village || a.hamlet || '';
-  if (city) parts.push(city);
-  if (a.state) parts.push(a.state);
-  if (a.postcode) parts.push(a.postcode);
-  return parts.join(', ');
-}
+        function renderEventMembers() {
+            const container = document.getElementById('event-members-list');
+            if(state.currentEvent.members.length === 0) {
+                container.innerHTML = `<p class="text-gray-400 text-sm italic">No members added yet.</p>`;
+                return;
+            }
+            container.innerHTML = state.currentEvent.members.map((m, idx) => `
+                <div class="flex items-center justify-between bg-gray-50 p-2 rounded border">
+                    <div>
+                        <span class="font-bold text-sm">${m.name}</span>
+                        <span class="text-xs text-gray-500 ml-2">${m.instrument || m.type}</span>
+                    </div>
+                    <button onclick="removeMember(${idx})" class="text-red-400 text-xs">✕</button>
+                </div>
+            `).join('');
+        }
 
-function showLocDrop(results, q) {
-  var drop = document.getElementById('loc-drop');
-  drop.innerHTML = '';
-  // Add search results
-  (results||[]).forEach(function(r) {
-    var a = r.address || {};
-    var name = r.name || a.amenity || a.building || r.display_name.split(',')[0].trim();
-    var addr = buildAddress(a) || r.display_name;
-    var item = document.createElement('div'); item.className = 'loc-item';
-    item.innerHTML = '<div class="loc-name">'+esc(name)+'</div><div class="loc-addr">'+esc(addr)+'</div>';
-    item.addEventListener('mousedown', function(e){ e.preventDefault(); });
-    item.addEventListener('click', function(){ selectVenue(name, addr); });
-    drop.appendChild(item);
-  });
-  // Always show "Enter manually" option
-  var manual = document.createElement('div'); manual.className = 'loc-item';
-  manual.style.cssText = 'border-top:1px dashed #dde1ec;';
-  manual.innerHTML = '<div class="loc-name" style="color:var(--accent)">&#9998; Use "'+esc(q)+'" — enter address manually</div>';
-  manual.addEventListener('mousedown', function(e){ e.preventDefault(); });
-  manual.addEventListener('click', function(){ useManualVenue(q); });
-  drop.appendChild(manual);
-  drop.style.display = 'block';
-}
+        function performEventSearch() {
+            renderSavedEventsList(false);
+        }
 
-function selectVenue(name, addr) {
-  venueSelected = true;
-  sv('f-venue-search', '');  // clear search field
-  sv('f-venue', name);
-  sv('f-address', addr);
-  hideLoc();
-  showVenuePopulated(true); // editable
-  clearErr('fd-venue-search');
-  autoSave();
-}
+        function renderSavedEventsList(hideAll) {
+            const container = document.getElementById('saved-events-list');
+            if (hideAll) {
+                container.innerHTML = `<p class="text-center text-gray-400 py-10">Select a date or click search to view events.</p>`;
+                return;
+            }
 
-function useManualVenue(nameQuery) {
-  venueSelected = true;
-  sv('f-venue-search', '');  // clear search field
-  sv('f-venue', nameQuery);
-  sv('f-address', '');
-  hideLoc();
-  showVenuePopulated(true); // fully editable
-  clearErr('fd-venue-search');
-  setTimeout(function(){ var el=document.getElementById('f-address'); if(el) el.focus(); }, 150);
-  autoSave();
-}
+            const filterDate = document.getElementById('search-date-filter').value;
+            const filtered = state.savedEvents.filter(e => !filterDate || e.date === filterDate);
 
-function showVenuePopulated(editable) {
-  var pop = document.getElementById('fd-venue-populated');
-  pop.style.display = 'block';
-  var fv = document.getElementById('f-venue');
-  var fa = document.getElementById('f-address');
-  var cb = document.getElementById('venue-clear-btn');
-  if (editable) {
-    [fv,fa].forEach(function(el){ if(el){el.removeAttribute('disabled');el.style.background='';el.style.color='';} });
-    if (cb) cb.style.display = 'block';
-  } else {
-    // View/read mode - disable fields and hide X
-    [fv,fa].forEach(function(el){ if(el){el.setAttribute('disabled','true');el.style.background='#f3f4f8';el.style.color='#555';} });
-    if (cb) cb.style.display = 'none';
-  }
-}
+            if(filtered.length === 0) {
+                container.innerHTML = `<p class="text-center text-gray-400 py-10">No events found.</p>`;
+                return;
+            }
 
-function clearVenue() {
-  venueSelected = false;
-  sv('f-venue-search',''); sv('f-venue',''); sv('f-address','');
-  document.getElementById('fd-venue-populated').style.display = 'none';
-  hideLoc();
-  autoSave();
-  // Focus back on search
-  setTimeout(function(){ var el=document.getElementById('f-venue-search'); if(el) el.focus(); }, 100);
-}
+            container.innerHTML = filtered.map(e => `
+                <div onclick="loadEvent(${e.id})" class="bg-white p-4 rounded-xl border shadow-sm flex justify-between items-center cursor-pointer">
+                    <div>
+                        <div class="font-bold">${e.venueName || 'Unnamed Venue'}</div>
+                        <div class="text-xs text-gray-500">${e.date} • ${e.type === 'Other' ? e.customType : e.type}</div>
+                    </div>
+                    <div class="text-blue-600 font-bold">Edit ›</div>
+                </div>
+            `).join('');
+        }
 
-function hideLoc() { var d=document.getElementById('loc-drop'); if(d) d.style.display='none'; }
-document.addEventListener('click', function(e) { if (!e.target.closest('.venue-wrap') && !e.target.closest('#fd-venue-populated')) hideLoc(); });
+        function loadEvent(id) {
+            state.currentEvent = state.savedEvents.find(e => e.id === id);
+            showView('details');
+        }
 
-// Enter key on venue search = use as manual venue name
-document.addEventListener('DOMContentLoaded', function() {
-  var vf = document.getElementById('f-venue-search');
-  if (vf) {
-    vf.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') {
-        var q = this.value.trim();
-        if (q) { hideLoc(); useManualVenue(q); }
-        e.preventDefault();
-      }
-    });
-  }
-});
+        function saveCurrentEvent() {
+            const e = state.currentEvent;
+            e.date = document.getElementById('event-date').value;
+            e.type = document.getElementById('event-type').value;
+            e.customType = document.getElementById('event-type-custom').value;
+            e.venueName = document.getElementById('venue-name').value;
+            e.times = {
+                scRhythm: document.getElementById('time-sc-rhythm').value,
+                scHorns: document.getElementById('time-sc-horns').value,
+                kpStart: document.getElementById('time-kp-start').value,
+                chuppah: document.getElementById('time-chuppah').value
+            };
 
-// ═══════════════════════════════════════════════════════════════
-// TYPE DROPDOWN
-// ═══════════════════════════════════════════════════════════════
-function rebuildTypeSelect() {
-  var sel = document.getElementById('f-type');
-  if (!sel) return;
-  var cur = sel.value || (currentEvent ? currentEvent.type : '') || '';
-  sel.innerHTML = '';
-  var blank = document.createElement('option'); blank.value=''; blank.textContent='Select event type...'; blank.disabled=true; blank.selected=!cur; sel.appendChild(blank);
-  eventTypes.forEach(function(t) { var o=document.createElement('option'); o.value=t; o.textContent=t; if(t===cur)o.selected=true; sel.appendChild(o); });
-  var oth = document.createElement('option'); oth.value='Other'; oth.textContent='Other...'; if(cur==='Other')oth.selected=true; sel.appendChild(oth);
-}
-function onTypeChange() {
-  var val = gv('f-type');
-  clearErr('fd-type');
-  document.getElementById('fd-custom').style.display = (val==='Other') ? 'block' : 'none';
-  if (val !== 'Other') sv('f-type-custom','');
-  autoSave();
-}
-function addEventType() {
-  var inp = document.getElementById('new-event-type');
-  var val = inp.value.trim();
-  if (!val) return;
-  if (eventTypes.indexOf(val) >= 0 || val==='Other') { toast('Already exists', true); return; }
-  eventTypes.push(val);
-  lsSet(LS.etypes, eventTypes);
-  rebuildTypeSelect();
-  renderTypeChips();
-  inp.value = '';
-  toast('"' + val + '" added!', false);
-}
-function removeEventType(t) {
-  eventTypes = eventTypes.filter(function(x){ return x !== t; });
-  lsSet(LS.etypes, eventTypes);
-  rebuildTypeSelect();
-  renderTypeChips();
-}
-function renderTypeChips() {
-  var el = document.getElementById('type-chips-list');
-  if (!el) return;
-  while (el.firstChild) el.removeChild(el.firstChild);
-  eventTypes.forEach(function(t) {
-    var div = document.createElement('div'); div.className = 'type-chip';
-    var span = document.createElement('span'); span.textContent = t;
-    var btn = document.createElement('button'); btn.className = 'del'; btn.textContent = 'x';
-    btn.addEventListener('click', function(){ removeEventType(t); });
-    div.appendChild(span); div.appendChild(btn); el.appendChild(div);
-  });
-}
+            if(!e.date || !e.venueName || (e.type === 'Other' && !e.customType)) {
+                return alert("Please fill in all required fields (Date, Venue, and Event Type).");
+            }
 
-// ═══════════════════════════════════════════════════════════════
-// MEMBER LISTS (band, singer, choir)
-// ═══════════════════════════════════════════════════════════════
-function renderBandList() {
-  var list = document.getElementById('band-list');
-  var na   = document.getElementById('band-na');
-  if (!currentEvent) return;
-  renderMemberTags(list, currentEvent.band || [], 'band');
-  na.style.display = ((currentEvent.band||[]).length === 0) ? 'block' : 'none';
-}
-function renderSingerList() {
-  var list = document.getElementById('singer-list');
-  var na   = document.getElementById('singer-na');
-  if (!currentEvent) return;
-  renderMemberTags(list, currentEvent.singers || [], 'singer');
-  na.style.display = ((currentEvent.singers||[]).length === 0) ? 'block' : 'none';
-}
-function renderChoirList() {
-  var list = document.getElementById('choir-list');
-  if (!currentEvent) return;
-  while (list.firstChild) list.removeChild(list.firstChild);
-  (currentEvent.choir || []).forEach(function(m) {
-    var row = document.createElement('div'); row.className = 'choir-row';
-    var info = document.createElement('div'); info.className = 'choir-info';
-    var nm = document.createElement('div'); nm.className = 'choir-name'; nm.textContent = m.name;
-    info.appendChild(nm);
-    var cw = document.createElement('div'); cw.className = 'choir-count-wrap';
-    var sel = document.createElement('select');
-    var blankOpt = document.createElement('option'); blankOpt.value=''; blankOpt.textContent='#'; sel.appendChild(blankOpt);
-    for (var i=1;i<=50;i++) { var o=document.createElement('option'); o.value=String(i); o.textContent=String(i); if(String(m.count)===String(i)) o.selected=true; sel.appendChild(o); }
-    var lbl = document.createElement('label'); lbl.textContent='Members';
-    (function(mid){ sel.addEventListener('change', function(){ updateChoirCount(mid, this.value); }); })(m.id);
-    cw.appendChild(sel); cw.appendChild(lbl);
-    var delBtn = document.createElement('button'); delBtn.className='member-tag-del'; delBtn.textContent='x';
-    (function(mid){ delBtn.addEventListener('click', function(){ removeChoir(mid); }); })(m.id);
-    row.appendChild(info); row.appendChild(cw); row.appendChild(delBtn);
-    list.appendChild(row);
-  });
-}
-function renderMemberTags(list, members, type) {
-  while (list.firstChild) list.removeChild(list.firstChild);
-  members.forEach(function(m) {
-    var tag = document.createElement('div'); tag.className = 'member-tag';
-    var info = document.createElement('div'); info.className = 'member-tag-info';
-    var nm = document.createElement('div'); nm.className = 'member-tag-name'; nm.textContent = m.name;
-    var rl = document.createElement('div'); rl.className = 'member-tag-role'; rl.textContent = m.role || '';
-    info.appendChild(nm); if(m.role) info.appendChild(rl);
-    var del = document.createElement('button'); del.className = 'member-tag-del'; del.textContent = '\u00d7';
-    (function(mid, t) { del.addEventListener('click', function(){ removeMember(mid, t); }); })(m.id, type);
-    tag.appendChild(info); tag.appendChild(del);
-    list.appendChild(tag);
-  });
-}
-function removeMember(id, type) {
-  if (!currentEvent) return;
-  if (type === 'band')   currentEvent.band    = (currentEvent.band||[]).filter(function(m){ return m.id!==id; });
-  if (type === 'singer') currentEvent.singers = (currentEvent.singers||[]).filter(function(m){ return m.id!==id; });
-  renderBandList(); renderSingerList();
-  autoSave();
-}
-function removeChoir(id) {
-  if (!currentEvent) return;
-  currentEvent.choir = (currentEvent.choir||[]).filter(function(m){ return m.id!==id; });
-  renderChoirList(); autoSave();
-}
-function updateChoirCount(id, count) {
-  if (!currentEvent) return;
-  var m = (currentEvent.choir||[]).find(function(m){ return m.id===id; });
-  if (m) m.count = count;
-  autoSave();
-}
+            const idx = state.savedEvents.findIndex(ev => ev.id === e.id);
+            if(idx > -1) state.savedEvents[idx] = e;
+            else state.savedEvents.push(e);
 
-// ═══════════════════════════════════════════════════════════════
-// POPUP (contact selector)
-// ═══════════════════════════════════════════════════════════════
-function openPopup(type) {
-  popupType = type;
-  var titles = {band:'Add Band Member', singer:'Add Singer', choir:'Add Choir / Group'};
-  document.getElementById('popup-title').textContent = titles[type] || 'Select Contact';
-  document.getElementById('popup-search').value = '';
-  filterPopup();
-  document.getElementById('member-popup').classList.add('open');
-}
-function closePopup() {
-  document.getElementById('member-popup').classList.remove('open');
-  popupType = '';
-}
-function filterPopup() {
-  var q = document.getElementById('popup-search').value.toLowerCase();
-  // Filter contacts by type, excluding already-added
-  var already = [];
-  if (popupType === 'band')   already = (currentEvent.band   ||[]).map(function(m){return m.id;});
-  if (popupType === 'singer') already = (currentEvent.singers||[]).map(function(m){return m.id;});
-  if (popupType === 'choir')  already = (currentEvent.choir  ||[]).map(function(m){return m.id;});
-  var filtered = contacts.filter(function(c) {
-    if (c.ctype !== popupType) return false;
-    if (already.indexOf(c.id) >= 0) return false;
-    if (!q) return true;
-    return c.name.toLowerCase().indexOf(q)>=0 || (c.role||'').toLowerCase().indexOf(q)>=0;
-  });
-  var list = document.getElementById('popup-list');
-  list.innerHTML = '';
-  if (!filtered.length) {
-    list.innerHTML = '<div class="popup-empty">No contacts found of this type.<br><small>Add contacts in Settings first.</small></div>';
-    return;
-  }
-  filtered.forEach(function(c) {
-    var item = document.createElement('div'); item.className = 'popup-item';
-    item.innerHTML = '<div><div class="popup-item-name">'+esc(c.name)+'</div><div class="popup-item-sub">'+esc(c.role||'')+' \u00b7 '+esc(c.email)+'</div></div>';
-    item.addEventListener('click', function() { addMemberFromPopup(c); });
-    list.appendChild(item);
-  });
-}
-function addMemberFromPopup(c) {
-  if (!currentEvent) return;
-  if (popupType === 'band') {
-    currentEvent.band = currentEvent.band || [];
-    currentEvent.band.push({id:c.id, name:c.name, role:c.role||''});
-    renderBandList();
-  } else if (popupType === 'singer') {
-    currentEvent.singers = currentEvent.singers || [];
-    currentEvent.singers.push({id:c.id, name:c.name});
-    renderSingerList();
-  } else if (popupType === 'choir') {
-    currentEvent.choir = currentEvent.choir || [];
-    currentEvent.choir.push({id:c.id, name:c.name, count:''});
-    renderChoirList();
-  }
-  closePopup();
-  autoSave();
-}
+            localStorage.setItem('sk_events', JSON.stringify(state.savedEvents));
+            alert("Event Saved Successfully!");
+            showView('home');
+        }
 
-// ═══════════════════════════════════════════════════════════════
-// VALIDATION
-// ═══════════════════════════════════════════════════════════════
-function showErr(id) { var el=document.getElementById(id); if(el) el.classList.add('field-err'); }
-function clearErr(id) { var el=document.getElementById(id); if(el) el.classList.remove('field-err'); }
-function validateEvent() {
-  var ok = true;
-  if (!gv('f-date'))  { showErr('fd-date');  ok=false; }
-  if (!gv('f-type'))  { showErr('fd-type');  ok=false; }
-  if (!gv('f-venue') && !gv('f-venue-search')) { showErr('fd-venue-search'); ok=false; }
-  return ok;
-}
+        // --- EXPORT TOOLS ---
+        function formatTime(timeStr) {
+            if(!timeStr) return "N/A";
+            const [h, m] = timeStr.split(':');
+            const hh = parseInt(h);
+            const ampm = hh >= 12 ? 'PM' : 'AM';
+            const hour = hh % 12 || 12;
+            return `${hour}:${m} ${ampm}`;
+        }
 
-// ═══════════════════════════════════════════════════════════════
-// CONTACTS MANAGEMENT
-// ═══════════════════════════════════════════════════════════════
-function saveContact() {
-  var name     = document.getElementById('nc-name').value.trim();
-  var email    = document.getElementById('nc-email').value.trim();
-  var role     = document.getElementById('nc-role').value.trim();
-  var ctype    = document.getElementById('nc-type').value;
-  var isDef    = document.getElementById('nc-default').checked;
-  var editId   = document.getElementById('nc-id').value;
-  var ok = true;
-  // Validate
-  if (!name)  { showErr('fd-nc-name');  ok=false; }
-  else clearErr('fd-nc-name');
-  if (!email || !isValidEmail(email)) { showErr('fd-nc-email'); ok=false; }
-  else clearErr('fd-nc-email');
-  if (!ctype) { showErr('fd-nc-type'); ok=false; }
-  else clearErr('fd-nc-type');
-  if (!ok) { toast('Please fix the errors above', true); return; }
-  if (editId) {
-    var idx = contacts.findIndex(function(c){ return String(c.id)===String(editId); });
-    if (idx >= 0) {
-      contacts[idx] = {id:contacts[idx].id, name:name, email:email, role:role, ctype:ctype, isDefault:isDef};
-      toast(name + ' updated!', false);
-    }
-  } else {
-    contacts.push({id:Date.now(), name:name, email:email, role:role, ctype:ctype, isDefault:isDef});
-    toast(name + ' added!', false);
-  }
-  lsSet(LS.contacts, contacts);
-  renderContacts();
-  cancelContactEdit();
-}
-function cancelContactEdit() {
-  ['nc-id','nc-name','nc-email','nc-role'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
-  document.getElementById('nc-type').value = '';
-  document.getElementById('nc-default').checked = false;
-  document.getElementById('nc-cancel').style.display = 'none';
-  document.getElementById('cf-title').textContent = 'Add New Contact';
-  ['fd-nc-name','fd-nc-email','fd-nc-type'].forEach(clearErr);
-}
-function editContact(id) {
-  var c = contacts.find(function(c){ return c.id===id; });
-  if (!c) return;
-  document.getElementById('nc-id').value    = String(c.id);
-  document.getElementById('nc-name').value  = c.name||'';
-  document.getElementById('nc-email').value = c.email||'';
-  document.getElementById('nc-role').value  = c.role||'';
-  document.getElementById('nc-type').value  = c.ctype||'';
-  document.getElementById('nc-default').checked = !!c.isDefault;
-  document.getElementById('nc-cancel').style.display='block';
-  document.getElementById('cf-title').textContent='Edit Contact';
-  var fw=document.getElementById('contact-form-wrap');
-  if(fw&&fw.scrollIntoView) fw.scrollIntoView({behavior:'smooth'});
-}
-function removeContact(id) {
-  contacts = contacts.filter(function(c){ return c.id!==id; });
-  lsSet(LS.contacts, contacts);
-  renderContacts();
-}
-function renderContacts() {
-  var q = (document.getElementById('contact-search')?document.getElementById('contact-search').value:'').toLowerCase();
-  var list = document.getElementById('contact-list');
-  if (!list) return;
-  var shown = q ? contacts.filter(function(c){ return c.name.toLowerCase().indexOf(q)>=0||(c.role||'').toLowerCase().indexOf(q)>=0||(c.email||'').toLowerCase().indexOf(q)>=0; }) : contacts;
-  var cnt = document.getElementById('contact-count'); if(cnt) cnt.textContent=contacts.length;
-  if (!shown.length) { list.innerHTML='<div style="color:var(--muted);font-size:13px;padding:8px 0;">No contacts found.</div>'; return; }
-  while(list.firstChild) list.removeChild(list.firstChild);
-  shown.forEach(function(c) {
-    var row=document.createElement('div'); row.className='contact-row';
-    var info=document.createElement('div'); info.className='contact-info';
-    var nr=document.createElement('div'); nr.className='contact-name-row';
-    var nm=document.createElement('span'); nm.style.cssText='font-size:14px;font-weight:700;'; nm.textContent=c.name;
-    nr.appendChild(nm);
-    var typeMap={band:'Band',singer:'Singer',choir:'Choir'};
-    var clsMap={band:'badge-band',singer:'badge-singer',choir:'badge-choir'};
-    if(c.ctype){var b=document.createElement('span');b.className='badge '+(clsMap[c.ctype]||'');b.textContent=typeMap[c.ctype]||c.ctype;nr.appendChild(b);}
-    if(c.isDefault){var db=document.createElement('span');db.className='badge badge-default';db.textContent='Default';nr.appendChild(db);}
-    info.appendChild(nr);
-    var meta=document.createElement('div');meta.className='contact-meta';meta.textContent=(c.role||'\u2014')+' \u00b7 '+(c.email||'no email');
-    info.appendChild(meta);
-    var eb=document.createElement('button');eb.className='btn-icon edit';eb.textContent='\u270f';
-    eb.addEventListener('click',function(){editContact(c.id);});
-    var db2=document.createElement('button');db2.className='btn-icon del';db2.textContent='x';
-    db2.addEventListener('click',function(){removeContact(c.id);});
-    row.appendChild(info);row.appendChild(eb);row.appendChild(db2);
-    list.appendChild(row);
-  });
-}
+        function formatDate(dateStr) {
+            if(!dateStr) return "";
+            const [y, m, d] = dateStr.split('-');
+            return `${m}/${d}/${y.slice(-2)}`;
+        }
 
-// ═══════════════════════════════════════════════════════════════
-// PREVIEW / PDF
-// ═══════════════════════════════════════════════════════════════
-function scalePreview() {
-  var sc=document.getElementById('pscaler'),wr=document.getElementById('pwrapper');
-  if(!sc||!wr)return;
-  var scale=sc.offsetWidth/750;
-  wr.style.transform='scale('+scale+')';wr.style.width='750px';
-  sc.style.height=Math.round(wr.scrollHeight*scale)+'px';
-}
-window.addEventListener('resize',scalePreview);
+        function emailCrew() {
+            const e = state.currentEvent;
+            const formattedDate = formatDate(e.date);
+            const eventType = e.type === 'Other' ? e.customType : e.type;
+            const subject = `Event Details - ${eventType} on ${formattedDate} at ${e.venueName}`;
+            
+            let body = `Event Details for ${e.venueName}\n`;
+            body += `Date: ${formattedDate}\n`;
+            body += `Type: ${eventType}\n\n`;
+            body += `Schedule:\n`;
+            body += `- Sound Check (Rhythm): ${formatTime(e.times.scRhythm)}\n`;
+            body += `- Sound Check (Horns): ${formatTime(e.times.scHorns)}\n`;
+            body += `- KP Start: ${formatTime(e.times.kpStart)}\n`;
+            body += `- Chuppah / Main Event Time: ${formatTime(e.times.chuppah)}\n\n`;
+            
+            const emails = e.members.map(m => m.email).join(',');
+            window.location.href = `mailto:${emails}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        }
 
-function doSaveAsPDF() {
-  renderPreview();
-  var btn = document.getElementById('btn-print-main');
-  var origText = btn.innerHTML;
-  btn.innerHTML = '&#9203; Generating PDF...';
-  btn.disabled = true;
+        async function downloadEventPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const e = state.currentEvent;
+            const eventTitle = e.type === 'Other' ? e.customType : e.type;
 
-  setTimeout(function() {
-    var wrapper = document.getElementById('pwrapper');
-    if (!wrapper) { btn.innerHTML = origText; btn.disabled = false; return; }
+            doc.setFontSize(22);
+            doc.text("EVENT ITINERARY", 105, 20, { align: 'center' });
+            
+            doc.setFontSize(12);
+            doc.text(`Venue: ${e.venueName}`, 20, 40);
+            doc.text(`Date: ${formatDate(e.date)}`, 20, 50);
+            doc.text(`Event Type: ${eventTitle}`, 20, 60);
 
-    // Temporarily make wrapper full-size for capture
-    var origTransform = wrapper.style.transform;
-    var origWidth     = wrapper.style.width;
-    wrapper.style.transform = 'none';
-    wrapper.style.width     = '750px';
+            doc.line(20, 65, 190, 65);
+            doc.text("SCHEDULE", 20, 75);
+            doc.text(`Sound Check - Rhythm: ${formatTime(e.times.scRhythm)}`, 30, 85);
+            doc.text(`Sound Check - Horns: ${formatTime(e.times.scHorns)}`, 30, 95);
+            doc.text(`KP Start: ${formatTime(e.times.kpStart)}`, 30, 105);
+            doc.text(`Chuppah / Main Event Time: ${formatTime(e.times.chuppah)}`, 30, 115);
 
-    html2canvas(wrapper, {
-      scale: 2,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#ffffff',
-      logging: false,
-      imageTimeout: 15000,
-      onclone: function(doc) {
-        var el = doc.getElementById('pwrapper');
-        if (el) { el.style.transform = 'none'; el.style.width = '750px'; }
-      }
-    }).then(function(canvas) {
-      // Restore wrapper
-      wrapper.style.transform = origTransform;
-      wrapper.style.width     = origWidth;
+            // Force actual download for Safari iOS
+            const blob = doc.output('blob');
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `Itinerary_${e.date}_${e.venueName.replace(/\s/g, '_')}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            setTimeout(() => URL.revokeObjectURL(url), 100);
+        }
 
-      var imgData = canvas.toDataURL('image/jpeg', 0.95);
-      var pdf     = new jspdf.jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
+        // --- SETTINGS RENDERING ---
+        function renderSettings() {
+            const contactCont = document.getElementById('settings-contact-list');
+            contactCont.innerHTML = state.contacts.map((c, i) => `
+                <div class="flex justify-between items-center p-2 bg-gray-50 rounded border text-sm">
+                    <span><strong>${c.name}</strong> (${c.instrument || c.type})</span>
+                    <button onclick="deleteContact(${i})" class="text-red-500">Delete</button>
+                </div>
+            `).join('');
 
-      var pageW = 210; // A4 width mm
-      var pageH = 297; // A4 height mm
-      var margin = 10;
-      var usableW = pageW - margin * 2;
+            const typeCont = document.getElementById('settings-event-types');
+            typeCont.innerHTML = state.eventTypes.map((t, i) => `
+                <span class="bg-gray-100 px-3 py-1 rounded-full text-xs font-bold flex items-center">
+                    ${t} <button onclick="deleteType(${i})" class="ml-2 text-gray-400">✕</button>
+                </span>
+            `).join('');
 
-      // Scale image to fit width
-      var imgW = canvas.width;
-      var imgH = canvas.height;
-      var ratio = usableW / (imgW / (canvas.width / usableW));
-      var pdfW  = usableW;
-      var pdfH  = (imgH / imgW) * pdfW;
+            document.getElementById('default-sc-rhythm').value = state.defaults.scRhythm;
+            document.getElementById('default-sc-horns').value = state.defaults.scHorns;
+            document.getElementById('default-kp-start').value = state.defaults.kpStart;
+            document.getElementById('default-chuppah').value = state.defaults.chuppah;
+        }
 
-      // If taller than one page, scale down to fit
-      var usableH = pageH - margin * 2;
-      if (pdfH > usableH) {
-        var scale = usableH / pdfH;
-        pdfW = pdfW * scale;
-        pdfH = pdfH * scale;
-      }
-
-      // Center on page
-      var x = (pageW - pdfW) / 2;
-      var y = margin;
-
-      pdf.addImage(imgData, 'JPEG', x, y, pdfW, pdfH);
-
-      // Build filename from event data
-      var ev = currentEvent || {};
-      var dateStr = (ev.date || '').replace(/-/g,'') || 'event';
-      var venue   = (ev.venueName || 'event').replace(/[^a-zA-Z0-9]/g,'-').toLowerCase();
-      var filename = 'SK-Event-' + dateStr + '-' + venue + '.pdf';
-
-      // iOS Safari fix: use blob URL with anchor click
-      var pdfBlob = pdf.output('blob');
-      var blobUrl = URL.createObjectURL(pdfBlob);
-      var a = document.createElement('a');
-      a.href = blobUrl;
-      a.download = filename;
-      a.target = '_blank'; // fallback for browsers that don't support download attr
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(function() {
-        document.body.removeChild(a);
-        URL.revokeObjectURL(blobUrl);
-      }, 1000);
-
-      btn.innerHTML = origText;
-      btn.disabled  = false;
-      toast('PDF saved! Check your Downloads folder.', false);
-    }).catch(function(err) {
-      wrapper.style.transform = origTransform;
-      wrapper.style.width     = origWidth;
-      console.error('PDF error:', err);
-      btn.innerHTML = origText;
-      btn.disabled  = false;
-      // Fallback to print if html2canvas fails
-      window.print();
-    });
-  }, 300);
-}
-
-function renderPreview() {
-  var ev = currentEvent;
-  if (!ev) return;
-  var date    = fmtDate(ev.date||gv('f-date'));
-  var venue   = ev.venueName || gv('f-venue') || '';
-  var address = ev.venueAddress || gv('f-address') || '';
-  var type = '';
-  if (ev.type === 'Other' || ev.type === '') {
-    type = ev.typeCustom || gv('f-type-custom') || '';
-  } else {
-    type = ev.type || gv('f-type') || '';
-  }
-  var band    = ev.band    || [];
-  var singers = ev.singers || [];
-  var choir   = ev.choir   || [];
-  var dc      = ev.dresscode || gv('f-dresscode') || '';
-  var notes   = ev.notes   || gv('f-notes')       || '';
-  var scR = ev.scRhythm||gv('f-sc-rhythm')||'';
-  var scH = ev.scHorns||gv('f-sc-horns')||'';
-  var kpS = ev.kpStart||gv('f-kp-start')||'';
-  var kpN = ev.kpNote||gv('f-kp-note')||'';
-  var chu = ev.chuppah||gv('f-chuppah')||'';
-
-  var bandH = band.length
-    ? band.map(function(m){return '<li>'+(m.role?'<strong>'+esc(m.role)+':</strong> ':'')+esc(m.name)+'</li>';}).join('')
-    : '<li style="color:#999">N/A</li>';
-
-  var singerH = singers.length
-    ? singers.map(function(m){return '<li>'+esc(m.name)+'</li>';}).join('')
-    : '<li style="color:#999">N/A</li>';
-
-  var choirH = choir.length ? choir.map(function(m){
-    var label = esc(m.name);
-    if (m.count) label += ' \u2013 ' + m.count + ' Members';
-    return '<li>'+label+'</li>';
-  }).join('') : '';
-
-  var dp = document.getElementById('doc-preview');
-  if (!dp) return;
-  dp.innerHTML =
-    '<div class="prev-header">' +
-      '<div class="prev-logo"><img src="images/logo.png" alt="Shea Kaller" onerror="this.style.display=\'none\'"></div>' +
-      '<div class="prev-info"><span class="co">SK Music Production Inc</span>845-445-6100<br><a href="mailto:Info@Sheakallerband.com">Info@Sheakallerband.com</a></div>' +
-    '</div>' +
-    '<div class="prev-title">Event Details</div>' +
-    '<div class="prev-body">' +
-      '<p>Dear Crew,</p>' +
-      '<p>Please find below the schedule and band lineup for the event on <strong>'+esc(date)+'</strong>'+(venue?', at <strong>'+esc(venue)+'</strong>':'')+'.</p>' +
-      '<p><strong>Type of Event:</strong> '+esc(type||'___')+'<br><strong>Location:</strong> '+esc(venue||'___')+(address?' \u2013 '+esc(address):'')+'</p>' +
-      '<hr class="prev-divider">' +
-      '<p><strong>Sound Check Schedule:</strong></p><ul><li>Rhythm: '+esc(scR)+'</li><li>Horns: '+esc(scH)+'</li></ul>' +
-      '<p><strong>Event Schedule:</strong></p><ul><li>KP Start time: '+esc(kpS)+(kpN?' ('+esc(kpN)+')':'')+'</li><li>Chuppah: '+esc(chu)+'</li></ul>' +
-      '<p><strong>Band Members:</strong></p><ul>'+bandH+'</ul>' +
-      '<p><strong>Singers:</strong></p><ul>'+singerH+'</ul>' +
-      (choirH ? '<p><strong>Groups / Choirs:</strong></p><ul>'+choirH+'</ul>' : '') +
-      '<p><strong>Dress Code:</strong></p><ul><li>'+esc(dc)+'</li></ul>' +
-      (notes?'<p>'+esc(notes)+'</p>':'') +
-      '<p style="margin-top:22px;">We\'ll Keep you updated if anything changes</p>' +
-    '</div>' +
-    '<div class="prev-watermark"><img src="images/logo.png" alt="" onerror="this.style.display=\'none\'"></div>';
-  setTimeout(scalePreview, 50);
-}
-
-// ═══════════════════════════════════════════════════════════════
-// EMAIL CREW
-// ═══════════════════════════════════════════════════════════════
-function gatherEmails() {
-  var ev = currentEvent; if (!ev) return [];
-  var memberIds = [];
-  (ev.band||[]).forEach(function(m){memberIds.push(m.id);});
-  (ev.singers||[]).forEach(function(m){memberIds.push(m.id);});
-  (ev.choir||[]).forEach(function(m){memberIds.push(m.id);});
-  var emails = [];
-  memberIds.forEach(function(id){
-    var c = contacts.find(function(c){return c.id===id;});
-    if (c&&c.email&&emails.indexOf(c.email)<0) emails.push(c.email);
-  });
-  return emails;
-}
-function emailCrew() {
-  if (!validateEvent()) { toast('Please fill in required fields first', true); return; }
-  var cc = gatherEmails();
-  if (!cc.length) { toast('No emails found. Check contacts.', true); return; }
-  var date  = fmtDate(currentEvent.date||gv('f-date'));
-  var venue = currentEvent.venueName||gv('f-venue')||'';
-  var subj  = encodeURIComponent('Event Details'+(date?' \u2013 '+date:'')+(venue?' at '+venue:''));
-  var bodyText = 'Dear Crew,\n\nPlease find attached the event details'+(date?' for '+date:'')+(venue?' at '+venue:'')+
-    '.\n\nPlease review the schedule and lineup carefully.\n\nThank you,\nSK Music Production Inc\n845-445-6100\nInfo@Sheakallerband.com';
-  var body = encodeURIComponent(bodyText);
-  var a=document.createElement('a');
-  a.href='mailto:Info@Sheakallerband.com?cc='+encodeURIComponent(cc.join(','))+'&subject='+subj+'&body='+body;
-  a.style.display='none'; document.body.appendChild(a); a.click();
-  setTimeout(function(){document.body.removeChild(a);},300);
-  toast('Email opened to ' + cc.length + ' recipients', false);
-}
-
-// ═══════════════════════════════════════════════════════════════
-// UTILITIES
-// ═══════════════════════════════════════════════════════════════
-function gv(id){ var el=document.getElementById(id); return el?el.value:''; }
-function sv(id,val){ var el=document.getElementById(id); if(el) el.value=val||''; }
-function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function fmtDate(val){
-  if(!val)return'';
-  var p=val.split('-'); if(p.length!==3)return val;
-  var y=parseInt(p[0]),m=parseInt(p[1]),d=parseInt(p[2]);
-  if(!y||!m||!d)return val;
-  return['January','February','March','April','May','June','July','August','September','October','November','December'][m-1]+' '+d+', '+y;
-}
-function isValidEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
-function toast(msg,isErr){
-  var t=document.getElementById('toast');
-  t.textContent=msg;
-  if(isErr)t.classList.add('err');else t.classList.remove('err');
-  t.classList.add('show');
-  setTimeout(function(){t.classList.remove('show');},3000);
-}
-
-// ═══════════════════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════════════════
-window.addEventListener('DOMContentLoaded', function() {
-  loadAll();
-  rebuildTypeSelect();
-  showScreen('home');
-  updateHomeTopbar();
-});
-</script>
-
+        // --- UTILS ---
+        function deleteContact(i) { state.contacts.splice(i, 1); localStorage.setItem('sk_contacts', JSON.stringify(state.contacts)); renderSettings(); }
+        function deleteType(i) { state.eventTypes.splice(i, 1); localStorage.setItem('sk_types', JSON.stringify(state.eventTypes)); renderSettings(); }
+        function addEventType() {
+            const val = document.getElementById('new-type-input').value;
+            if(val) { state.eventTypes.push(val); localStorage.setItem('sk_types', JSON.stringify(state.eventTypes)); renderSettings(); document.getElementById('new-type-input').value = ''; }
+        }
+    </script>
 </body>
 </html>
