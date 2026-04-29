@@ -364,7 +364,8 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
 <!-- ═══════════ HOME SCREEN ═══════════ -->
 
 <div class="screen active" id="screen-home" style="flex-direction:column;overflow-y:auto;">
-  <div class="home-hero">
+  <div class="home-hero" style="position:relative;">
+  <button onclick="location.reload()" title="Refresh" style="position:absolute;top:10px;right:10px;z-index:10;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.3);border-radius:50%;width:36px;height:36px;font-size:17px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;" aria-label="Refresh">&#8635;</button>
     <img src="images/logo-W.png" alt="Shea Kaller" onerror="this.style.display='none'">
     <h1>Event Builder</h1>
     <p>SK Music Production Inc</p>
@@ -420,7 +421,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v4.2
+  A Davidowitz Project &copy; 2026 - v4.4
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -641,7 +642,7 @@ var SEED_CONTACTS = [
   {id:13,name:"Yedidim Choir",     email:"yedidim@example.com", role:"Choir",                       ctype:"choir",  isDefault:false}
 ];
 var SEED_ETYPES = ['Wedding','Bar Mitzvah','Bat Mitzvah','Corporate Event','Birthday Party','Anniversary','Concert'];
-var SEED_DEFS   = {'def-sc-rhythm':'6:00','def-sc-horns':'6:45','def-kp-start':'6:45','def-kp-note':'Only Choir','def-chuppah':'7:45','def-dresscode':'White Shirt / Black Jacket, Yarmulka & Necktie.','def-notes':'Horn Players Should bring clip-on mics.'};
+var SEED_DEFS   = {'def-sc-rhythm':'6:00','def-sc-horns':'6:45','def-sc-strings':'','def-kp-start':'6:45','def-kp-note':'Only Choir','def-chuppah':'7:45','def-dresscode':'White Shirt / Black Jacket, Yarmulka & Necktie.','def-notes':'Horn Players Should bring clip-on mics.'};
 
 // ── Live state ────────────────────────────────────────────────
 var contacts    = [];
@@ -677,6 +678,8 @@ function showScreen(name) {
   ['home','settings','event'].forEach(function(s) {
     var el = document.getElementById('screen-' + s);
     if (el) el.classList.toggle('active', s === name);
+    // Always scroll to top when switching screens
+    if (el && s === name) { el.scrollTop = 0; }
   });
   var topbar = document.getElementById('topbar');
   var footer = document.getElementById('home-footer');
