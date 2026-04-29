@@ -33,7 +33,7 @@
   --inp-border:#cdd1e0;
 }
 html,body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;font-size:16px;-webkit-text-size-adjust:100%;height:100%;overflow:hidden;}
-#app{display:flex;flex-direction:column;height:100%;overflow:hidden;position:relative;}
+#app{position:fixed;top:0;left:0;right:0;bottom:0;overflow:hidden;display:flex;flex-direction:column;}
 
 /* ═══════════════════════════════════════════
 TOPBAR (dark navy, always visible)
@@ -43,7 +43,8 @@ background:#1a1d2e;
 padding:8px 14px;
 display:flex;align-items:center;gap:10px;flex-shrink:0;
 box-shadow:0 2px 8px rgba(0,0,0,.3);
-min-height:68px;
+min-height:56px;
+z-index:100;
 }
 .topbar-logo{display:flex;align-items:center;}
 .topbar-logo img{height:52px;width:auto;object-fit:contain;}
@@ -74,8 +75,9 @@ border-bottom:3px solid transparent;margin-bottom:-1px;
 /* ═══════════════════════════════════════════
 SCREENS
 ═══════════════════════════════════════════ */
-.screen{display:none;flex:1;overflow:hidden;flex-direction:column;position:absolute;top:0;left:0;right:0;bottom:0;visibility:hidden;}
-.screen.active{display:flex;position:relative;visibility:visible;}
+.screen{display:none;flex:1;min-height:0;}
+.screen.active{display:block;overflow-y:auto;}
+#screen-event.active,#screen-settings.active{display:flex;flex-direction:column;overflow:hidden;}
 .scroll-area{flex:1;overflow-y:auto;padding:16px 14px 80px;-webkit-overflow-scrolling:touch;}
 
 /* ═══════════════════════════════════════════
@@ -90,12 +92,13 @@ flex-shrink:0;
 .home-hero img{height:90px;width:auto;margin-bottom:12px;}
 .home-hero h1{color:#fff;font-size:22px;font-weight:900;letter-spacing:.02em;}
 .home-hero p{color:rgba(255,255,255,.5);font-size:13px;margin-top:6px;}
-.home-actions{display:flex;flex-direction:column;gap:12px;padding:20px 14px;}
+.home-actions{display:block;padding:20px 14px;}
 .home-btn{
 display:flex;align-items:center;gap:14px;
 background:#fff;border:1px solid var(–border);border-radius:16px;
 padding:18px 20px;cursor:pointer;-webkit-tap-highlight-color:transparent;
 box-shadow:0 2px 8px rgba(0,0,0,.06);transition:transform .1s;
+margin-bottom:12px;
 }
 .home-btn:active{transform:scale(.98);}
 .home-btn-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
@@ -358,8 +361,9 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
 
 <!-- ═══════════ HOME SCREEN ═══════════ -->
 
-<div class="screen active" id="screen-home" style="flex-direction:column;overflow-y:auto;height:100%;">
+<div class="screen active" id="screen-home" style="overflow-y:auto;">
   <div class="home-hero" style="position:relative;">
+  <button onclick="openSettings()" title="Settings" style="position:absolute;top:10px;left:10px;z-index:10;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.3);border-radius:50%;width:36px;height:36px;font-size:17px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;" aria-label="Settings">&#9881;</button>
   <button onclick="location.reload()" title="Refresh" style="position:absolute;top:10px;right:10px;z-index:10;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.3);border-radius:50%;width:36px;height:36px;font-size:17px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;" aria-label="Refresh">&#8635;</button>
     <img src="images/logo-W.png" alt="Shea Kaller" onerror="this.style.display='none'">
     <h1>Event Builder</h1>
@@ -374,25 +378,19 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
       </div>
       <div class="home-btn-arrow">&#8250;</div>
     </div>
-    <div class="home-btn" onclick="openSettings()">
-      <div class="home-btn-icon" style="background:#f3f0ff;">&#9881;&#65039;</div>
-      <div class="home-btn-text">
-        <strong>App Settings</strong>
-        <span>Contacts, event types, defaults</span>
-      </div>
-      <div class="home-btn-arrow">&#8250;</div>
-    </div>
+
+```
+<!-- Saved Events search — inline in home-actions -->
+<div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:12px;" id="existing-events-section">
+  <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;">&#128197; Saved Events</div>
+  <div style="display:flex;gap:8px;margin-bottom:10px;">
+    <input type="date" id="events-date-filter" style="flex:1;font-size:13px;padding:9px 10px;border:1.5px solid var(--inp-border);border-radius:10px;background:var(--bg);color:var(--text);outline:none;-webkit-appearance:none;">
+    <button onclick="searchEvents()" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:9px 16px;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0;">Search</button>
   </div>
+  <div id="events-list"></div>
+</div>
+```
 
-  <!-- Existing events list (shown after tapping Open) -->
-
-  <div id="existing-events-section" style="padding:0 14px 20px;border-top:1px solid var(--border);margin-top:8px;">
-    <div style="font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;padding-top:4px;">Saved Events</div>
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-      <input type="date" id="events-date-filter" style="flex:1;font-size:13px;padding:10px 10px;border:1.5px solid var(--inp-border);border-radius:10px;background:var(--inp);color:var(--text);outline:none;-webkit-appearance:none;">
-      <button onclick="searchEvents()" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:11px 18px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;flex-shrink:0;">Search</button>
-    </div>
-    <div id="events-list"></div>
   </div>
   <!-- Spacer so content doesn't hide behind footer -->
   <div style="height:56px;flex-shrink:0;"></div>
@@ -408,12 +406,12 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v5.0
+  A Davidowitz Project &copy; 2026 - v5.7
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
 
-<div class="screen" id="screen-settings" style="flex-direction:column;">
+<div class="screen" id="screen-settings">
   <div class="tabs" id="tabs-settings" style="display:none;"><!-- hidden, settings has its own back --></div>
   <div class="scroll-area" id="settings-scroll">
 
@@ -496,7 +494,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
 
 <!-- ═══════════ EVENT SCREEN ═══════════ -->
 
-<div class="screen" id="screen-event" style="flex-direction:column;">
+<div class="screen" id="screen-event">
   <div class="tabs tabs-event">
     <button class="tab active" id="tab-details" onclick="switchEventTab('details')">&#9999;&#65038; Details</button>
     <button class="tab" id="tab-preview" onclick="switchEventTab('preview')">&#128065; Preview</button>
@@ -699,7 +697,7 @@ function showScreen(name) {
   var footer = document.getElementById('home-footer');
   if (name === 'home') {
     topbar.style.display = 'none';
-    document.getElementById('existing-events-section').style.display = 'none';
+    // existing-events-section is always visible
     if (footer) footer.style.display = 'block';
   } else {
     if (footer) footer.style.display = 'none';
@@ -1833,6 +1831,9 @@ window.addEventListener('DOMContentLoaded', function() {
   rebuildTypeSelect();
   showScreen('home');
   updateHomeTopbar();
+  // Show empty state in events list on load
+  var el = document.getElementById('events-list');
+  if (el && !el.innerHTML) el.innerHTML = '<div class="events-list-empty" style="padding:16px 0 4px;">Select a date or press Search to find events.</div>';
 });
 </script>
 
