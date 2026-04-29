@@ -33,7 +33,7 @@
   --inp-border:#cdd1e0;
 }
 html,body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;font-size:16px;-webkit-text-size-adjust:100%;height:100%;overflow:hidden;}
-#app{display:flex;flex-direction:column;height:100%;overflow:hidden;}
+#app{display:flex;flex-direction:column;height:100%;overflow:hidden;position:relative;}
 
 /* ═══════════════════════════════════════════
 TOPBAR (dark navy, always visible)
@@ -74,8 +74,8 @@ border-bottom:3px solid transparent;margin-bottom:-1px;
 /* ═══════════════════════════════════════════
 SCREENS
 ═══════════════════════════════════════════ */
-.screen{display:none;flex:1;overflow:hidden;flex-direction:column;}
-.screen.active{display:flex;}
+.screen{display:none;flex:1;overflow:hidden;flex-direction:column;position:absolute;top:0;left:0;right:0;bottom:0;visibility:hidden;}
+.screen.active{display:flex;position:relative;visibility:visible;}
 .scroll-area{flex:1;overflow-y:auto;padding:16px 14px 80px;-webkit-overflow-scrolling:touch;}
 
 /* ═══════════════════════════════════════════
@@ -135,17 +135,6 @@ padding:13px 14px;font-size:15px;font-family:‘Lato’,sans-serif;
 outline:none;-webkit-appearance:none;appearance:none;
 }
 input[type=date]::-webkit-calendar-picker-indicator{filter:opacity(.5);cursor:pointer;}
-input[type=time]{
--webkit-appearance:none;appearance:none;
-width:auto;display:inline-block;
-background:var(–inp);border:1.5px solid var(–inp-border);
-border-radius:10px;padding:11px 14px;font-size:15px;
-font-family:‘Lato’,sans-serif;color:var(–text);
-min-width:130px;max-width:160px;cursor:pointer;
-}
-input[type=time]::-webkit-date-and-time-value{text-align:left;}
-input[type=time]::-webkit-datetime-edit{color:var(–text);}
-input[type=time]::-webkit-datetime-edit-fields-wrapper{padding:0;}
 input:focus,textarea:focus,select:focus{border-color:var(–accent);box-shadow:0 0 0 3px rgba(74,93,168,.1);}
 input::placeholder,textarea::placeholder{color:#b0b8cc;}
 textarea{resize:vertical;min-height:70px;}
@@ -292,30 +281,31 @@ pointer-events:none;z-index:0;
 }
 .prev-watermark img{width:210px;height:210px;object-fit:contain;opacity:0.18;display:block;}
 
-.card-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-.card-title-row .card-title{margin-bottom:0;}
-.btn-broadcast{display:flex;align-items:center;gap:5px;background:#fff4e0;color:#c47f00;border:1.5px solid #f0c060;border-radius:20px;padding:5px 11px;font-size:11px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;letter-spacing:.02em;flex-shrink:0;}
-.btn-broadcast:active{background:#ffe8b0;}
-.bcast-popup-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:900;align-items:flex-end;justify-content:center;}
-.bcast-popup-overlay.open{display:flex;}
-.bcast-sheet{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:600px;padding:20px 16px 40px;max-height:85vh;display:flex;flex-direction:column;}
-.bcast-title{font-size:17px;font-weight:700;margin-bottom:4px;text-align:center;}
-.bcast-subtitle{font-size:12px;color:var(–muted);text-align:center;margin-bottom:14px;}
-.bcast-search{width:100%;margin-bottom:10px;}
-.bcast-list{overflow-y:auto;flex:1;margin-bottom:12px;}
+/* TIME INPUT */
+input[type=time]{-webkit-appearance:none;appearance:none;width:auto;display:inline-block;background:var(–inp);border:1.5px solid var(–inp-border);border-radius:10px;padding:11px 14px;font-size:15px;font-family:‘Lato’,sans-serif;color:var(–text);min-width:130px;max-width:160px;cursor:pointer;}
+input[type=time]::-webkit-date-and-time-value{text-align:left;}
+input[type=date]::-webkit-calendar-picker-indicator{filter:opacity(.5);cursor:pointer;}
+/* BROADCAST */
+.btn-broadcast{background:#e8f0fe;color:#3347a0;border:1.5px solid #c8d0f0;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0;}
+.btn-broadcast:active{background:#d0dbfc;}
+/* UPCOMING BADGE */
+.badge-upcoming{display:inline-block;background:#e8f4ff;color:#1a6fb5;border:1px solid #b3d8f5;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:700;letter-spacing:.04em;margin-left:6px;vertical-align:middle;}
+/* BROADCAST ITEMS */
 .bcast-item{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid var(–border);cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .bcast-item:last-child{border-bottom:none;}
 .bcast-item:active{background:#f5f7ff;}
 .bcast-check{width:28px;height:28px;border-radius:7px;border:2.5px solid #aab0c8;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:17px;font-weight:900;transition:background .15s,border-color .15s;color:transparent;}
 .bcast-check.checked{background:#2eaa7a;border-color:#2eaa7a;color:#fff;}
 .bcast-item-info{flex:1;}
-.bcast-item-name{font-size:15px;font-weight:700;}
+.bcast-item-name{font-weight:700;font-size:14px;color:var(–text);}
 .bcast-item-sub{font-size:12px;color:var(–muted);margin-top:2px;}
-.bcast-actions{display:flex;gap:8px;}
-.btn-bcast-send{flex:1;background:#e8a020;color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;}
-.btn-bcast-send:active{background:#c88010;}
-.btn-bcast-cancel{background:#f0f2f7;color:var(–muted);border:1px solid var(–border);border-radius:12px;padding:14px 18px;font-size:14px;font-weight:700;cursor:pointer;}
-.badge-upcoming{display:inline-block;background:#e8f4ff;color:#1a6fb5;border:1px solid #b3d8f5;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:700;letter-spacing:.04em;margin-left:6px;vertical-align:middle;}
+/* EVENT OPTIONS */
+.options-row{display:flex;align-items:center;width:100%;text-align:left;background:none;border:none;border-bottom:1px solid var(–border);padding:15px 6px;font-size:16px;color:var(–text);cursor:pointer;font-family:‘Lato’,sans-serif;-webkit-tap-highlight-color:transparent;}
+.options-row:last-child{border-bottom:none;}
+.options-row:active{background:#f5f7ff;}
+.options-row-wa{color:#128C7E;}
+.options-row-del{color:#d93025;}
+
 /* ═══════════════════════════════════════════
 TOAST
 ═══════════════════════════════════════════ */
@@ -344,8 +334,8 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
 .preview-scaler{width:100%!important;overflow:visible!important;}
 .preview-wrapper{width:100%!important;transform:none!important;box-shadow:none!important;border-radius:0!important;}
 .preview-inner{padding:12px 16px!important;}
-.prev-watermark{bottom:24px!important;right:24px!important;width:210px!important;height:210px!important;}
-.prev-watermark img{width:210px!important;height:210px!important;opacity:0.18!important;}
+.prev-watermark{bottom:8px!important;right:8px!important;}
+.prev-watermark img{width:160px!important;opacity:0.18!important;}
 }
 </style>
 
@@ -421,7 +411,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v4.4
+  A Davidowitz Project &copy; 2026 - v4.5
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -541,13 +531,13 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
       <div class="field"><label>Chuppah / Main Event Time</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-chuppah" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-chuppah')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
     </div>
     <div class="card">
-      <div class="card-title-row"><div class="card-title">Band Members</div><button class="btn-broadcast" onclick="openBroadcast('band')">&#128228; Broadcast</button></div>
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">Band Members<button class="btn-broadcast" onclick="openBroadcast('band')">&#128226; Broadcast</button></div>
       <div id="band-list" class="member-list"></div>
       <div id="band-na" style="font-size:13px;color:var(--muted);margin-bottom:8px;display:none;">N/A</div>
       <button class="btn-add-member" id="btn-add-band" onclick="openPopup('band')">&#43; Add Band Member</button>
     </div>
     <div class="card">
-      <div class="card-title-row"><div class="card-title">Singers</div><button class="btn-broadcast" onclick="openBroadcast('singer')">&#128228; Broadcast</button></div>
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">Singers<button class="btn-broadcast" onclick="openBroadcast('singer')">&#128226; Broadcast</button></div>
       <div id="singer-list" class="member-list"></div>
       <div id="singer-na" style="font-size:13px;color:var(--muted);margin-bottom:8px;display:none;">N/A</div>
       <button class="btn-add-member" id="btn-add-singer" onclick="openPopup('singer')">&#43; Add Singer</button>
@@ -590,19 +580,24 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
 
 <!-- BROADCAST POPUP -->
 
-<div class="bcast-popup-overlay" id="broadcast-popup">
-  <div class="bcast-sheet">
-    <div class="bcast-title" id="bcast-title">&#128228; Broadcast Availability</div>
-    <div class="bcast-subtitle" id="bcast-subtitle">Select recipients to check availability</div>
-    <input type="text" class="bcast-search" id="bcast-search" placeholder="Search..." oninput="filterBroadcast()">
-    <div class="bcast-list" id="bcast-list"></div>
-    <div class="bcast-actions">
-      <button class="btn-bcast-cancel" onclick="closeBroadcast()">Cancel</button>
-      <button class="btn-bcast-send" id="bcast-send-btn" onclick="sendBroadcast()">&#9993; Send Broadcast</button>
-    </div>
+<div class="popup-overlay" id="bcast-popup">
+  <div class="popup-sheet">
+    <div class="popup-title" id="bcast-title">&#128226; Broadcast</div>
+    <p style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:12px;" id="bcast-sub">Select recipients</p>
+    <input type="text" class="popup-search" id="bcast-search" placeholder="Search..." oninput="filterBroadcast()">
+    <div class="popup-list" id="bcast-list"></div>
+    <button id="bcast-send-btn" onclick="sendBroadcast()" style="display:block;width:100%;margin-top:10px;background:#4a5da8;color:#fff;border:none;border-radius:10px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;">&#9993; Send Broadcast Email</button>
+    <button class="popup-close" onclick="closeBroadcast()">Cancel</button>
   </div>
 </div>
-
+<!-- EVENT OPTIONS POPUP -->
+<div class="popup-overlay" id="event-options-popup">
+  <div class="popup-sheet" style="padding-bottom:10px;">
+    <div class="popup-title" style="margin-bottom:4px;">Event Options</div>
+    <div id="event-options-list" style="display:flex;flex-direction:column;gap:0;margin-top:8px;"></div>
+    <button class="popup-close" style="margin-top:8px;" onclick="closeEventOptions()">Cancel</button>
+  </div>
+</div>
 </div><!-- /app -->
 <div id="toast"></div>
 
@@ -665,7 +660,7 @@ function loadAll() {
 }
 function saveDefs() {
   var d = {};
-  ['def-sc-rhythm','def-sc-horns','def-kp-start','def-kp-note','def-chuppah','def-dresscode','def-notes'].forEach(function(k) {
+  ['def-sc-rhythm','def-sc-horns','def-sc-strings','def-kp-start','def-kp-note','def-chuppah','def-dresscode','def-notes'].forEach(function(k) {
     var el = document.getElementById(k); if (el) d[k] = el.value;
   });
   lsSet(LS.defs, d);
@@ -678,9 +673,8 @@ function showScreen(name) {
   ['home','settings','event'].forEach(function(s) {
     var el = document.getElementById('screen-' + s);
     if (el) el.classList.toggle('active', s === name);
-    // Always scroll to top when switching screens
-    if (el && s === name) { el.scrollTop = 0; }
   });
+  setTimeout(function(){var t=document.getElementById('screen-'+name);if(t){t.scrollTop=0;}},50);
   var topbar = document.getElementById('topbar');
   var footer = document.getElementById('home-footer');
   if (name === 'home') {
@@ -793,14 +787,6 @@ function showExistingEvents() {
   document.getElementById('events-date-filter').value = '';
   sec.scrollIntoView({behavior:'smooth'});
 }
-function searchEvents() {
-  var dateFilter = document.getElementById('events-date-filter').value;
-  var list = document.getElementById('events-list');
-  if (!savedEvents.length) { list.innerHTML = '<div class="events-list-empty">No saved events yet.<br>Create your first event above.</div>'; return; }
-  var filtered = dateFilter ? savedEvents.filter(function(ev){ return ev.date === dateFilter; }) : savedEvents.slice();
-  if (!filtered.length) { list.innerHTML = '<div class="events-list-empty">No events found for that date.</div>'; return; }
-  renderEventsList(filtered);
-}
 function renderEventsList(eventsToShow) {
   var list = document.getElementById('events-list');
   var events = eventsToShow || savedEvents;
@@ -817,20 +803,13 @@ function renderEventsList(eventsToShow) {
     var dateStr = fmtDate(ev.date) || 'No date';
     var typeStr = ev.typeCustom || ev.type || 'Event';
     var venueStr = ev.venueName || 'No venue';
-    var isUpcoming=false; if(ev.date){var evDate=new Date(ev.date+'T00:00:00');var today=new Date();today.setHours(0,0,0,0);isUpcoming=evDate>=today;}
-    var upcomingBadge=isUpcoming?'<span class="badge-upcoming">&#9650; Upcoming</span>':'';
     card.innerHTML = '<div class="event-card-info">' +
-      '<div class="event-card-title">' + esc(typeStr) + ' – ' + esc(venueStr) + '</div>' +
-      '<div class="event-card-sub">' + esc(dateStr) + upcomingBadge + '</div>' +
+      '<div class="event-card-title">' + esc(typeStr) + ' \u2013 ' + esc(venueStr) + '</div>' +
+      '<div class="event-card-sub">' + esc(dateStr) + '</div>' +
       '</div>' +
       '<div style="display:flex;gap:6px;align-items:center;">' +
-      '<button onclick="deleteEvent(\'' + ev.id + '\',event)" style="background:#fff0f0;color:#d93025;border:1px solid #fdd;border-radius:8px;width:32px;height:32px;font-size:14px;cursor:pointer;flex-shrink:0;">&#128465;</button>' +
-      '<div class="event-card-arrow">&#8250;</div>' +
+      '<button onclick="showEventOptions(\''+ev.id+'\',event)" style="background:#f0f2f7;color:#4a5da8;border:1.5px solid #c8d0f0;border-radius:8px;width:36px;height:36px;font-size:20px;cursor:pointer;flex-shrink:0;">&#8943;</button>' +
       '</div>';
-    card.addEventListener('click', function(e) {
-      if (e.target.tagName === 'BUTTON') return;
-      openExistingEvent(ev.id);
-    });
     list.appendChild(card);
   });
 }
@@ -884,7 +863,6 @@ function setEventEditMode(editable) {
   ['f-venue','f-address'].forEach(function(id){ var el=document.getElementById(id); if(el){el.setAttribute('disabled','true');el.style.background='#f3f4f8';el.style.color='#888';}});
   var addBtns = document.querySelectorAll('.btn-add-member');
   addBtns.forEach(function(b){ b.style.display = editable ? 'flex' : 'none'; });
-  document.querySelectorAll('.btn-broadcast').forEach(function(b){ b.style.display = 'flex'; });
   var delBtns = document.querySelectorAll('.member-tag-del');
   delBtns.forEach(function(b){ b.style.display = editable ? 'block' : 'none'; });
 }
@@ -989,59 +967,45 @@ function onVenueInput() {
   venueSearchTimer = setTimeout(function() { searchVenue(q); }, 500);
 }
 
-// Hardcoded bias: Brooklyn, NY — no GPS prompt
-var BIAS_LAT = 40.6782;
-var BIAS_LON = -73.9442;
-
-function searchVenue(q) {
-  // Use Photon API (Komoot) — better relevance than Nominatim, no API key needed
-  // lat/lon bias pushes NJ/NY results to the top
-  var url = 'https://photon.komoot.io/api/?q=' + encodeURIComponent(q) +
-            '&lat=' + BIAS_LAT + '&lon=' + BIAS_LON +
-            '&limit=7&lang=en';
-  fetch(url)
-    .then(function(r){ return r.json(); })
-    .then(function(data){ showLocDrop(data.features || [], q); })
-    .catch(function(){ showLocDrop([], q); });
+var BIAS_LAT=40.6782,BIAS_LON=-73.9442;
+function searchVenue(q){
+  var url='https://photon.komoot.io/api/?q='+encodeURIComponent(q)+'&lat='+BIAS_LAT+'&lon='+BIAS_LON+'&limit=7&lang=en';
+  fetch(url).then(function(r){return r.json();}).then(function(data){showLocDrop(data.features||[],q);}).catch(function(){showLocDrop([],q);});
 }
 
+function buildAddress(a) {
+  var parts = [];
+  if (a.house_number && a.road) parts.push(a.house_number + ' ' + a.road);
+  else if (a.road) parts.push(a.road);
+  var city = a.city || a.town || a.village || a.hamlet || '';
+  if (city) parts.push(city);
+  if (a.state) parts.push(a.state);
+  if (a.postcode) parts.push(a.postcode);
+  return parts.join(', ');
+}
 
-
-function showLocDrop(results, q) {
-  var drop = document.getElementById('loc-drop');
-  drop.innerHTML = '';
-
-  (results||[]).forEach(function(r) {
-    var p = r.properties || {};
-    // Build a clean display name
-    var name = p.name || p.street || q;
-    // Build address line from Photon properties
-    var addrParts = [];
-    if (p.housenumber && p.street) addrParts.push(p.housenumber + ' ' + p.street);
-    else if (p.street) addrParts.push(p.street);
-    if (p.city || p.town || p.village) addrParts.push(p.city || p.town || p.village);
-    if (p.state) addrParts.push(p.state);
-    if (p.postcode) addrParts.push(p.postcode);
-    var addr = addrParts.join(', ');
-    // Skip if name and addr are essentially the same (dedup)
-    if (!addr || addr === name) addr = p.country || '';
-    var item = document.createElement('div'); item.className = 'loc-item';
-    item.innerHTML = '<div class="loc-name">'+esc(name)+'</div><div class="loc-addr">'+esc(addr)+'</div>';
-    item.addEventListener('mousedown', function(e){ e.preventDefault(); });
-    item.addEventListener('click', function(){ selectVenue(name, addr); });
+function showLocDrop(results,q){
+  var drop=document.getElementById('loc-drop');drop.innerHTML='';
+  (results||[]).forEach(function(r){
+    var p=r.properties||{};
+    var name=p.name||p.street||q;
+    var addrParts=[];
+    if(p.housenumber&&p.street)addrParts.push(p.housenumber+' '+p.street);else if(p.street)addrParts.push(p.street);
+    if(p.city||p.town||p.village)addrParts.push(p.city||p.town||p.village);
+    if(p.state)addrParts.push(p.state);if(p.postcode)addrParts.push(p.postcode);
+    var addr=addrParts.join(', ');if(!addr||addr===name)addr=p.country||'';
+    var item=document.createElement('div');item.className='loc-item';
+    item.innerHTML='<div class="loc-name">'+esc(name)+'</div><div class="loc-addr">'+esc(addr)+'</div>';
+    item.addEventListener('mousedown',function(e){e.preventDefault();});
+    item.addEventListener('click',function(){selectVenue(name,addr);});
     drop.appendChild(item);
   });
-
-  // Always show "Enter manually" option
-  var manual = document.createElement('div'); manual.className = 'loc-item';
-  manual.style.cssText = 'border-top:1px dashed #dde1ec;';
-  manual.innerHTML = '<div class="loc-name" style="color:var(--accent)">&#9998; Use "'+esc(q)+'" — enter address manually</div>';
-  manual.addEventListener('mousedown', function(e){ e.preventDefault(); });
-  manual.addEventListener('click', function(){ useManualVenue(q); });
-  drop.appendChild(manual);
-  drop.style.display = 'block';
+  var manual=document.createElement('div');manual.className='loc-item';manual.style.cssText='border-top:1px dashed #dde1ec;';
+  manual.innerHTML='<div class="loc-name" style="color:var(--accent)">&#9998; Use "'+esc(q)+'" — enter address manually</div>';
+  manual.addEventListener('mousedown',function(e){e.preventDefault();});
+  manual.addEventListener('click',function(){useManualVenue(q);});
+  drop.appendChild(manual);drop.style.display='block';
 }
-
 function selectVenue(name, addr) {
   venueSelected = true;
   sv('f-venue-search', '');  // clear search field
@@ -1299,8 +1263,7 @@ function validateEvent() {
   var ok = true;
   if (!gv('f-date'))  { showErr('fd-date');  ok=false; }
   if (!gv('f-type'))  { showErr('fd-type');  ok=false; }
-  if (gv('f-type') === 'Other' && !gv('f-type-custom').trim()) { showErr('fd-custom'); ok=false; }
-  else clearErr('fd-custom');
+  if (gv('f-type') === 'Other' && !gv('f-type-custom').trim()) { showErr('fd-custom'); ok=false; } else clearErr('fd-custom');
   if (!gv('f-venue') && !gv('f-venue-search')) { showErr('fd-venue-search'); ok=false; }
   return ok;
 }
@@ -1324,10 +1287,8 @@ function saveContact() {
   else clearErr('fd-nc-email');
   if (!ctype) { showErr('fd-nc-type'); ok=false; }
   else clearErr('fd-nc-type');
-  if (ctype === 'band' && !role) { showErr('fd-nc-role'); ok=false; }
-  else clearErr('fd-nc-role');
-  if (!isValidPhone(phone)) { showErr('fd-nc-phone'); ok=false; }
-  else clearErr('fd-nc-phone');
+  if (ctype === 'band' && !role) { showErr('fd-nc-role'); ok=false; } else clearErr('fd-nc-role');
+  if (!isValidPhone(phone)) { showErr('fd-nc-phone'); ok=false; } else clearErr('fd-nc-phone');
   if (!ok) { toast('Please fix the errors above', true); return; }
   if (editId) {
     var idx = contacts.findIndex(function(c){ return String(c.id)===String(editId); });
@@ -1352,21 +1313,6 @@ function cancelContactEdit() {
   ['fd-nc-name','fd-nc-email','fd-nc-phone','fd-nc-type'].forEach(clearErr);
   onContactTypeChange();
 }
-function onContactTypeChange() {
-  var ctype = document.getElementById('nc-type').value;
-  var roleField = document.getElementById('fd-nc-role');
-  var roleInput = document.getElementById('nc-role');
-  var roleLabel = roleField ? roleField.querySelector('label') : null;
-  if (ctype === 'band') {
-    if (roleField) roleField.style.display = 'block';
-    if (roleLabel) roleLabel.className = 'req-label';
-  } else {
-    if (roleField) roleField.style.display = 'none';
-    if (roleInput) roleInput.value = '';
-    if (roleLabel) roleLabel.className = '';
-    clearErr('fd-nc-role');
-  }
-}
 function editContact(id) {
   var c = contacts.find(function(c){ return c.id===id; });
   if (!c) return;
@@ -1376,8 +1322,8 @@ function editContact(id) {
   document.getElementById('nc-role').value  = c.role||'';
   document.getElementById('nc-phone').value = c.phone||'';
   document.getElementById('nc-type').value  = c.ctype||'';
-  onContactTypeChange();
   document.getElementById('nc-default').checked = !!c.isDefault;
+  onContactTypeChange();
   document.getElementById('nc-cancel').style.display='block';
   document.getElementById('cf-title').textContent='Edit Contact';
   var fw=document.getElementById('contact-form-wrap');
@@ -1518,7 +1464,7 @@ function doSaveAsPDF() {
 
       btn.innerHTML = origText;
       btn.disabled  = false;
-      
+
     }).catch(function(err) {
       wrapper.style.transform = origTransform;
       wrapper.style.width     = origWidth;
@@ -1583,7 +1529,7 @@ function renderPreview() {
       '<p><strong>Type of Event:</strong> '+esc(type||'___')+'<br><strong>Location:</strong> '+esc(venue||'___')+(address?' \u2013 '+esc(address):'')+'</p>' +
       '<hr class="prev-divider">' +
       '<p><strong>Sound Check Schedule:</strong></p><ul>'+(scR?'<li>Rhythm: '+esc(scR)+'</li>':'')+(scH?'<li>Horns: '+esc(scH)+'</li>':'')+(scS?'<li>Strings in Lobby: '+esc(scS)+'</li>':'')+'</ul>' +
-      '<p><strong>Event Schedule:</strong></p><ul><li>KP Start time: '+esc(kpS)+(kpN?' ('+esc(kpN)+')':'')+'</li><li>Chuppah / Main Event: '+esc(chu)+'</li></ul>' +
+      '<p><strong>Event Schedule:</strong></p><ul><li>KP Start time: '+esc(kpS)+(kpN?' ('+esc(kpN)+')':'')+'</li><li>Chuppah: '+esc(chu)+'</li></ul>' +
       '<p><strong>Band Members:</strong></p><ul>'+bandH+'</ul>' +
       '<p><strong>Singers:</strong></p><ul>'+singerH+'</ul>' +
       (choirH ? '<p><strong>Groups / Choirs:</strong></p><ul>'+choirH+'</ul>' : '') +
@@ -1617,14 +1563,11 @@ function emailCrew() {
   if (!cc.length) { toast('No emails found. Check contacts.', true); return; }
   var date  = fmtDate(currentEvent.date||gv('f-date'));
   var venue = currentEvent.venueName||gv('f-venue')||'';
-  var dateShort = fmtDateShort(currentEvent.date||gv('f-date'));
-  var evType = '';
-  if (currentEvent.type === 'Other' || currentEvent.type === '') {
-    evType = currentEvent.typeCustom || gv('f-type-custom') || '';
-  } else {
-    evType = currentEvent.type || gv('f-type') || '';
-  }
-  var subj  = encodeURIComponent('Event Details - ' + (evType||'Event') + ' on ' + (dateShort||date) + (venue?' at '+venue:''));
+  var evType2='';
+  if(currentEvent.type==='Other'||currentEvent.type===''){evType2=currentEvent.typeCustom||gv('f-type-custom')||'';}
+  else{evType2=currentEvent.type||gv('f-type')||'';}
+  var dateShort2=fmtDateShort(currentEvent.date||gv('f-date'));
+  var subj=encodeURIComponent('Event Details - '+(evType2||'Event')+' on '+(dateShort2||date)+(venue?' at '+venue:''));
   var bodyText = 'Dear Crew,\n\nPlease find attached the event details'+(date?' for '+date:'')+(venue?' at '+venue:'')+
     '.\n\nPlease review the schedule and lineup carefully.\n\nThank you,\nSK Music Production Inc\n845-445-6100\nInfo@Sheakallerband.com';
   var body = encodeURIComponent(bodyText);
@@ -1660,142 +1603,112 @@ function toast(msg,isErr){
 // ═══════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════
-// == HELPERS ==
-function fmtTime(val){
-  if(!val)return'';
-  var parts=val.split(':'); if(parts.length<2)return val;
-  var h=parseInt(parts[0],10),m=parts[1];
-  var ampm=h>=12?'PM':'AM'; h=h%12; if(h===0)h=12;
-  return h+':'+m+' '+ampm;
-}
-function fmtDateShort(val){
-  if(!val)return'';
-  var p=val.split('-'); if(p.length!==3)return val;
-  var y=parseInt(p[0]),mo=parseInt(p[1]),d=parseInt(p[2]);
-  if(!y||!mo||!d)return val;
-  var yy=String(y).slice(-2);
-  return (mo<10?'0':'')+mo+'/'+(d<10?'0':'')+d+'/'+yy;
-}
-function clearTimeField(id){
-  var el=document.getElementById(id);
-  if(el){el.value='';el.dispatchEvent(new Event('input'));}
-}
-function formatPhoneInput(input){
-  var digits=input.value.replace(/\D/g,'').substring(0,10);
-  var f='';
-  if(digits.length===0){f='';}
-  else if(digits.length<=3){f='('+digits;}
-  else if(digits.length<=6){f='('+digits.substring(0,3)+') '+digits.substring(3);}
-  else{f='('+digits.substring(0,3)+') '+digits.substring(3,6)+'-'+digits.substring(6);}
-  input.value=f; clearErr('fd-nc-phone');
-}
-function isValidPhone(p){
-  if(!p)return true;
-  return p.replace(/\D/g,'').length===10;
-}
-// == BROADCAST ==
-var broadcastType='';
-var broadcastSelected=[];
+
+// ── UTILITIES ──────────────────────────────────────────────────
+function formatPhoneInput(input){var d=input.value.replace(/\D/g,'').substring(0,10);var f='';if(d.length===0)f='';else if(d.length<=3)f='('+d;else if(d.length<=6)f='('+d.substring(0,3)+') '+d.substring(3);else f='('+d.substring(0,3)+') '+d.substring(3,6)+'-'+d.substring(6);input.value=f;clearErr('fd-nc-phone');}
+function isValidPhone(p){if(!p)return true;return p.replace(/\D/g,'').length===10;}
+function clearTimeField(id){var el=document.getElementById(id);if(el){el.value='';el.dispatchEvent(new Event('input'));}}
+function fmtDateShort(val){if(!val)return'';var p=val.split('-');if(p.length!==3)return val;var y=parseInt(p[0]),m=parseInt(p[1]),d=parseInt(p[2]);if(!y||!m||!d)return val;var yy=String(y).slice(-2);return(m<10?'0':'')+m+'/'+(d<10?'0':'')+d+'/'+yy;}
+function fmtTime(val){if(!val)return'';var parts=val.split(':');if(parts.length<2)return val;var h=parseInt(parts[0],10);var m=parts[1];var ampm=h>=12?'PM':'AM';h=h%12;if(h===0)h=12;return h+':'+m+' '+ampm;}
+
+// ── CONTACT TYPE CHANGE ────────────────────────────────────────
+function onContactTypeChange(){var ctype=document.getElementById('nc-type').value;var rf=document.getElementById('fd-nc-role');var ri=document.getElementById('nc-role');var rl=rf?rf.querySelector('label'):null;if(ctype==='band'){if(rf)rf.style.display='block';if(rl)rl.className='req-label';}else{if(rf)rf.style.display='none';if(ri)ri.value='';if(rl)rl.className='';clearErr('fd-nc-role');}}
+
+// ── SEARCH EVENTS ──────────────────────────────────────────────
+function searchEvents(){var df=document.getElementById('events-date-filter').value;var list=document.getElementById('events-list');if(!savedEvents.length){list.innerHTML='<div class="events-list-empty">No saved events yet.<br>Create your first event above.</div>';return;}var filtered=df?savedEvents.filter(function(ev){return ev.date===df;}):savedEvents.slice();if(!filtered.length){list.innerHTML='<div class="events-list-empty">No events found for that date.</div>';return;}renderEventsList(filtered);}
+
+// ── BROADCAST ──────────────────────────────────────────────────
+var broadcastType='',broadcastSelected=[];
 function openBroadcast(type){
   if(!gv('f-date')||!gv('f-type')){toast('Please fill in Date and Event Type first',true);return;}
-  // Block broadcast for past events
-  var evDate = gv('f-date');
-  if(evDate){var d=new Date(evDate+'T00:00:00'),tod=new Date();tod.setHours(0,0,0,0);if(d<tod){toast('Cannot broadcast for a past event',true);return;}}
-  broadcastType=type; broadcastSelected=[];
+  var evDate=gv('f-date');if(evDate){var d=new Date(evDate+'T00:00:00'),tod=new Date();tod.setHours(0,0,0,0);if(d<tod){toast('Cannot broadcast for a past event',true);return;}}
+  broadcastType=type;broadcastSelected=[];
   var lbl=type==='band'?'Band Members':'Singers';
-  document.getElementById('bcast-title').textContent='\u{1F4E2} Broadcast to '+lbl;
-  document.getElementById('bcast-subtitle').textContent="Select who to check availability with \u2014 they will be BCC'd";
+  document.getElementById('bcast-title').textContent='\uD83D\uDCE2 Broadcast \u2013 '+lbl;
+  document.getElementById('bcast-sub').textContent='Select who to check availability with \u2014 they will be BCC\u2019d';
   document.getElementById('bcast-search').value='';
   filterBroadcast();
-  document.getElementById('broadcast-popup').classList.add('open');
+  document.getElementById('bcast-popup').classList.add('open');
 }
-function closeBroadcast(){
-  document.getElementById('broadcast-popup').classList.remove('open');
-  broadcastType=''; broadcastSelected=[];
-}
+function closeBroadcast(){document.getElementById('bcast-popup').classList.remove('open');broadcastType='';broadcastSelected=[];}
 function filterBroadcast(){
   var q=document.getElementById('bcast-search').value.toLowerCase();
   var pool=contacts.filter(function(c){return c.ctype===broadcastType;});
   if(q)pool=pool.filter(function(c){return c.name.toLowerCase().indexOf(q)>=0||(c.role||'').toLowerCase().indexOf(q)>=0;});
-  var list=document.getElementById('bcast-list');
-  list.innerHTML='';
-  if(!pool.length){
-    list.innerHTML='<div style="text-align:center;color:var(--muted);font-size:14px;padding:20px;">No contacts found.</div>';
-    updateBroadcastBtn();return;
-  }
-  pool.forEach(function(c){
-    var item=document.createElement('div');
-    item.className='bcast-item';
-    item.setAttribute('data-id', c.id);
-    var isChk=broadcastSelected.indexOf(c.id)>=0;
-    // Check if already confirmed on this event
-    var eventList = broadcastType === 'band' ? (currentEvent.band||[]) : (currentEvent.singers||[]);
-    var isConfirmed = eventList.some(function(m){ return m.id === c.id; });
-    var confirmedBadge = isConfirmed ? '<span style="display:inline-block;background:#fff3cd;color:#856404;border:1px solid #ffc107;border-radius:12px;padding:1px 8px;font-size:10px;font-weight:700;margin-left:6px;">&#10003; Confirmed</span>' : '';
-    item.innerHTML=
-      '<div class="bcast-check'+(isChk?' checked':'')+'" id="bchk-'+c.id+'">'+( isChk?'&#10004;':'')+' </div>'+
-      '<div class="bcast-item-info">'+
-        '<div class="bcast-item-name">'+esc(c.name)+confirmedBadge+'</div>'+
-        '<div class="bcast-item-sub">'+esc(c.role||'')+(c.email?' · '+esc(c.email):'')+(c.phone?' · '+esc(c.phone):'')+'</div>'+
-      '</div>';
-    // Use closure to capture c.id
-    (function(cid){
-      item.addEventListener('click', function(){
-        var idx=broadcastSelected.indexOf(cid);
-        if(idx>=0) broadcastSelected.splice(idx,1);
-        else broadcastSelected.push(cid);
-        // Update just this checkbox in-place, no full re-render
-        var chkEl=document.getElementById('bchk-'+cid);
-        var nowChk=broadcastSelected.indexOf(cid)>=0;
-        if(chkEl){
-          chkEl.className='bcast-check'+(nowChk?' checked':'');
-          chkEl.innerHTML=nowChk?'&#10004;':'';
-        }
-        item.style.background=nowChk?'#e8f7f1':'';
-        updateBroadcastBtn();
-      });
-    })(c.id);
+  var list=document.getElementById('bcast-list');list.innerHTML='';
+  if(!pool.length){list.innerHTML='<div style="text-align:center;color:var(--muted);font-size:14px;padding:20px;">No contacts found.</div>';updateBroadcastBtn();return;}
+  var eventList=broadcastType==='band'?(currentEvent&&currentEvent.band||[]):(currentEvent&&currentEvent.singers||[]);
+  pool.forEach(function(con){
+    var item=document.createElement('div');item.className='bcast-item';item.setAttribute('data-id',con.id);
+    var isChk=broadcastSelected.indexOf(con.id)>=0;
+    var isConf=eventList.some(function(m){return m.id===con.id;});
+    var confBadge=isConf?'<span style="display:inline-block;background:#fff3cd;color:#856404;border:1px solid #ffc107;border-radius:12px;padding:1px 8px;font-size:10px;font-weight:700;margin-left:6px;">\u2713 Confirmed</span>':'';
+    item.innerHTML='<div class="bcast-check'+(isChk?' checked':'')+'" id="bchk-'+con.id+'">'+(isChk?'&#10004;':'')+'</div>'+'<div class="bcast-item-info"><div class="bcast-item-name">'+esc(con.name)+confBadge+'</div>'+'<div class="bcast-item-sub">'+esc(con.role||'')+(con.email?' \u00b7 '+esc(con.email):'')+(con.phone?' \u00b7 '+esc(con.phone):'')+'</div></div>';
+    (function(cid){item.addEventListener('click',function(){
+      var idx=broadcastSelected.indexOf(cid);
+      if(idx>=0)broadcastSelected.splice(idx,1);else broadcastSelected.push(cid);
+      var chkEl=document.getElementById('bchk-'+cid);var nowChk=broadcastSelected.indexOf(cid)>=0;
+      if(chkEl){chkEl.className='bcast-check'+(nowChk?' checked':'');chkEl.innerHTML=nowChk?'&#10004;':'';}
+      item.style.background=nowChk?'#e8f7f1':'';
+      updateBroadcastBtn();
+    });})(con.id);
     list.appendChild(item);
   });
   updateBroadcastBtn();
 }
-function updateBroadcastBtn(){
-  var btn=document.getElementById('bcast-send-btn');
-  btn.innerHTML=broadcastSelected.length
-    ?'&#9993; Send to '+broadcastSelected.length+' recipient'+(broadcastSelected.length!==1?'s':'')
-    :'&#9993; Send Broadcast';
-}
+function updateBroadcastBtn(){var btn=document.getElementById('bcast-send-btn');if(!btn)return;var n=broadcastSelected.length;btn.textContent=n>0?'\u2709 Send to '+n+' recipient'+(n>1?'s':''):'\u2709 Send Broadcast Email';btn.style.opacity=n>0?'1':'0.5';}
 function sendBroadcast(){
-  if(!broadcastSelected.length){toast('Select at least one recipient',true);return;}
-  var bccs=[];
-  broadcastSelected.forEach(function(id){
-    var c=contacts.find(function(x){return x.id===id;});
-    if(c&&c.email)bccs.push(c.email);
-  });
-  if(!bccs.length){toast('No email addresses found',true);return;}
-  var date=fmtDate(currentEvent.date||gv('f-date'));
-  var dateShort=fmtDateShort(currentEvent.date||gv('f-date'));
-  var venue=currentEvent.venueName||gv('f-venue')||'';
-  var evType=(currentEvent.type==='Other'||!currentEvent.type)
-    ?(currentEvent.typeCustom||gv('f-type-custom')||'')
-    :(currentEvent.type||gv('f-type')||'');
-  var subj=encodeURIComponent('Availability Check \u2013 '+(evType||'Event')+' on '+dateShort+(venue?' at '+venue:''));
-  var body=encodeURIComponent(
-    'Hi,\n\nWe are reaching out to check your availability for the following event:\n\n'+
-    '  Event:  '+(evType||'TBD')+'\n'+
-    '  Date:   '+(date||'TBD')+'\n'+
-    (venue?'  Venue:  '+venue+'\n':'')+
-    '\nPlease reply at your earliest convenience to let us know if you are available.\n\n'+
-    'PLEASE NOTE: This is an availability inquiry only \u2014 it is NOT a booking or confirmation. '+
-    'A separate follow-up will be sent if we need to confirm your spot.\n\n'+
-    'Thank you,\nSK Music Production Inc\n845-445-6100\nInfo@Sheakallerband.com'
-  );
-  var a=document.createElement('a');
-  a.href='mailto:Info@Sheakallerband.com?bcc='+encodeURIComponent(bccs.join(','))+'&subject='+subj+'&body='+body;
-  a.style.display='none'; document.body.appendChild(a); a.click();
-  setTimeout(function(){document.body.removeChild(a);},300);
+  if(!broadcastSelected.length){toast('Please select at least one recipient',true);return;}
+  var bccs=[];broadcastSelected.forEach(function(id){var con=contacts.find(function(c){return c.id===id;});if(con&&con.email&&bccs.indexOf(con.email)<0)bccs.push(con.email);});
+  if(!bccs.length){toast('No emails found for selected contacts',true);return;}
+  var ev=currentEvent||{};
+  var evType=(ev.type==='Other'||!ev.type)?(ev.typeCustom||gv('f-type-custom')||'Event'):(ev.type||gv('f-type')||'Event');
+  var dateShort=fmtDateShort(ev.date||gv('f-date'));var dateLong=fmtDate(ev.date||gv('f-date'));var venue=ev.venueName||gv('f-venue')||'';
+  var subj=encodeURIComponent('Availability Check - '+evType+' on '+dateShort+(venue?' at '+venue:''));
+  var nl='\n';
+  var body='Hi,'+nl+nl+'We are reaching out to check your availability for an upcoming event:'+nl+nl+'  Event: '+evType+nl+'  Date:  '+dateLong+nl+(venue?'  Venue: '+venue+nl:'')+nl+'Please reply to let us know if you are available for this date.'+nl+nl+'NOTE: This is an availability inquiry only - not a booking or confirmation. A separate follow-up will be sent to confirmed crew members once the lineup is finalized.'+nl+nl+'Thank you,'+nl+'SK Music Production Inc'+nl+'845-445-6100'+nl+'Info@Sheakallerband.com';
+  var a=document.createElement('a');a.href='mailto:Info@Sheakallerband.com?bcc='+encodeURIComponent(bccs.join(','))+'&subject='+subj+'&body='+encodeURIComponent(body);a.style.display='none';document.body.appendChild(a);a.click();setTimeout(function(){document.body.removeChild(a);},300);
   closeBroadcast();
 }
+
+// ── EVENT OPTIONS MENU ─────────────────────────────────────────
+var optionsEventId=null;
+function showEventOptions(id,e){
+  if(e)e.stopPropagation();
+  var ev=savedEvents.find(function(ev){return ev.id===id;});if(!ev)return;
+  var list=document.getElementById('event-options-list');list.innerHTML='';
+  var b1=document.createElement('button');b1.className='options-row';b1.innerHTML='&#9998;\u00a0 Edit Event';
+  b1.addEventListener('click',function(){closeEventOptions();openExistingEvent(id);});list.appendChild(b1);
+  var b2=document.createElement('button');b2.className='options-row options-row-wa';
+  b2.innerHTML='<svg viewBox="0 0 24 24" width="18" height="18" style="vertical-align:middle;margin-right:8px;fill:#25D366;flex-shrink:0;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.118 1.532 5.847L.057 23.882l6.196-1.448A11.934 11.934 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.806 9.806 0 01-5.001-1.368l-.36-.214-3.68.859.899-3.573-.235-.375A9.813 9.813 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182c5.43 0 9.818 4.388 9.818 9.818 0 5.43-4.388 9.818-9.818 9.818z"/></svg>Share via WhatsApp';
+  b2.addEventListener('click',function(){closeEventOptions();shareEventWhatsApp(id);});list.appendChild(b2);
+  var b3=document.createElement('button');b3.className='options-row options-row-del';b3.innerHTML='&#128465;\u00a0 Delete Event';
+  b3.addEventListener('click',function(){closeEventOptions();if(confirm('Delete this event? This cannot be undone.'))deleteEvent(id,null);});list.appendChild(b3);
+  document.getElementById('event-options-popup').classList.add('open');
+}
+function closeEventOptions(){document.getElementById('event-options-popup').classList.remove('open');optionsEventId=null;}
+function shareEventWhatsApp(id){
+  var ev=savedEvents.find(function(ev){return ev.id===id;});if(!ev)return;
+  var evType=(ev.type==='Other')?(ev.typeCustom||'Event'):(ev.type||'Event');
+  var dateLong=fmtDate(ev.date||''),venue=ev.venueName||'',addr=ev.venueAddress||'';
+  var nl='\n';
+  var msg='*Event Details*'+nl+nl+'Dear Crew,'+nl+nl;
+  msg+='Please find below the schedule and band lineup for the event on *'+dateLong+'*'+(venue?' at *'+venue+'*':'')+'. '+nl+nl;
+  msg+='*Type of Event:* '+evType+nl;
+  if(venue)msg+='*Location:* '+venue+(addr?' \u2013 '+addr:'')+nl;
+  var scR=fmtTime(ev.scRhythm||''),scH=fmtTime(ev.scHorns||''),scS=fmtTime(ev.scStrings||'');
+  if(scR||scH||scS){msg+=nl+'*Sound Check Schedule*'+nl;if(scR)msg+='\u2022 Rhythm: '+scR+nl;if(scH)msg+='\u2022 Horns: '+scH+nl;if(scS)msg+='\u2022 Strings in Lobby: '+scS+nl;}
+  var kpS=fmtTime(ev.kpStart||''),kpN=ev.kpNote||'',chu=fmtTime(ev.chuppah||'');
+  if(kpS||kpN||chu){msg+=nl+'*Event Schedule*'+nl;if(kpS||kpN)msg+='\u2022 KP Start Time: '+(kpS||'')+(kpN?' ('+kpN+')':'')+nl;if(chu)msg+='\u2022 Chuppah / Main Event: '+chu+nl;}
+  var band=ev.band||[];if(band.length){msg+=nl+'*Band Members*'+nl;band.forEach(function(m){msg+='\u2022 '+(m.role?m.role+': ':'')+m.name+nl;});}
+  var singers=ev.singers||[];if(singers.length){msg+=nl+'*Singers*'+nl;singers.forEach(function(m){msg+='\u2022 '+m.name+nl;});}
+  var choir=ev.choir||[];if(choir.length){msg+=nl+'*Groups / Choirs*'+nl;choir.forEach(function(m){msg+='\u2022 '+m.name+(ev.choirCount?' - '+ev.choirCount+' Members':'')+nl;});}
+  if(ev.dresscode)msg+=nl+'*Dress Code*'+nl+'\u2022 '+ev.dresscode+nl;
+  if(ev.notes)msg+=nl+'*Note:* '+ev.notes+nl;
+  msg+=nl+'We\u2019ll keep you updated if anything changes.';
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+
 window.addEventListener('DOMContentLoaded', function() {
   loadAll();
   rebuildTypeSelect();
