@@ -420,7 +420,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v4.0
+  A Davidowitz Project &copy; 2026 - v4.2
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -480,6 +480,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Pre-fill values for every new event.</p>
   <div class="field"><label>Sound Check – Rhythm</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="def-sc-rhythm" oninput="saveDefs()"><button type="button" onclick="clearTimeField('def-sc-rhythm')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
   <div class="field"><label>Sound Check – Horns</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="def-sc-horns" oninput="saveDefs()"><button type="button" onclick="clearTimeField('def-sc-horns')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
+  <div class="field"><label>Strings in Lobby</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="def-sc-strings" oninput="saveDefs()"><button type="button" onclick="clearTimeField('def-sc-strings')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
   <div class="field"><label>KP Start</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="def-kp-start" oninput="saveDefs()"><button type="button" onclick="clearTimeField('def-kp-start')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
   <div class="field"><label>KP Note</label><input type="text" id="def-kp-note" oninput="saveDefs()"></div>
   <div class="field"><label>Chuppah / Main Event Time</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="def-chuppah" oninput="saveDefs()"><button type="button" onclick="clearTimeField('def-chuppah')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
@@ -533,6 +534,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
       <div class="card-title">Schedule</div>
       <div class="field"><label>Sound Check – Rhythm</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-rhythm" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-sc-rhythm')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
       <div class="field"><label>Sound Check – Horns</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-horns" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-sc-horns')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
+      <div class="field"><label>Strings in Lobby</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-strings" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-sc-strings')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
       <div class="field"><label>KP Start Time</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-kp-start" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-kp-start')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
       <div class="field"><label>KP Note</label><input type="text" id="f-kp-note" oninput="autoSave()"></div>
       <div class="field"><label>Chuppah / Main Event Time</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-chuppah" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-chuppah')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
@@ -723,7 +725,7 @@ function topbarAction() {
 }
 function goHome() {
   // Check for unsaved changes on new events
-  if (isNewEvent && isEditMode && currentEvent) {
+  if (isEditMode && currentEvent) {
     // Check if any data has been entered
     var hasData = currentEvent.date || currentEvent.venueName || (currentEvent.band||[]).length || (currentEvent.singers||[]).length;
     if (hasData) {
@@ -759,7 +761,7 @@ function startNewEvent() {
   currentEvent = {
     id: 'evt_' + Date.now(),
     date:'', type:'', typeCustom:'', venueName:'', venueAddress:'',
-    scRhythm:'', scHorns:'', kpStart:'', kpNote:'', chuppah:'',
+    scRhythm:'', scHorns:'', scStrings:'', kpStart:'', kpNote:'', chuppah:'',
     band:[], singers:[], choir:[], choirCount:'',
     dresscode:'', notes:'', venueRaw:''
   };
@@ -767,6 +769,7 @@ function startNewEvent() {
   var defs = lsGet(LS.defs, SEED_DEFS);
   currentEvent.scRhythm  = defs['def-sc-rhythm']  || '';
   currentEvent.scHorns   = defs['def-sc-horns']   || '';
+  currentEvent.scStrings = defs['def-sc-strings'] || '';
   currentEvent.kpStart   = defs['def-kp-start']   || '';
   currentEvent.kpNote    = defs['def-kp-note']     || '';
   currentEvent.chuppah   = defs['def-chuppah']     || '';
@@ -814,8 +817,8 @@ function renderEventsList(eventsToShow) {
     var isUpcoming=false; if(ev.date){var evDate=new Date(ev.date+'T00:00:00');var today=new Date();today.setHours(0,0,0,0);isUpcoming=evDate>=today;}
     var upcomingBadge=isUpcoming?'<span class="badge-upcoming">&#9650; Upcoming</span>':'';
     card.innerHTML = '<div class="event-card-info">' +
-      '<div class="event-card-title">' + esc(typeStr) + ' – ' + esc(venueStr) + upcomingBadge + '</div>' +
-      '<div class="event-card-sub">' + esc(dateStr) + '</div>' +
+      '<div class="event-card-title">' + esc(typeStr) + ' – ' + esc(venueStr) + '</div>' +
+      '<div class="event-card-sub">' + esc(dateStr) + upcomingBadge + '</div>' +
       '</div>' +
       '<div style="display:flex;gap:6px;align-items:center;">' +
       '<button onclick="deleteEvent(\'' + ev.id + '\',event)" style="background:#fff0f0;color:#d93025;border:1px solid #fdd;border-radius:8px;width:32px;height:32px;font-size:14px;cursor:pointer;flex-shrink:0;">&#128465;</button>' +
@@ -911,6 +914,7 @@ function readFormIntoCurrentEvent() {
   currentEvent.venueRaw     = gv('f-venue-search');
   currentEvent.scRhythm    = gv('f-sc-rhythm');
   currentEvent.scHorns     = gv('f-sc-horns');
+  currentEvent.scStrings   = gv('f-sc-strings');
   currentEvent.kpStart     = gv('f-kp-start');
   currentEvent.kpNote      = gv('f-kp-note');
   currentEvent.chuppah     = gv('f-chuppah');
@@ -928,6 +932,7 @@ function populateEventForm() {
   sv('f-address',      currentEvent.venueAddress|| '');
   sv('f-sc-rhythm',    currentEvent.scRhythm    || '');
   sv('f-sc-horns',     currentEvent.scHorns     || '');
+  sv('f-sc-strings',   currentEvent.scStrings   || '');
   sv('f-kp-start',     currentEvent.kpStart     || '');
   sv('f-kp-note',      currentEvent.kpNote      || '');
   sv('f-chuppah',      currentEvent.chuppah     || '');
@@ -1542,6 +1547,7 @@ function renderPreview() {
   var notes   = ev.notes   || gv('f-notes')       || '';
   var scR = fmtTime(ev.scRhythm||gv('f-sc-rhythm')||'');
   var scH = fmtTime(ev.scHorns||gv('f-sc-horns')||'');
+  var scS = fmtTime(ev.scStrings||gv('f-sc-strings')||'');
   var kpS = fmtTime(ev.kpStart||gv('f-kp-start')||'');
   var kpN = ev.kpNote||gv('f-kp-note')||'';
   var chu = fmtTime(ev.chuppah||gv('f-chuppah')||'');
@@ -1573,7 +1579,7 @@ function renderPreview() {
       '<p>Please find below the schedule and band lineup for the event on <strong>'+esc(date)+'</strong>'+(venue?', at <strong>'+esc(venue)+'</strong>':'')+'.</p>' +
       '<p><strong>Type of Event:</strong> '+esc(type||'___')+'<br><strong>Location:</strong> '+esc(venue||'___')+(address?' \u2013 '+esc(address):'')+'</p>' +
       '<hr class="prev-divider">' +
-      '<p><strong>Sound Check Schedule:</strong></p><ul><li>Rhythm: '+esc(scR)+'</li><li>Horns: '+esc(scH)+'</li></ul>' +
+      '<p><strong>Sound Check Schedule:</strong></p><ul>'+(scR?'<li>Rhythm: '+esc(scR)+'</li>':'')+(scH?'<li>Horns: '+esc(scH)+'</li>':'')+(scS?'<li>Strings in Lobby: '+esc(scS)+'</li>':'')+'</ul>' +
       '<p><strong>Event Schedule:</strong></p><ul><li>KP Start time: '+esc(kpS)+(kpN?' ('+esc(kpN)+')':'')+'</li><li>Chuppah / Main Event: '+esc(chu)+'</li></ul>' +
       '<p><strong>Band Members:</strong></p><ul>'+bandH+'</ul>' +
       '<p><strong>Singers:</strong></p><ul>'+singerH+'</ul>' +
@@ -1689,6 +1695,9 @@ var broadcastType='';
 var broadcastSelected=[];
 function openBroadcast(type){
   if(!gv('f-date')||!gv('f-type')){toast('Please fill in Date and Event Type first',true);return;}
+  // Block broadcast for past events
+  var evDate = gv('f-date');
+  if(evDate){var d=new Date(evDate+'T00:00:00'),tod=new Date();tod.setHours(0,0,0,0);if(d<tod){toast('Cannot broadcast for a past event',true);return;}}
   broadcastType=type; broadcastSelected=[];
   var lbl=type==='band'?'Band Members':'Singers';
   document.getElementById('bcast-title').textContent='\u{1F4E2} Broadcast to '+lbl;
