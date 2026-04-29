@@ -606,7 +606,8 @@ function loadAll() {
 }
 function saveDefs() {
   var d = {};
-  ['def-sc-rhythm','def-sc-horns','def-kp-start','def-kp-note','def-chuppah','def-dresscode','def-notes'].forEach(function(k) {
+  var defKeys = ['def-sc-rhythm','def-sc-horns','def-kp-start','def-kp-note','def-chuppah','def-dresscode','def-notes'];
+  defKeys.forEach(function(k) {
     var el = document.getElementById(k); if (el) d[k] = el.value;
   });
   lsSet(LS.defs, d);
@@ -616,7 +617,8 @@ function saveDefs() {
 // NAVIGATION
 // ═══════════════════════════════════════════════════════════════
 function showScreen(name) {
-  ['home','settings','event'].forEach(function(s) {
+  var screens = ['home','settings','event'];
+  screens.forEach(function(s) {
     var el = document.getElementById('screen-' + s);
     if (el) el.classList.toggle('active', s === name);
   });
@@ -701,7 +703,7 @@ function startNewEvent() {
   isNewEvent = true;
   isEditMode = true;
   // Clear any leftover validation errors
-  ['fd-date','fd-type','fd-venue-search'].forEach(clearErr);
+  clearErr('fd-date'); clearErr('fd-type'); clearErr('fd-venue-search');
   currentEvent = {
     id: 'evt_' + Date.now(),
     date:'', type:'', typeCustom:'', venueName:'', venueAddress:'',
@@ -809,7 +811,8 @@ function setEventEditMode(editable) {
     }
   });
   // Always disable readonly venue fields
-  ['f-venue','f-address'].forEach(function(id){ var el=document.getElementById(id); if(el){el.setAttribute('disabled','true');el.style.background='#f3f4f8';el.style.color='#888';}});
+  var roFields = ['f-venue','f-address'];
+  roFields.forEach(function(id){ var el=document.getElementById(id); if(el){el.setAttribute('disabled','true');el.style.background='#f3f4f8';el.style.color='#888';}});
   var addBtns = document.querySelectorAll('.btn-add-member');
   addBtns.forEach(function(b){ b.style.display = editable ? 'flex' : 'none'; });
   var delBtns = document.querySelectorAll('.member-tag-del');
@@ -1252,12 +1255,13 @@ function saveContact() {
   cancelContactEdit();
 }
 function cancelContactEdit() {
-  ['nc-id','nc-name','nc-email','nc-role'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+  var ncFields = ['nc-id','nc-name','nc-email','nc-role'];
+  ncFields.forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
   document.getElementById('nc-type').value = '';
   document.getElementById('nc-default').checked = false;
   document.getElementById('nc-cancel').style.display = 'none';
   document.getElementById('cf-title').textContent = 'Add New Contact';
-  ['fd-nc-name','fd-nc-email','fd-nc-type'].forEach(clearErr);
+  clearErr('fd-nc-name'); clearErr('fd-nc-email'); clearErr('fd-nc-type');
 }
 function editContact(id) {
   var c = contacts.find(function(c){ return c.id===id; });
