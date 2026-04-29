@@ -379,14 +379,13 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
     </div>
 
 ```
-<!-- Saved Events search — inline in home-actions -->
 <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.06);" id="existing-events-section">
   <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;">&#128197; Saved Events</div>
   <div style="display:flex;gap:8px;margin-bottom:10px;">
     <input type="date" id="events-date-filter" style="flex:1;font-size:13px;padding:9px 10px;border:1.5px solid var(--inp-border);border-radius:10px;background:var(--bg);color:var(--text);outline:none;-webkit-appearance:none;">
     <button onclick="searchEvents()" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:9px 16px;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0;">Search</button>
   </div>
-  <div id="events-list"></div>
+  <div id="events-list"><div class="events-list-empty" style="padding:8px 0 2px;">Select a date or press Search to find events.</div></div>
 </div>
 ```
 
@@ -405,7 +404,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v6.0
+  A Davidowitz Project &copy; 2026 - v6.1
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
