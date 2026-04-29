@@ -365,7 +365,11 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   <!-- Existing events list (shown after tapping Open) -->
 
   <div id="existing-events-section" style="display:none;padding:0 14px 20px;">
-    <div style="font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;">Saved Events</div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+      <div style="font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;flex:1;">Saved Events</div>
+      <input type="date" id="events-date-filter" style="font-size:13px;padding:7px 10px;border:1.5px solid var(--inp-border);border-radius:10px;background:var(--inp);color:var(--text);outline:none;-webkit-appearance:none;max-width:150px;">
+      <button onclick="searchEvents()" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;">Search</button>
+    </div>
     <div id="events-list"></div>
   </div>
   <!-- Spacer so content doesn't hide behind footer -->
@@ -382,7 +386,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v2.6
+  A Davidowitz Project &copy; 2026 - v2.7
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -729,17 +733,36 @@ function startNewEvent() {
 function showExistingEvents() {
   var sec = document.getElementById('existing-events-section');
   sec.style.display = 'block';
-  renderEventsList();
+  // Clear list and filter — user must press Search to populate
+  document.getElementById('events-list').innerHTML = '';
+  document.getElementById('events-date-filter').value = '';
   sec.scrollIntoView({behavior:'smooth'});
 }
-function renderEventsList() {
+function searchEvents() {
+  var dateFilter = document.getElementById('events-date-filter').value; // yyyy-mm-dd or ''
   var list = document.getElementById('events-list');
   if (!savedEvents.length) {
     list.innerHTML = '<div class="events-list-empty">No saved events yet.<br>Create your first event above.</div>';
     return;
   }
+  var filtered = dateFilter
+    ? savedEvents.filter(function(ev){ return ev.date === dateFilter; })
+    : savedEvents.slice();
+  if (!filtered.length) {
+    list.innerHTML = '<div class="events-list-empty">No events found for that date.</div>';
+    return;
+  }
+  renderEventsList(filtered);
+}
+function renderEventsList(eventsToShow) {
+  var list = document.getElementById('events-list');
+  var events = eventsToShow || savedEvents;
+  if (!events.length) {
+    list.innerHTML = '<div class="events-list-empty">No saved events yet.<br>Create your first event above.</div>';
+    return;
+  }
   // Sort newest first
-  var sorted = savedEvents.slice().sort(function(a,b){ return (b.date||'') > (a.date||'') ? 1 : -1; });
+  var sorted = events.slice().sort(function(a,b){ return (b.date||'') > (a.date||'') ? 1 : -1; });
   list.innerHTML = '';
   sorted.forEach(function(ev) {
     var card = document.createElement('div');
@@ -766,7 +789,7 @@ function deleteEvent(id, e) {
   if (e) e.stopPropagation();
   savedEvents = savedEvents.filter(function(ev){ return ev.id !== id; });
   lsSet(LS.events, savedEvents);
-  renderEventsList();
+  searchEvents();
   toast('Event deleted', false);
 }
 function openExistingEvent(id) {
@@ -1413,47 +1436,19 @@ function doSaveAsPDF() {
       var venue   = (ev.venueName || 'event').replace(/[^a-zA-Z0-9]/g,'-').toLowerCase();
       var filename = 'SK-Event-' + dateStr + '-' + venue + '.pdf';
 
-      // iOS Safari download handling
-      // iOS Safari (including PWA/home-screen mode) does not support <a download> for blobs.
-      // Blob URLs just navigate the current page (the UUID URL you see).
-      // Best iOS approach: open a base64 data URI in a new tab — user can then use
-      // the Share Sheet to save to Files, print, etc.
-      var isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) ||
-                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-
-      if (isIOS) {
-        // Open base64 data URI in new tab — Safari can display and share it
-        var dataUri = pdf.output('datauristring');
-        var newTab = window.open();
-        if (newTab) {
-          newTab.document.write(
-            '<html><head><title>' + filename + '</title></head>' +
-            '<body style="margin:0;">' +
-            '<iframe src="' + dataUri + '" style="width:100%;height:100vh;border:none;"></iframe>' +
-            '</body></html>'
-          );
-          newTab.document.close();
-          toast('PDF opened — use the Share button (↑) to save to Files.', false);
-        } else {
-          // Pop-up blocked fallback: navigate current tab
-          window.location.href = pdf.output('datauristring');
-        }
-      } else {
-        // Non-iOS: standard blob anchor download
-        var pdfArrayBuf = pdf.output('arraybuffer');
-        var pdfBlob = new Blob([pdfArrayBuf], { type: 'application/pdf' });
-        var blobUrl = URL.createObjectURL(pdfBlob);
-        var a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = blobUrl;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(function() {
-          document.body.removeChild(a);
-          URL.revokeObjectURL(blobUrl);
-        }, 2000);
-      }
+      // iOS Safari fix: use blob URL with anchor click
+      var pdfBlob = pdf.output('blob');
+      var blobUrl = URL.createObjectURL(pdfBlob);
+      var a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename;
+      a.target = '_blank'; // fallback for browsers that don't support download attr
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function() {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(blobUrl);
+      }, 1000);
 
       btn.innerHTML = origText;
       btn.disabled  = false;
