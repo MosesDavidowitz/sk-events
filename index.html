@@ -117,6 +117,7 @@ display:flex;align-items:center;gap:12px;
 .event-card-info{flex:1;}
 .event-card-title{font-size:15px;font-weight:700;}
 .event-card-sub{font-size:12px;color:var(–muted);margin-top:3px;}
+.badge-upcoming{display:inline-block;background:#e8f4ff;color:#1a6fb5;border:1px solid #b3d8f5;border-radius:20px;padding:2px 9px;font-size:10px;font-weight:700;letter-spacing:.04em;margin-left:6px;vertical-align:middle;}
 .event-card-arrow{color:var(–muted);font-size:18px;}
 
 /* ═══════════════════════════════════════════
@@ -406,7 +407,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v3.5
+  A Davidowitz Project &copy; 2026 - v3.6
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -791,8 +792,16 @@ function renderEventsList(eventsToShow) {
     var dateStr = fmtDate(ev.date) || 'No date';
     var typeStr = ev.typeCustom || ev.type || 'Event';
     var venueStr = ev.venueName || 'No venue';
+    // Determine if event is upcoming (date is today or in the future)
+    var isUpcoming = false;
+    if (ev.date) {
+      var evDate = new Date(ev.date + 'T00:00:00');
+      var today  = new Date(); today.setHours(0,0,0,0);
+      isUpcoming = evDate >= today;
+    }
+    var upcomingBadge = isUpcoming ? '<span class="badge-upcoming">&#9650; Upcoming</span>' : '';
     card.innerHTML = '<div class="event-card-info">' +
-      '<div class="event-card-title">' + esc(typeStr) + ' \u2013 ' + esc(venueStr) + '</div>' +
+      '<div class="event-card-title">' + esc(typeStr) + ' – ' + esc(venueStr) + upcomingBadge + '</div>' +
       '<div class="event-card-sub">' + esc(dateStr) + '</div>' +
       '</div>' +
       '<div style="display:flex;gap:6px;align-items:center;">' +
