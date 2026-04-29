@@ -307,6 +307,9 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:opacity(.5);cursor:po
 .options-row-wa{color:#128C7E;}
 .options-row-del{color:#d93025;}
 
+.star-btn{color:#e0e0e0;transition:color .1s;user-select:none;-webkit-user-select:none;}
+.star-btn.active{color:#f5a623;}
+
 /* ═══════════════════════════════════════════
 TOAST
 ═══════════════════════════════════════════ */
@@ -412,7 +415,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v4.6
+  A Davidowitz Project &copy; 2026 - v4.7
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -441,6 +444,17 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
       <div class="err-msg">Please select a type</div>
     </div>
     <div class="field" id="fd-nc-role" style="display:none;"><label>Instrument</label><input type="text" id="nc-role" placeholder="e.g. Trumpet"><div class="err-msg">Instrument is required</div></div>
+    <div class="field">
+      <label>Rating <span style="font-weight:400;font-size:11px;color:var(--muted);">(optional)</span></label>
+      <div id="nc-stars-row" style="display:flex;gap:6px;margin-top:4px;">
+        <span class="star-btn" data-val="1" onclick="setContactStar(1)" style="font-size:26px;cursor:pointer;line-height:1;">&#9733;</span>
+        <span class="star-btn" data-val="2" onclick="setContactStar(2)" style="font-size:26px;cursor:pointer;line-height:1;">&#9733;</span>
+        <span class="star-btn" data-val="3" onclick="setContactStar(3)" style="font-size:26px;cursor:pointer;line-height:1;">&#9733;</span>
+        <span class="star-btn" data-val="4" onclick="setContactStar(4)" style="font-size:26px;cursor:pointer;line-height:1;">&#9733;</span>
+        <span class="star-btn" data-val="5" onclick="setContactStar(5)" style="font-size:26px;cursor:pointer;line-height:1;">&#9733;</span>
+      </div>
+      <input type="hidden" id="nc-rating" value="0">
+    </div>
     <div class="field" style="display:flex;align-items:center;gap:10px;">
       <input type="checkbox" id="nc-default" style="width:20px;height:20px;cursor:pointer;accent-color:var(--accent);flex-shrink:0;">
       <label for="nc-default" style="font-size:14px;color:var(--text);font-weight:600;letter-spacing:0;cursor:pointer;margin:0;">Default (auto-add to every new event)</label>
@@ -585,6 +599,15 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   <div class="popup-sheet">
     <div class="popup-title" id="bcast-title">&#128226; Broadcast</div>
     <p style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:12px;" id="bcast-sub">Select recipients</p>
+    <div style="display:flex;align-items:center;justify-content:center;gap:4px;margin-bottom:8px;">
+      <span style="font-size:12px;color:var(--muted);margin-right:4px;">Filter:</span>
+      <span class="bcast-star-filter" id="bsf-1" data-val="1" onclick="setBcastStarFilter(1)" style="font-size:22px;color:#e0e0e0;cursor:pointer;line-height:1;">&#9733;</span>
+      <span class="bcast-star-filter" id="bsf-2" data-val="2" onclick="setBcastStarFilter(2)" style="font-size:22px;color:#e0e0e0;cursor:pointer;line-height:1;">&#9733;</span>
+      <span class="bcast-star-filter" id="bsf-3" data-val="3" onclick="setBcastStarFilter(3)" style="font-size:22px;color:#e0e0e0;cursor:pointer;line-height:1;">&#9733;</span>
+      <span class="bcast-star-filter" id="bsf-4" data-val="4" onclick="setBcastStarFilter(4)" style="font-size:22px;color:#e0e0e0;cursor:pointer;line-height:1;">&#9733;</span>
+      <span class="bcast-star-filter" id="bsf-5" data-val="5" onclick="setBcastStarFilter(5)" style="font-size:22px;color:#e0e0e0;cursor:pointer;line-height:1;">&#9733;</span>
+      <span style="font-size:11px;color:var(--accent);cursor:pointer;margin-left:6px;" onclick="setBcastStarFilter(0)">Clear</span>
+    </div>
     <input type="text" class="popup-search" id="bcast-search" placeholder="Search..." oninput="filterBroadcast()">
     <div class="popup-list" id="bcast-list"></div>
     <button id="bcast-send-btn" onclick="sendBroadcast()" style="display:block;width:100%;margin-top:10px;background:#4a5da8;color:#fff;border:none;border-radius:10px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;">&#9993; Send Broadcast Email</button>
@@ -1277,6 +1300,7 @@ function saveContact() {
   var email    = document.getElementById('nc-email').value.trim();
   var role     = document.getElementById('nc-role').value.trim();
   var phone    = document.getElementById('nc-phone').value.trim();
+  var rating   = parseInt(document.getElementById('nc-rating').value||'0');
   var ctype    = document.getElementById('nc-type').value;
   var isDef    = document.getElementById('nc-default').checked;
   var editId   = document.getElementById('nc-id').value;
@@ -1294,11 +1318,11 @@ function saveContact() {
   if (editId) {
     var idx = contacts.findIndex(function(c){ return String(c.id)===String(editId); });
     if (idx >= 0) {
-      contacts[idx] = {id:contacts[idx].id, name:name, email:email, phone:phone, role:role, ctype:ctype, isDefault:isDef};
+      contacts[idx] = {id:contacts[idx].id, name:name, email:email, phone:phone, role:role, ctype:ctype, isDefault:isDef, rating:rating};
       toast(name + ' updated!', false);
     }
   } else {
-    contacts.push({id:Date.now(), name:name, email:email, phone:phone, role:role, ctype:ctype, isDefault:isDef});
+    contacts.push({id:Date.now(), name:name, email:email, phone:phone, role:role, ctype:ctype, isDefault:isDef, rating:rating});
     toast(name + ' added!', false);
   }
   lsSet(LS.contacts, contacts);
@@ -1307,6 +1331,7 @@ function saveContact() {
 }
 function cancelContactEdit() {
   ['nc-id','nc-name','nc-email','nc-phone','nc-role'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+  var ratingEl=document.getElementById('nc-rating'); if(ratingEl) ratingEl.value=0; renderStarRow(0);
   document.getElementById('nc-type').value = '';
   document.getElementById('nc-default').checked = false;
   document.getElementById('nc-cancel').style.display = 'none';
@@ -1322,6 +1347,8 @@ function editContact(id) {
   document.getElementById('nc-email').value = c.email||'';
   document.getElementById('nc-role').value  = c.role||'';
   document.getElementById('nc-phone').value = c.phone||'';
+  document.getElementById('nc-rating').value = c.rating||0;
+  renderStarRow(c.rating||0);
   document.getElementById('nc-type').value  = c.ctype||'';
   document.getElementById('nc-default').checked = !!c.isDefault;
   onContactTypeChange();
@@ -1354,7 +1381,8 @@ function renderContacts() {
     if(c.ctype){var b=document.createElement('span');b.className='badge '+(clsMap[c.ctype]||'');b.textContent=typeMap[c.ctype]||c.ctype;nr.appendChild(b);}
     if(c.isDefault){var db=document.createElement('span');db.className='badge badge-default';db.textContent='Default';nr.appendChild(db);}
     info.appendChild(nr);
-    var meta=document.createElement('div');meta.className='contact-meta';meta.textContent=(c.role||'\u2014')+' \u00b7 '+(c.email||'no email')+(c.phone?' \u00b7 '+c.phone:'');
+    var meta=document.createElement('div');meta.className='contact-meta';var starsStr=''; if(c.rating>0){ for(var si=0;si<5;si++) starsStr+=(si<c.rating)?'\u2605':'\u2606'; }
+    meta.innerHTML=esc((c.role||'\u2014')+' \u00b7 '+(c.email||'no email')+(c.phone?' \u00b7 '+c.phone:''))+(starsStr?' <span style="color:#f5a623;font-size:12px;letter-spacing:1px;">'+starsStr+'</span>':'');
     info.appendChild(meta);
     var eb=document.createElement('button');eb.className='btn-icon edit';eb.textContent='\u270f';
     eb.addEventListener('click',function(){editContact(c.id);});
@@ -1613,13 +1641,35 @@ function fmtDateShort(val){if(!val)return'';var p=val.split('-');if(p.length!==3
 function fmtTime(val){if(!val)return'';var parts=val.split(':');if(parts.length<2)return val;var h=parseInt(parts[0],10);var m=parts[1];var ampm=h>=12?'PM':'AM';h=h%12;if(h===0)h=12;return h+':'+m+' '+ampm;}
 
 // ── CONTACT TYPE CHANGE ────────────────────────────────────────
+function setContactStar(val){
+  var current=parseInt(document.getElementById('nc-rating').value||'0');
+  // Toggle off if same star clicked
+  var newVal = (current===val) ? 0 : val;
+  document.getElementById('nc-rating').value=newVal;
+  renderStarRow(newVal);
+}
+function renderStarRow(val){
+  var stars=document.querySelectorAll('#nc-stars-row .star-btn');
+  stars.forEach(function(s,i){
+    s.className='star-btn'+(i<val?' active':'');
+  });
+}
 function onContactTypeChange(){var ctype=document.getElementById('nc-type').value;var rf=document.getElementById('fd-nc-role');var ri=document.getElementById('nc-role');var rl=rf?rf.querySelector('label'):null;if(ctype==='band'){if(rf)rf.style.display='block';if(rl)rl.className='req-label';}else{if(rf)rf.style.display='none';if(ri)ri.value='';if(rl)rl.className='';clearErr('fd-nc-role');}}
 
 // ── SEARCH EVENTS ──────────────────────────────────────────────
 function searchEvents(){var df=document.getElementById('events-date-filter').value;var list=document.getElementById('events-list');if(!savedEvents.length){list.innerHTML='<div class="events-list-empty">No saved events yet.<br>Create your first event above.</div>';return;}var filtered=df?savedEvents.filter(function(ev){return ev.date===df;}):savedEvents.slice();if(!filtered.length){list.innerHTML='<div class="events-list-empty">No events found for that date.</div>';return;}renderEventsList(filtered);}
 
 // ── BROADCAST ──────────────────────────────────────────────────
-var broadcastType='',broadcastSelected=[];
+var broadcastType='',broadcastSelected=[],bcastStarFilter=0;
+function setBcastStarFilter(val){
+  bcastStarFilter=(bcastStarFilter===val)?0:val; // toggle off if same
+  // Update star UI
+  for(var i=1;i<=5;i++){
+    var el=document.getElementById('bsf-'+i);
+    if(el) el.style.color = (i<=bcastStarFilter)?'#f5a623':'#e0e0e0';
+  }
+  filterBroadcast();
+}
 function openBroadcast(type){
   if(!gv('f-date')||!gv('f-type')){toast('Please fill in Date and Event Type first',true);return;}
   var evDate=gv('f-date');if(evDate){var d=new Date(evDate+'T00:00:00'),tod=new Date();tod.setHours(0,0,0,0);if(d<tod){toast('Cannot broadcast for a past event',true);return;}}
@@ -1628,6 +1678,8 @@ function openBroadcast(type){
   document.getElementById('bcast-title').textContent='\uD83D\uDCE2 Broadcast \u2013 '+lbl;
   document.getElementById('bcast-sub').textContent='Select who to check availability with \u2014 they will be BCC\u2019d';
   document.getElementById('bcast-search').value='';
+  bcastStarFilter=0;
+  for(var i=1;i<=5;i++){var sf=document.getElementById('bsf-'+i);if(sf)sf.style.color='#e0e0e0';}
   filterBroadcast();
   document.getElementById('bcast-popup').classList.add('open');
 }
@@ -1636,6 +1688,7 @@ function filterBroadcast(){
   var q=document.getElementById('bcast-search').value.toLowerCase();
   var pool=contacts.filter(function(c){return c.ctype===broadcastType;});
   if(q)pool=pool.filter(function(c){return c.name.toLowerCase().indexOf(q)>=0||(c.role||'').toLowerCase().indexOf(q)>=0;});
+  if(bcastStarFilter>0)pool=pool.filter(function(c){return (c.rating||0)>=bcastStarFilter;});
   var list=document.getElementById('bcast-list');list.innerHTML='';
   if(!pool.length){list.innerHTML='<div style="text-align:center;color:var(--muted);font-size:14px;padding:20px;">No contacts found.</div>';updateBroadcastBtn();return;}
   var eventList=broadcastType==='band'?(currentEvent&&currentEvent.band||[]):(currentEvent&&currentEvent.singers||[]);
@@ -1751,7 +1804,7 @@ function showEventOptions(id,e){
   if(e)e.stopPropagation();
   var ev=savedEvents.find(function(ev){return ev.id===id;});if(!ev)return;
   var list=document.getElementById('event-options-list');list.innerHTML='';
-  var b1=document.createElement('button');b1.className='options-row';b1.innerHTML='&#9998;\u00a0 Edit Event';
+  var b1=document.createElement('button');b1.className='options-row';b1.innerHTML='&#128203;\u00a0 Event Details';
   b1.addEventListener('click',function(){closeEventOptions();openExistingEvent(id);});list.appendChild(b1);
   var b2=document.createElement('button');b2.className='options-row options-row-wa';
   b2.innerHTML='<svg viewBox="0 0 24 24" width="18" height="18" style="vertical-align:middle;margin-right:8px;fill:#25D366;flex-shrink:0;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.118 1.532 5.847L.057 23.882l6.196-1.448A11.934 11.934 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.806 9.806 0 01-5.001-1.368l-.36-.214-3.68.859.899-3.573-.235-.375A9.813 9.813 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182c5.43 0 9.818 4.388 9.818 9.818 0 5.43-4.388 9.818-9.818 9.818z"/></svg>Share via WhatsApp';
