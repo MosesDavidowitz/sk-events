@@ -306,7 +306,7 @@ html,body{background:#fff!important;height:auto;overflow:visible;}
 <!-- ═══════════ TOPBAR ═══════════ -->
 
 <div class="topbar" id="topbar">
-  <button class="btn-top btn-navy" id="topbar-back" onclick="topbarBack()" style="display:none;font-size:13px;">&#8249; Home</button>
+  <button class="btn-top btn-navy" id="topbar-back" onclick="topbarBack()" style="display:none;font-size:13px;">&#8249; Back</button>
   <div class="topbar-title" id="topbar-title" style="flex:1;text-align:center;"></div>
   <button class="btn-top btn-save" id="topbar-btn" onclick="topbarAction()" style="display:none">Save</button>
 </div>
@@ -345,15 +345,28 @@ html,body{background:#fff!important;height:auto;overflow:visible;}
       <div class="home-btn-arrow">&#8250;</div>
     </div>
   </div>
-  <!-- Footer -->
-  <div style="text-align:center;padding:24px 14px 32px;color:#aab0c0;font-size:12px;flex-shrink:0;">
-    A Deverowitz Project &copy; 2026
-  </div>
+
   <!-- Existing events list (shown after tapping Open) -->
-  <div id="existing-events-section" style="display:none;padding:0 14px 80px;">
+
+  <div id="existing-events-section" style="display:none;padding:0 14px 20px;">
     <div style="font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;">Saved Events</div>
     <div id="events-list"></div>
   </div>
+  <!-- Spacer so content doesn't hide behind footer -->
+  <div style="height:56px;flex-shrink:0;"></div>
+</div>
+<!-- Home footer - sticky dark banner, only shows on home screen -->
+<div id="home-footer" style="
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;
+  background:#1a1d2e;
+  text-align:center;padding:14px;
+  color:rgba(255,255,255,.45);font-size:12px;
+  font-family:'Lato',sans-serif;letter-spacing:.03em;
+  z-index:50;
+  border-top:1px solid rgba(255,255,255,.08);
+">
+  A Davidowitz Project &copy; 2026
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -583,10 +596,13 @@ function showScreen(name) {
     if (el) el.classList.toggle('active', s === name);
   });
   var topbar = document.getElementById('topbar');
+  var footer = document.getElementById('home-footer');
   if (name === 'home') {
     topbar.style.display = 'none';
     document.getElementById('existing-events-section').style.display = 'none';
+    if (footer) footer.style.display = 'block';
   } else {
+    if (footer) footer.style.display = 'none';
     topbar.style.display = 'flex';
     if (name === 'settings') {
       setTopbar('Settings', '\u2190 Back', 'goHome');
@@ -600,7 +616,7 @@ function setTopbar(title, backLabel, actionLabel, actionFn) {
   var back = document.getElementById('topbar-back');
   var btn  = document.getElementById('topbar-btn');
   if (backLabel) {
-    back.textContent = backLabel;
+    back.innerHTML = backLabel;
     back.style.display = 'block';
   } else {
     back.style.display = 'none';
