@@ -92,13 +92,12 @@ flex-shrink:0;
 .home-hero img{height:90px;width:auto;margin-bottom:12px;}
 .home-hero h1{color:#fff;font-size:22px;font-weight:900;letter-spacing:.02em;}
 .home-hero p{color:rgba(255,255,255,.5);font-size:13px;margin-top:6px;}
-.home-actions{display:block;padding:20px 14px;}
+.home-actions{display:flex;flex-direction:column;gap:12px;padding:20px 14px;}
 .home-btn{
 display:flex;align-items:center;gap:14px;
 background:#fff;border:1px solid var(–border);border-radius:16px;
 padding:18px 20px;cursor:pointer;-webkit-tap-highlight-color:transparent;
 box-shadow:0 2px 8px rgba(0,0,0,.06);transition:transform .1s;
-margin-bottom:12px;
 }
 .home-btn:active{transform:scale(.98);}
 .home-btn-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
@@ -381,7 +380,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
 
 ```
 <!-- Saved Events search — inline in home-actions -->
-<div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:12px;" id="existing-events-section">
+<div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.06);" id="existing-events-section">
   <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;">&#128197; Saved Events</div>
   <div style="display:flex;gap:8px;margin-bottom:10px;">
     <input type="date" id="events-date-filter" style="flex:1;font-size:13px;padding:9px 10px;border:1.5px solid var(--inp-border);border-radius:10px;background:var(--bg);color:var(--text);outline:none;-webkit-appearance:none;">
@@ -406,7 +405,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v5.8
+  A Davidowitz Project &copy; 2026 - v6.0
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -696,7 +695,11 @@ function showScreen(name) {
   var footer = document.getElementById('home-footer');
   if (name === 'home') {
     topbar.style.display = 'none';
-    // existing-events-section is always visible
+    // existing-events-section is always visible — reset to hint state
+    var evList = document.getElementById('events-list');
+    if (evList) evList.innerHTML = '<div class="events-list-empty" style="padding:8px 0 2px;">Select a date or press Search to find events.</div>';
+    var dfInput = document.getElementById('events-date-filter');
+    if (dfInput) dfInput.value = '';
     if (footer) footer.style.display = 'block';
   } else {
     if (footer) footer.style.display = 'none';
@@ -1830,9 +1833,7 @@ window.addEventListener('DOMContentLoaded', function() {
   rebuildTypeSelect();
   showScreen('home');
   updateHomeTopbar();
-  // Show empty state in events list on load
-  var el = document.getElementById('events-list');
-  if (el && !el.innerHTML) el.innerHTML = '<div class="events-list-empty" style="padding:16px 0 4px;">Select a date or press Search to find events.</div>';
+  // events-list hint is set by showScreen('home') on load
 });
 </script>
 
