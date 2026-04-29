@@ -293,7 +293,8 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:opacity(.5);cursor:po
 /* BROADCAST ITEMS */
 .bcast-item{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid var(–border);cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .bcast-item:last-child{border-bottom:none;}
-.bcast-item:active{background:#f5f7ff;}
+.bcast-item{cursor:default;}
+.bcast-check{cursor:pointer;}
 .bcast-check{width:28px;height:28px;border-radius:7px;border:2.5px solid #aab0c8;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:17px;font-weight:900;transition:background .15s,border-color .15s;color:transparent;}
 .bcast-check.checked{background:#2eaa7a;border-color:#2eaa7a;color:#fff;}
 .bcast-item-info{flex:1;}
@@ -411,7 +412,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v4.5
+  A Davidowitz Project &copy; 2026 - v4.6
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -1638,23 +1639,94 @@ function filterBroadcast(){
   var list=document.getElementById('bcast-list');list.innerHTML='';
   if(!pool.length){list.innerHTML='<div style="text-align:center;color:var(--muted);font-size:14px;padding:20px;">No contacts found.</div>';updateBroadcastBtn();return;}
   var eventList=broadcastType==='band'?(currentEvent&&currentEvent.band||[]):(currentEvent&&currentEvent.singers||[]);
+  var sentMap=(currentEvent&&currentEvent.broadcastSent)||{};
   pool.forEach(function(con){
-    var item=document.createElement('div');item.className='bcast-item';item.setAttribute('data-id',con.id);
+    var item=document.createElement('div');
+    item.className='bcast-item';
+    item.setAttribute('data-id',con.id);
+
     var isChk=broadcastSelected.indexOf(con.id)>=0;
     var isConf=eventList.some(function(m){return m.id===con.id;});
+    var sentModes=sentMap[con.id]||[];
+    var sentBadges='';
+    if(sentModes.indexOf('email')>=0) sentBadges+='<span style="display:inline-block;background:#e3f2fd;color:#1565c0;border:1px solid #90caf9;border-radius:10px;padding:1px 7px;font-size:9px;font-weight:700;margin-left:4px;">\u2709 Email</span>';
+    if(sentModes.indexOf('wa')>=0)    sentBadges+='<span style="display:inline-block;background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;border-radius:10px;padding:1px 7px;font-size:9px;font-weight:700;margin-left:4px;">\uD83D\uDCAC WA</span>';
     var confBadge=isConf?'<span style="display:inline-block;background:#fff3cd;color:#856404;border:1px solid #ffc107;border-radius:12px;padding:1px 8px;font-size:10px;font-weight:700;margin-left:6px;">\u2713 Confirmed</span>':'';
-    item.innerHTML='<div class="bcast-check'+(isChk?' checked':'')+'" id="bchk-'+con.id+'">'+(isChk?'&#10004;':'')+'</div>'+'<div class="bcast-item-info"><div class="bcast-item-name">'+esc(con.name)+confBadge+'</div>'+'<div class="bcast-item-sub">'+esc(con.role||'')+(con.email?' \u00b7 '+esc(con.email):'')+(con.phone?' \u00b7 '+esc(con.phone):'')+'</div></div>';
-    (function(cid){item.addEventListener('click',function(){
-      var idx=broadcastSelected.indexOf(cid);
-      if(idx>=0)broadcastSelected.splice(idx,1);else broadcastSelected.push(cid);
-      var chkEl=document.getElementById('bchk-'+cid);var nowChk=broadcastSelected.indexOf(cid)>=0;
-      if(chkEl){chkEl.className='bcast-check'+(nowChk?' checked':'');chkEl.innerHTML=nowChk?'&#10004;':'';}
-      item.style.background=nowChk?'#e8f7f1':'';
-      updateBroadcastBtn();
-    });})(con.id);
+
+    // Checkbox
+    var chkDiv=document.createElement('div');
+    chkDiv.className='bcast-check'+(isChk?' checked':'');
+    chkDiv.id='bchk-'+con.id;
+    chkDiv.innerHTML=isChk?'&#10004;':'';
+    chkDiv.style.flexShrink='0';
+    chkDiv.style.cursor='pointer';
+    (function(cid,cd,it){
+      cd.addEventListener('click',function(e){
+        e.stopPropagation();
+        var i=broadcastSelected.indexOf(cid);
+        if(i>=0)broadcastSelected.splice(i,1);else broadcastSelected.push(cid);
+        var nowChk=broadcastSelected.indexOf(cid)>=0;
+        cd.className='bcast-check'+(nowChk?' checked':'');
+        cd.innerHTML=nowChk?'&#10004;':'';
+        it.style.background=nowChk?'#e8f7f1':'';
+        updateBroadcastBtn();
+      });
+    })(con.id,chkDiv,item);
+    item.appendChild(chkDiv);
+
+    // Info
+    var infoDiv=document.createElement('div');
+    infoDiv.className='bcast-item-info';
+    infoDiv.style.flex='1';
+    infoDiv.innerHTML='<div class="bcast-item-name">'+esc(con.name)+confBadge+sentBadges+'</div>'+
+      '<div class="bcast-item-sub">'+esc(con.role||'')+(con.email?' \u00b7 '+esc(con.email):'')+'</div>';
+    item.appendChild(infoDiv);
+
+    // WhatsApp button (only if phone exists)
+    if(con.phone){
+      var waBtn=document.createElement('button');
+      waBtn.style.cssText='background:#25D366;border:none;border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent;';
+      waBtn.title='Send via WhatsApp';
+      waBtn.innerHTML='<svg viewBox="0 0 24 24" width="18" height="18" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.118 1.532 5.847L.057 23.882l6.196-1.448A11.934 11.934 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.806 9.806 0 01-5.001-1.368l-.36-.214-3.68.859.899-3.573-.235-.375A9.813 9.813 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182c5.43 0 9.818 4.388 9.818 9.818 0 5.43-4.388 9.818-9.818 9.818z"/></svg>';
+      (function(cid,phone,btn){
+        btn.addEventListener('click',function(e){
+          e.stopPropagation();
+          sendBroadcastWhatsApp(cid,phone);
+        });
+      })(con.id,con.phone,waBtn);
+      item.appendChild(waBtn);
+    }
+
     list.appendChild(item);
   });
   updateBroadcastBtn();
+}
+function markBroadcastSent(contactIds, mode){
+  if(!currentEvent) return;
+  if(!currentEvent.broadcastSent) currentEvent.broadcastSent={};
+  contactIds.forEach(function(id){
+    if(!currentEvent.broadcastSent[id]) currentEvent.broadcastSent[id]=[];
+    if(currentEvent.broadcastSent[id].indexOf(mode)<0) currentEvent.broadcastSent[id].push(mode);
+  });
+  // Persist to savedEvents
+  var idx=savedEvents.findIndex(function(ev){return ev.id===currentEvent.id;});
+  if(idx>=0) savedEvents[idx]=currentEvent;
+  lsSet(LS.events, savedEvents);
+}
+function sendBroadcastWhatsApp(cid,phone){
+  var ev=currentEvent||{};
+  var evType=(ev.type==='Other'||!ev.type)?(ev.typeCustom||gv('f-type-custom')||'Event'):(ev.type||gv('f-type')||'Event');
+  var dateLong=fmtDate(ev.date||gv('f-date')),venue=ev.venueName||gv('f-venue')||'';
+  var nl='\n';
+  var msg='Hi,'+nl+nl+'We are reaching out to check your availability for an upcoming event:'+nl+nl;
+  msg+='  Event: '+evType+nl+'  Date:  '+dateLong+nl+(venue?'  Venue: '+venue+nl:'')+nl;
+  msg+='Please reply to let us know if you are available for this date.'+nl+nl;
+  msg+='NOTE: This is an availability inquiry only - not a booking or confirmation. A follow-up will be sent once the lineup is finalized.'+nl+nl;
+  msg+='Thank you,'+nl+'SK Music Production Inc'+nl+'845-445-6100'+nl+'Info@Sheakallerband.com';
+  var digits=phone.replace(/\D/g,'');
+  window.open('https://wa.me/1'+digits+'?text='+encodeURIComponent(msg),'_blank');
+  markBroadcastSent([cid],'wa');
+  setTimeout(filterBroadcast,400);
 }
 function updateBroadcastBtn(){var btn=document.getElementById('bcast-send-btn');if(!btn)return;var n=broadcastSelected.length;btn.textContent=n>0?'\u2709 Send to '+n+' recipient'+(n>1?'s':''):'\u2709 Send Broadcast Email';btn.style.opacity=n>0?'1':'0.5';}
 function sendBroadcast(){
@@ -1668,7 +1740,9 @@ function sendBroadcast(){
   var nl='\n';
   var body='Hi,'+nl+nl+'We are reaching out to check your availability for an upcoming event:'+nl+nl+'  Event: '+evType+nl+'  Date:  '+dateLong+nl+(venue?'  Venue: '+venue+nl:'')+nl+'Please reply to let us know if you are available for this date.'+nl+nl+'NOTE: This is an availability inquiry only - not a booking or confirmation. A separate follow-up will be sent to confirmed crew members once the lineup is finalized.'+nl+nl+'Thank you,'+nl+'SK Music Production Inc'+nl+'845-445-6100'+nl+'Info@Sheakallerband.com';
   var a=document.createElement('a');a.href='mailto:Info@Sheakallerband.com?bcc='+encodeURIComponent(bccs.join(','))+'&subject='+subj+'&body='+encodeURIComponent(body);a.style.display='none';document.body.appendChild(a);a.click();setTimeout(function(){document.body.removeChild(a);},300);
+  markBroadcastSent(broadcastSelected.slice(),'email');
   closeBroadcast();
+  filterBroadcast();
 }
 
 // ── EVENT OPTIONS MENU ─────────────────────────────────────────
