@@ -382,7 +382,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v2.5
+  A Davidowitz Project &copy; 2026 - v2.6
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -1413,25 +1413,47 @@ function doSaveAsPDF() {
       var venue   = (ev.venueName || 'event').replace(/[^a-zA-Z0-9]/g,'-').toLowerCase();
       var filename = 'SK-Event-' + dateStr + '-' + venue + '.pdf';
 
-      // iOS Safari fix: force download via blob URI
-      // iOS Safari does not honour the `download` attr on blob: URLs opened in _blank.
-      // Solution: output as arraybuffer, wrap in Blob with explicit application/pdf MIME,
-      // create an object URL and trigger click synchronously (no setTimeout delay on the click).
-      var pdfArrayBuf = pdf.output('arraybuffer');
-      var pdfBlob = new Blob([pdfArrayBuf], { type: 'application/pdf' });
-      var blobUrl = URL.createObjectURL(pdfBlob);
-      var a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = blobUrl;
-      a.download = filename;
-      // Do NOT set target=_blank — it causes Safari to open in browser tab instead of download
-      document.body.appendChild(a);
-      a.click();
-      // Revoke after a short delay to allow download to start
-      setTimeout(function() {
-        document.body.removeChild(a);
-        URL.revokeObjectURL(blobUrl);
-      }, 2000);
+      // iOS Safari download handling
+      // iOS Safari (including PWA/home-screen mode) does not support <a download> for blobs.
+      // Blob URLs just navigate the current page (the UUID URL you see).
+      // Best iOS approach: open a base64 data URI in a new tab — user can then use
+      // the Share Sheet to save to Files, print, etc.
+      var isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) ||
+                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+      if (isIOS) {
+        // Open base64 data URI in new tab — Safari can display and share it
+        var dataUri = pdf.output('datauristring');
+        var newTab = window.open();
+        if (newTab) {
+          newTab.document.write(
+            '<html><head><title>' + filename + '</title></head>' +
+            '<body style="margin:0;">' +
+            '<iframe src="' + dataUri + '" style="width:100%;height:100vh;border:none;"></iframe>' +
+            '</body></html>'
+          );
+          newTab.document.close();
+          toast('PDF opened — use the Share button (↑) to save to Files.', false);
+        } else {
+          // Pop-up blocked fallback: navigate current tab
+          window.location.href = pdf.output('datauristring');
+        }
+      } else {
+        // Non-iOS: standard blob anchor download
+        var pdfArrayBuf = pdf.output('arraybuffer');
+        var pdfBlob = new Blob([pdfArrayBuf], { type: 'application/pdf' });
+        var blobUrl = URL.createObjectURL(pdfBlob);
+        var a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = blobUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function() {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(blobUrl);
+        }, 2000);
+      }
 
       btn.innerHTML = origText;
       btn.disabled  = false;
