@@ -125,7 +125,7 @@ CARDS & FORMS
 .field{margin-bottom:13px;position:relative;}
 .field:last-child{margin-bottom:0;}
 label{display:block;font-size:12px;color:var(–muted);font-weight:700;letter-spacing:.04em;margin-bottom:5px;}
-.req-label::after{content:” *”;color:var(–danger);}
+.req-label::after{content:” (required)”;color:var(–danger);font-size:11px;font-weight:400;letter-spacing:0;}
 input[type=text],input[type=email],input[type=date],textarea,select{
 width:100%;background:var(–inp);color:var(–text);
 border:1.5px solid var(–inp-border);border-radius:10px;
@@ -700,6 +700,8 @@ function updateHomeTopbar() {
 function startNewEvent() {
   isNewEvent = true;
   isEditMode = true;
+  // Clear any leftover validation errors
+  ['fd-date','fd-type','fd-venue-search'].forEach(clearErr);
   currentEvent = {
     id: 'evt_' + Date.now(),
     date:'', type:'', typeCustom:'', venueName:'', venueAddress:'',
