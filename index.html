@@ -72,8 +72,8 @@ border-bottom:3px solid transparent;margin-bottom:-1px;
 /* ═══════════════════════════════════════════
 SCREENS
 ═══════════════════════════════════════════ */
-.screen{display:none;overflow-y:auto;-webkit-overflow-scrolling:touch;position:absolute;top:0;left:0;right:0;bottom:0;}
-.screen.active{display:block;}
+.screen{display:none;flex:1;overflow:hidden;flex-direction:column;}
+.screen.active{display:flex;}
 .scroll-area{flex:1;overflow-y:auto;padding:16px 14px 80px;-webkit-overflow-scrolling:touch;}
 
 /* ═══════════════════════════════════════════
@@ -125,7 +125,7 @@ CARDS & FORMS
 .field{margin-bottom:13px;position:relative;}
 .field:last-child{margin-bottom:0;}
 label{display:block;font-size:12px;color:var(–muted);font-weight:700;letter-spacing:.04em;margin-bottom:5px;}
-.req-label::after{content:” (required)”;color:var(–danger);font-size:11px;font-weight:400;letter-spacing:0;}
+.req-label::after{content:” *”;color:var(–danger);}
 input[type=text],input[type=email],input[type=date],textarea,select{
 width:100%;background:var(–inp);color:var(–text);
 border:1.5px solid var(–inp-border);border-radius:10px;
@@ -259,9 +259,9 @@ PREVIEW / PDF
 .btn-email-crew{background:#2eaa7a;color:#fff;box-shadow:0 3px 10px rgba(46,170,122,.3);}
 .preview-scaler{width:100%;overflow:hidden;border-radius:4px;box-shadow:0 2px 16px rgba(0,0,0,.12);}
 .preview-wrapper{background:#fff;color:#222;font-family:‘Times New Roman’,Times,serif;width:750px;transform-origin:top left;}
-.preview-inner{padding:22px 30px;position:relative;overflow:hidden;min-height:900px;}
+.preview-inner{padding:22px 30px;position:relative;overflow:hidden;}
 .prev-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
-.prev-logo img{height:110px;width:auto;object-fit:contain;}
+.prev-logo img{height:76px;width:auto;object-fit:contain;}
 .prev-info{text-align:right;font-size:12px;line-height:1.55;font-family:‘Lato’,sans-serif;padding-top:4px;}
 .prev-info .co{color:#1a5fa8;font-size:15px;font-weight:700;display:block;margin-bottom:3px;}
 .prev-info a{color:#1a5fa8;text-decoration:none;}
@@ -271,14 +271,8 @@ PREVIEW / PDF
 .prev-body ul{margin:1px 0 5px 26px;}
 .prev-body li{margin-bottom:1px;}
 .prev-divider{border:none;border-top:1px solid #e0e0e0;margin:8px 0;}
-.prev-watermark{
-position:absolute;
-bottom:24px;right:24px;
-width:220px;height:220px;
-pointer-events:none;z-index:0;
-display:flex;align-items:flex-end;justify-content:flex-end;
-}
-.prev-watermark img{width:220px;height:220px;object-fit:contain;opacity:0.18;}
+.prev-watermark{position:absolute;bottom:16px;right:16px;pointer-events:none;z-index:0;}
+.prev-watermark img{width:180px;height:auto;opacity:0.20;}
 
 /* ═══════════════════════════════════════════
 TOAST
@@ -300,7 +294,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
 #screen-home,#screen-settings,
 #tab-details-content,
 #btn-print-main,#btn-email-main,
-#home-footer{display:none!important;}
+#print-tip-div,#home-footer{display:none!important;}
 /* Show event screen and preview tab */
 #screen-event{display:block!important;height:auto!important;overflow:visible!important;}
 #tab-preview-content{display:block!important;height:auto!important;overflow:visible!important;padding:0!important;}
@@ -321,13 +315,13 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
 
 <div class="topbar" id="topbar">
   <button class="btn-top btn-navy" id="topbar-back" onclick="topbarBack()" style="display:none;font-size:13px;">&#8249; Back</button>
-  <div class="topbar-title" id="topbar-title" style="flex:1;text-align:center;">SK Events</div>
+  <div class="topbar-title" id="topbar-title" style="flex:1;text-align:center;"></div>
   <button class="btn-top btn-save" id="topbar-btn" onclick="topbarAction()" style="display:none">Save</button>
 </div>
 
 <!-- ═══════════ HOME SCREEN ═══════════ -->
 
-<div class="screen active" id="screen-home">
+<div class="screen active" id="screen-home" style="flex-direction:column;overflow-y:auto;">
   <div class="home-hero">
     <img src="images/logo-W.png" alt="Shea Kaller" onerror="this.style.display='none'">
     <h1>Event Builder</h1>
@@ -366,17 +360,26 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
     <div style="font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;">Saved Events</div>
     <div id="events-list"></div>
   </div>
-  <!-- Footer inside home screen -->
-  <div style="background:#1a1d2e;text-align:center;padding:16px 14px;margin-top:auto;border-top:1px solid rgba(255,255,255,.08);flex-shrink:0;">
-    <span style="color:rgba(255,255,255,.45);font-size:12px;font-family:'Lato',sans-serif;letter-spacing:.03em;">A Davidowitz Project &copy; 2026 &nbsp;&bull;&nbsp; v3.5</span>
-  </div>
+  <!-- Spacer so content doesn't hide behind footer -->
+  <div style="height:56px;flex-shrink:0;"></div>
 </div>
 <!-- Home footer - sticky dark banner, only shows on home screen -->
-<div id="home-footer" style="display:none;"></div>
+<div id="home-footer" style="
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;
+  background:#1a1d2e;
+  text-align:center;padding:14px;
+  color:rgba(255,255,255,.45);font-size:12px;
+  font-family:'Lato',sans-serif;letter-spacing:.03em;
+  z-index:50;
+  border-top:1px solid rgba(255,255,255,.08);
+">
+  A Davidowitz Project &copy; 2026
+</div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
 
-<div class="screen" id="screen-settings">
+<div class="screen" id="screen-settings" style="flex-direction:column;">
   <div class="tabs" id="tabs-settings" style="display:none;"><!-- hidden, settings has its own back --></div>
   <div class="scroll-area" id="settings-scroll">
 
@@ -414,7 +417,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
 </div>
 
 <!-- Event Types -->
-<div class="stoggle" onclick="toggleSec('sc-evtypes',this)"><span>&#127926; Event Types</span><span class="sarrow">&#8250;</span></div>
+<div class="stoggle" onclick="toggleSec('sc-evtypes',this)"><span>&#127917; Event Types</span><span class="sarrow">&#8250;</span></div>
 <div class="sbody" id="sc-evtypes">
   <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Manage the Type of Event dropdown.</p>
   <div class="type-chips" id="type-chips-list"></div>
@@ -443,7 +446,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
 
 <!-- ═══════════ EVENT SCREEN ═══════════ -->
 
-<div class="screen" id="screen-event">
+<div class="screen" id="screen-event" style="flex-direction:column;">
   <div class="tabs tabs-event">
     <button class="tab active" id="tab-details" onclick="switchEventTab('details')">&#9999;&#65038; Details</button>
     <button class="tab" id="tab-preview" onclick="switchEventTab('preview')">&#128065; Preview</button>
@@ -513,8 +516,14 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   <!-- Preview tab -->
   <div id="tab-preview-content" class="scroll-area" style="display:none;">
     <div class="preview-outer">
-      <button id="btn-print-main" class="btn-block btn-print" onclick="doSaveAsPDF()">&#11123; Download PDF</button>
       <button id="btn-email-main" class="btn-block btn-email-crew" onclick="emailCrew()">&#9993; Email Crew</button>
+      <button id="btn-print-main" class="btn-block btn-print" onclick="doPrint()">&#128424; Save as PDF</button>
+      <div id="print-tip-div" style="font-size:13px;color:#1a1d2e;background:#fff;border:1px solid #dde1ec;border-radius:10px;padding:12px 14px;margin-bottom:14px;line-height:1.7;">
+        <div style="font-weight:700;margin-bottom:6px;">&#128247; How to save a clean PDF on iPhone:</div>
+        <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:3px;"><span style="background:#4a5da8;color:#fff;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">1</span><span>Tap <strong>Save as PDF</strong> above</span></div>
+        <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:3px;"><span style="background:#4a5da8;color:#fff;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">2</span><span>Long-press the page thumbnail that appears</span></div>
+        <div style="display:flex;align-items:baseline;gap:6px;"><span style="background:#4a5da8;color:#fff;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">3</span><span>Tap <strong>Share</strong> &#8594; <strong>Save to Files</strong> — clean PDF, no URL!</span></div>
+      </div>
       <div class="preview-scaler" id="pscaler">
         <div class="preview-wrapper" id="pwrapper">
           <div class="preview-inner" id="doc-preview"></div>
@@ -539,11 +548,6 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
 <div id="toast"></div>
 
 <script>
-// ═══════════════════════════════════════════════════════════════
-// APP VERSION
-// ═══════════════════════════════════════════════════════════════
-var APP_VERSION = "3.0";
-
 // ═══════════════════════════════════════════════════════════════
 // DATA & STORAGE
 // localStorage keys — these persist independently of index.html updates
@@ -602,8 +606,7 @@ function loadAll() {
 }
 function saveDefs() {
   var d = {};
-  var defKeys = ['def-sc-rhythm','def-sc-horns','def-kp-start','def-kp-note','def-chuppah','def-dresscode','def-notes'];
-  defKeys.forEach(function(k) {
+  ['def-sc-rhythm','def-sc-horns','def-kp-start','def-kp-note','def-chuppah','def-dresscode','def-notes'].forEach(function(k) {
     var el = document.getElementById(k); if (el) d[k] = el.value;
   });
   lsSet(LS.defs, d);
@@ -613,17 +616,19 @@ function saveDefs() {
 // NAVIGATION
 // ═══════════════════════════════════════════════════════════════
 function showScreen(name) {
-  var screens = ['home','settings','event'];
-  screens.forEach(function(s) {
+  ['home','settings','event'].forEach(function(s) {
     var el = document.getElementById('screen-' + s);
-    if (el) { if (s === name) { el.classList.add('active'); } else { el.classList.remove('active'); } }
+    if (el) el.classList.toggle('active', s === name);
   });
   var topbar = document.getElementById('topbar');
+  var footer = document.getElementById('home-footer');
   if (name === 'home') {
-    topbar.style.cssText = 'background:#1a1d2e;display:flex;align-items:center;gap:10px;flex-shrink:0;min-height:0;height:0;padding:0;overflow:hidden;';
+    topbar.style.display = 'none';
     document.getElementById('existing-events-section').style.display = 'none';
+    if (footer) footer.style.display = 'block';
   } else {
-    topbar.style.cssText = 'background:#1a1d2e;padding:8px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.3);min-height:68px;';
+    if (footer) footer.style.display = 'none';
+    topbar.style.display = 'flex';
     if (name === 'settings') {
       setTopbar('App Settings', '\u2190 Back', null, null);
       document.getElementById('topbar-back').setAttribute('data-back','goHome');
@@ -684,8 +689,8 @@ function openSettings() {
 
 // home screen settings button (top right on home)
 function updateHomeTopbar() {
-  var topbar = document.getElementById('topbar');
-  topbar.style.cssText = 'background:#1a1d2e;display:flex;align-items:center;gap:10px;flex-shrink:0;min-height:0;height:0;padding:0;overflow:hidden;';
+  // On home screen: hide topbar completely (hero has logo+title)
+  document.getElementById('topbar').style.display = 'none';
 }
 // Settings is now a home button, no override needed
 
@@ -695,8 +700,6 @@ function updateHomeTopbar() {
 function startNewEvent() {
   isNewEvent = true;
   isEditMode = true;
-  // Clear any leftover validation errors
-  clearErr('fd-date'); clearErr('fd-type'); clearErr('fd-venue-search');
   currentEvent = {
     id: 'evt_' + Date.now(),
     date:'', type:'', typeCustom:'', venueName:'', venueAddress:'',
@@ -804,8 +807,7 @@ function setEventEditMode(editable) {
     }
   });
   // Always disable readonly venue fields
-  var roFields = ['f-venue','f-address'];
-  roFields.forEach(function(id){ var el=document.getElementById(id); if(el){el.setAttribute('disabled','true');el.style.background='#f3f4f8';el.style.color='#888';}});
+  ['f-venue','f-address'].forEach(function(id){ var el=document.getElementById(id); if(el){el.setAttribute('disabled','true');el.style.background='#f3f4f8';el.style.color='#888';}});
   var addBtns = document.querySelectorAll('.btn-add-member');
   addBtns.forEach(function(b){ b.style.display = editable ? 'flex' : 'none'; });
   var delBtns = document.querySelectorAll('.member-tag-del');
@@ -832,9 +834,8 @@ function autoSave() {
 function readFormIntoCurrentEvent() {
   if (!currentEvent) return;
   currentEvent.date        = gv('f-date');
-  var typeVal = gv('f-type');
-  currentEvent.type       = typeVal;
-  currentEvent.typeCustom = (typeVal === 'Other') ? gv('f-type-custom') : '';
+  currentEvent.type        = gv('f-type');
+  currentEvent.typeCustom  = gv('f-type-custom');
   currentEvent.venueName    = gv('f-venue');
   currentEvent.venueAddress = gv('f-address');
   currentEvent.venueRaw     = gv('f-venue-search');
@@ -892,7 +893,7 @@ function toggleSec(id, el) {
   var b = document.getElementById(id);
   if (!b) return;
   var open = b.classList.toggle('open');
-  if (el) { if (open) { el.classList.add('open'); } else { el.classList.remove('open'); } }
+  if (el) el.classList.toggle('open', open);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1006,7 +1007,18 @@ function hideLoc() { var d=document.getElementById('loc-drop'); if(d) d.style.di
 document.addEventListener('click', function(e) { if (!e.target.closest('.venue-wrap') && !e.target.closest('#fd-venue-populated')) hideLoc(); });
 
 // Enter key on venue search = use as manual venue name
-
+document.addEventListener('DOMContentLoaded', function() {
+  var vf = document.getElementById('f-venue-search');
+  if (vf) {
+    vf.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        var q = this.value.trim();
+        if (q) { hideLoc(); useManualVenue(q); }
+        e.preventDefault();
+      }
+    });
+  }
+});
 
 // ═══════════════════════════════════════════════════════════════
 // TYPE DROPDOWN
@@ -1237,13 +1249,12 @@ function saveContact() {
   cancelContactEdit();
 }
 function cancelContactEdit() {
-  var ncFields = ['nc-id','nc-name','nc-email','nc-role'];
-  ncFields.forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+  ['nc-id','nc-name','nc-email','nc-role'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
   document.getElementById('nc-type').value = '';
   document.getElementById('nc-default').checked = false;
   document.getElementById('nc-cancel').style.display = 'none';
   document.getElementById('cf-title').textContent = 'Add New Contact';
-  clearErr('fd-nc-name'); clearErr('fd-nc-email'); clearErr('fd-nc-type');
+  ['fd-nc-name','fd-nc-email','fd-nc-type'].forEach(clearErr);
 }
 function editContact(id) {
   var c = contacts.find(function(c){ return c.id===id; });
@@ -1306,195 +1317,134 @@ function scalePreview() {
 }
 window.addEventListener('resize',scalePreview);
 
-function doSaveAsPDF() {
+function doPrint() {
   renderPreview();
-
-  var docInner = document.getElementById('doc-preview');
-  if (!docInner) { window.print(); return; }
-
-  var base = window.location.href.replace(/\/[^\/]*$/, '/');
-
-  var previewStyles = [
-    '*{box-sizing:border-box;margin:0;padding:0;}',
-    'body{background:#fff;font-family:"Times New Roman",Times,serif;padding:18px 22px;position:relative;min-height:96vh;}',
-    '.prev-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}',
-    '.prev-logo img{height:110px;width:auto;object-fit:contain;}',
-    '.prev-info{text-align:right;font-size:12px;line-height:1.55;font-family:Lato,sans-serif;padding-top:4px;}',
-    '.prev-info .co{color:#1a5fa8;font-size:14px;font-weight:700;display:block;margin-bottom:2px;}',
-    '.prev-info a{color:#1a5fa8;text-decoration:none;}',
-    '.prev-title{text-align:center;color:#1a5fa8;font-weight:700;font-size:18px;margin-bottom:10px;font-family:Lato,sans-serif;letter-spacing:.03em;}',
-    '.prev-body{font-size:12.5px;line-height:1.55;position:relative;z-index:1;}',
-    '.prev-body p{margin-bottom:5px;}',
-    '.prev-body ul{margin:1px 0 5px 26px;}',
-    '.prev-body li{margin-bottom:1px;}',
-    '.prev-divider{border:none;border-top:1px solid #e0e0e0;margin:8px 0;}',
-    '.prev-watermark{position:fixed;bottom:24px;right:24px;width:220px;height:220px;pointer-events:none;z-index:0;}',
-    '.prev-watermark img{width:220px;height:220px;object-fit:contain;opacity:0.18;}',
-    '@media print{@page{margin:8mm;size:A4 portrait;}body{padding:0;}}'
-  ].join('');
-
-  var html = '<!DOCTYPE html><html><head>' +
-    '<meta charset="UTF-8"><meta name="viewport" content="width=device-width">' +
-    '<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">' +
-    '<base href="' + base + '">' +
-    '<style>' + previewStyles + '</style>' +
-
-```
-'</head><body>' + docInner.innerHTML + '</body></html>';
-```
-
-var blob = new Blob([html], {type:‘text/html’});
-var url  = URL.createObjectURL(blob);
-
-// On iOS Safari: open in same tab temporarily, print, then go back
-// This avoids popup blocker AND removes the app URL from print footer
-var a = document.createElement(‘a’);
-a.href = url;
-a.target = ‘_blank’;
-document.body.appendChild(a);
-a.click();
-document.body.removeChild(a);
-setTimeout(function(){ URL.revokeObjectURL(url); }, 60000);
+  window.print();
 }
 
 function renderPreview() {
-var ev = currentEvent;
-if (!ev) return;
-var date    = fmtDate(ev.date||gv(‘f-date’));
-var venue   = ev.venueName || gv(‘f-venue’) || ‘’;
-var address = ev.venueAddress || gv(‘f-address’) || ‘’;
-var type = ‘’;
-if (ev.type === ‘Other’ || ev.type === ‘’) {
-type = ev.typeCustom || gv(‘f-type-custom’) || ‘’;
-} else {
-type = ev.type || gv(‘f-type’) || ‘’;
-}
-var band    = ev.band    || [];
-var singers = ev.singers || [];
-var choir   = ev.choir   || [];
-var dc      = ev.dresscode || gv(‘f-dresscode’) || ‘’;
-var notes   = ev.notes   || gv(‘f-notes’)       || ‘’;
-var scR = ev.scRhythm||gv(‘f-sc-rhythm’)||’’;
-var scH = ev.scHorns||gv(‘f-sc-horns’)||’’;
-var kpS = ev.kpStart||gv(‘f-kp-start’)||’’;
-var kpN = ev.kpNote||gv(‘f-kp-note’)||’’;
-var chu = ev.chuppah||gv(‘f-chuppah’)||’’;
+  var ev = currentEvent;
+  if (!ev) return;
+  var date    = fmtDate(ev.date||gv('f-date'));
+  var venue   = ev.venueName || gv('f-venue') || '';
+  var address = ev.venueAddress || gv('f-address') || '';
+  var type = ev.typeCustom || (ev.type === 'Other' ? ev.typeCustom : ev.type) || gv('f-type') || '';
+  if (!type || type === 'Other') type = ev.typeCustom || gv('f-type-custom') || '';
+  var band    = ev.band    || [];
+  var singers = ev.singers || [];
+  var choir   = ev.choir   || [];
+  var dc      = ev.dresscode || gv('f-dresscode') || '';
+  var notes   = ev.notes   || gv('f-notes')       || '';
+  var scR = ev.scRhythm||gv('f-sc-rhythm')||'';
+  var scH = ev.scHorns||gv('f-sc-horns')||'';
+  var kpS = ev.kpStart||gv('f-kp-start')||'';
+  var kpN = ev.kpNote||gv('f-kp-note')||'';
+  var chu = ev.chuppah||gv('f-chuppah')||'';
 
-var bandH = band.length
-? band.map(function(m){return ‘<li>’+(m.role?’<strong>’+esc(m.role)+’:</strong> ‘:’’)+esc(m.name)+’</li>’;}).join(’’)
-: ‘<li style="color:#999">N/A</li>’;
+  var bandH = band.length
+    ? band.map(function(m){return '<li>'+(m.role?'<strong>'+esc(m.role)+':</strong> ':'')+esc(m.name)+'</li>';}).join('')
+    : '<li style="color:#999">N/A</li>';
 
-var singerH = singers.length
-? singers.map(function(m){return ‘<li>’+esc(m.name)+’</li>’;}).join(’’)
-: ‘<li style="color:#999">N/A</li>’;
+  var singerH = singers.length
+    ? singers.map(function(m){return '<li>'+esc(m.name)+'</li>';}).join('')
+    : '<li style="color:#999">N/A</li>';
 
-var choirH = choir.length ? choir.map(function(m){
-var label = esc(m.name);
-if (m.count) label += ’ \u2013 ’ + m.count + ’ Members’;
-return ‘<li>’+label+’</li>’;
-}).join(’’) : ‘’;
+  var choirH = choir.length ? choir.map(function(m){
+    var label = esc(m.name);
+    if (m.count) label += ' \u2013 ' + m.count + ' Members';
+    return '<li>'+label+'</li>';
+  }).join('') : '';
 
-var dp = document.getElementById(‘doc-preview’);
-if (!dp) return;
-dp.innerHTML =
-‘<div class="prev-header">’ +
-‘<div class="prev-logo"><img src="images/logo.png" alt="Shea Kaller" onerror="this.style.display=\'none\'"></div>’ +
-‘<div class="prev-info"><span class="co">SK Music Production Inc</span>845-445-6100<br><a href="mailto:Info@Sheakallerband.com">Info@Sheakallerband.com</a></div>’ +
-‘</div>’ +
-‘<div class="prev-title">Event Details</div>’ +
-‘<div class="prev-body">’ +
-‘<p>Dear Crew,</p>’ +
-‘<p>Please find below the schedule and band lineup for the event on <strong>’+esc(date)+’</strong>’+(venue?’, at <strong>’+esc(venue)+’</strong>’:’’)+’.</p>’ +
-‘<p><strong>Type of Event:</strong> ‘+esc(type||’***’)+’<br><strong>Location:</strong> ‘+esc(venue||’***’)+(address?’ \u2013 ‘+esc(address):’’)+’</p>’ +
-‘<hr class="prev-divider">’ +
-‘<p><strong>Sound Check Schedule:</strong></p><ul><li>Rhythm: ‘+esc(scR)+’</li><li>Horns: ‘+esc(scH)+’</li></ul>’ +
-‘<p><strong>Event Schedule:</strong></p><ul><li>KP Start time: ‘+esc(kpS)+(kpN?’ (’+esc(kpN)+’)’:’’)+’</li><li>Chuppah: ‘+esc(chu)+’</li></ul>’ +
-‘<p><strong>Band Members:</strong></p><ul>’+bandH+’</ul>’ +
-‘<p><strong>Singers:</strong></p><ul>’+singerH+’</ul>’ +
-(choirH ? ‘<p><strong>Groups / Choirs:</strong></p><ul>’+choirH+’</ul>’ : ‘’) +
-‘<p><strong>Dress Code:</strong></p><ul><li>’+esc(dc)+’</li></ul>’ +
-(notes?’<p>’+esc(notes)+’</p>’:’’) +
-‘<p style="margin-top:22px;">We'll Keep you updated if anything changes</p>’ +
-‘</div>’ +
-‘<div class="prev-watermark"><img src="images/logo.png" alt="" onerror="this.style.display=\'none\'"></div>’;
-setTimeout(scalePreview, 50);
+  var dp = document.getElementById('doc-preview');
+  if (!dp) return;
+  dp.innerHTML =
+    '<div class="prev-header">' +
+      '<div class="prev-logo"><img src="images/logo.png" alt="Shea Kaller" onerror="this.style.display=\'none\'"></div>' +
+      '<div class="prev-info"><span class="co">SK Music Production Inc</span>845-445-6100<br><a href="mailto:Info@Sheakallerband.com">Info@Sheakallerband.com</a></div>' +
+    '</div>' +
+    '<div class="prev-title">Event Details</div>' +
+    '<div class="prev-body">' +
+      '<p>Dear Crew,</p>' +
+      '<p>Please find below the schedule and band lineup for the event on <strong>'+esc(date)+'</strong>'+(venue?', at <strong>'+esc(venue)+'</strong>':'')+'.</p>' +
+      '<p><strong>Type of Event:</strong> '+esc(type||'___')+'<br><strong>Location:</strong> '+esc(venue||'___')+(address?' \u2013 '+esc(address):'')+'</p>' +
+      '<hr class="prev-divider">' +
+      '<p><strong>Sound Check Schedule:</strong></p><ul><li>Rhythm: '+esc(scR)+'</li><li>Horns: '+esc(scH)+'</li></ul>' +
+      '<p><strong>Event Schedule:</strong></p><ul><li>KP Start time: '+esc(kpS)+(kpN?' ('+esc(kpN)+')':'')+'</li><li>Chuppah: '+esc(chu)+'</li></ul>' +
+      '<p><strong>Band Members:</strong></p><ul>'+bandH+'</ul>' +
+      '<p><strong>Singers:</strong></p><ul>'+singerH+'</ul>' +
+      (choirH ? '<p><strong>Groups / Choirs:</strong></p><ul>'+choirH+'</ul>' : '') +
+      '<p><strong>Dress Code:</strong></p><ul><li>'+esc(dc)+'</li></ul>' +
+      (notes?'<p>'+esc(notes)+'</p>':'') +
+      '<p style="margin-top:22px;">We\'ll Keep you updated if anything changes</p>' +
+    '</div>' +
+    '<div class="prev-watermark"><img src="images/logo.png" alt="" onerror="this.style.display=\'none\'"></div>';
+  setTimeout(scalePreview, 50);
 }
 
 // ═══════════════════════════════════════════════════════════════
 // EMAIL CREW
 // ═══════════════════════════════════════════════════════════════
 function gatherEmails() {
-var ev = currentEvent; if (!ev) return [];
-var memberIds = [];
-(ev.band||[]).forEach(function(m){memberIds.push(m.id);});
-(ev.singers||[]).forEach(function(m){memberIds.push(m.id);});
-(ev.choir||[]).forEach(function(m){memberIds.push(m.id);});
-var emails = [];
-memberIds.forEach(function(id){
-var c = contacts.find(function(c){return c.id===id;});
-if (c&&c.email&&emails.indexOf(c.email)<0) emails.push(c.email);
-});
-return emails;
+  var ev = currentEvent; if (!ev) return [];
+  var memberIds = [];
+  (ev.band||[]).forEach(function(m){memberIds.push(m.id);});
+  (ev.singers||[]).forEach(function(m){memberIds.push(m.id);});
+  (ev.choir||[]).forEach(function(m){memberIds.push(m.id);});
+  var emails = [];
+  memberIds.forEach(function(id){
+    var c = contacts.find(function(c){return c.id===id;});
+    if (c&&c.email&&emails.indexOf(c.email)<0) emails.push(c.email);
+  });
+  return emails;
 }
 function emailCrew() {
-if (!validateEvent()) { toast(‘Please fill in required fields first’, true); return; }
-var cc = gatherEmails();
-if (!cc.length) { toast(‘No emails found. Check contacts.’, true); return; }
-var date  = fmtDate(currentEvent.date||gv(‘f-date’));
-var venue = currentEvent.venueName||gv(‘f-venue’)||’’;
-var subj  = encodeURIComponent(‘Event Details’+(date?’ \u2013 ‘+date:’’)+(venue?’ at ‘+venue:’’));
-var bodyText = ‘Dear Crew,\n\nPlease find attached the event details’+(date?’ for ‘+date:’’)+(venue?’ at ‘+venue:’’)+
-‘.\n\nPlease review the schedule and lineup carefully.\n\nThank you,\nSK Music Production Inc\n845-445-6100\nInfo@Sheakallerband.com’;
-var body = encodeURIComponent(bodyText);
-var a=document.createElement(‘a’);
-a.href=‘mailto:Info@Sheakallerband.com?cc=’+encodeURIComponent(cc.join(’,’))+’&subject=’+subj+’&body=’+body;
-a.style.display=‘none’; document.body.appendChild(a); a.click();
-setTimeout(function(){document.body.removeChild(a);},300);
-toast(‘Email opened to ’ + cc.length + ’ recipients’, false);
+  if (!validateEvent()) { toast('Please fill in required fields first', true); return; }
+  var cc = gatherEmails();
+  if (!cc.length) { toast('No emails found. Check contacts.', true); return; }
+  var date  = fmtDate(currentEvent.date||gv('f-date'));
+  var venue = currentEvent.venueName||gv('f-venue')||'';
+  var subj  = encodeURIComponent('Event Details'+(date?' \u2013 '+date:'')+(venue?' at '+venue:''));
+  var bodyText = 'Dear Crew,\n\nPlease find attached the event details'+(date?' for '+date:'')+(venue?' at '+venue:'')+
+    '.\n\nPlease review the schedule and lineup carefully.\n\nThank you,\nSK Music Production Inc\n845-445-6100\nInfo@Sheakallerband.com';
+  var body = encodeURIComponent(bodyText);
+  var a=document.createElement('a');
+  a.href='mailto:Info@Sheakallerband.com?cc='+encodeURIComponent(cc.join(','))+'&subject='+subj+'&body='+body;
+  a.style.display='none'; document.body.appendChild(a); a.click();
+  setTimeout(function(){document.body.removeChild(a);},300);
+  toast('Email opened to ' + cc.length + ' recipients', false);
 }
 
 // ═══════════════════════════════════════════════════════════════
 // UTILITIES
 // ═══════════════════════════════════════════════════════════════
-function gv(id){ var el=document.getElementById(id); return el?el.value:’’; }
-function sv(id,val){ var el=document.getElementById(id); if(el) el.value=val||’’; }
-function esc(s){ return (s||’’).replace(/&/g,’&’).replace(/</g,’<’).replace(/>/g,’>’).replace(/”/g,’"’); }
+function gv(id){ var el=document.getElementById(id); return el?el.value:''; }
+function sv(id,val){ var el=document.getElementById(id); if(el) el.value=val||''; }
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function fmtDate(val){
-if(!val)return’’;
-var p=val.split(’-’); if(p.length!==3)return val;
-var y=parseInt(p[0]),m=parseInt(p[1]),d=parseInt(p[2]);
-if(!y||!m||!d)return val;
-return[‘January’,‘February’,‘March’,‘April’,‘May’,‘June’,‘July’,‘August’,‘September’,‘October’,‘November’,‘December’][m-1]+’ ‘+d+’, ’+y;
+  if(!val)return'';
+  var p=val.split('-'); if(p.length!==3)return val;
+  var y=parseInt(p[0]),m=parseInt(p[1]),d=parseInt(p[2]);
+  if(!y||!m||!d)return val;
+  return['January','February','March','April','May','June','July','August','September','October','November','December'][m-1]+' '+d+', '+y;
 }
-function isValidEmail(e){ return /^[^\s@]+@[^\s@]+.[^\s@]+$/.test(e); }
+function isValidEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
 function toast(msg,isErr){
-var t=document.getElementById(‘toast’);
-t.textContent=msg;
-if(isErr)t.classList.add(‘err’);else t.classList.remove(‘err’);
-t.classList.add(‘show’);
-setTimeout(function(){t.classList.remove(‘show’);},3000);
+  var t=document.getElementById('toast');
+  t.textContent=msg;
+  if(isErr)t.classList.add('err');else t.classList.remove('err');
+  t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},3000);
 }
 
 // ═══════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════
-window.addEventListener(‘DOMContentLoaded’, function() { try {
-// Venue search enter key
-var vf = document.getElementById(‘f-venue-search’);
-if (vf) {
-vf.addEventListener(‘keydown’, function(e) {
-if (e.key === ‘Enter’) {
-var q = this.value.trim();
-if (q) { hideLoc(); useManualVenue(q); }
-e.preventDefault();
-}
+window.addEventListener('DOMContentLoaded', function() {
+  loadAll();
+  rebuildTypeSelect();
+  showScreen('home');
+  updateHomeTopbar();
 });
-}
-loadAll();
-rebuildTypeSelect();
-showScreen(‘home’);
-updateHomeTopbar();
-} catch(err) { document.body.innerHTML = ‘<div style="padding:20px;font-size:14px;color:red;"><b>ERROR:</b><br>’ + err.message + ‘<br><br>’ + err.stack + ‘</div>’; } });
 </script>
 
 </body>
