@@ -261,9 +261,9 @@ PREVIEW / PDF
 .btn-email-crew{background:#2eaa7a;color:#fff;box-shadow:0 3px 10px rgba(46,170,122,.3);}
 .preview-scaler{width:100%;overflow:hidden;border-radius:4px;box-shadow:0 2px 16px rgba(0,0,0,.12);}
 .preview-wrapper{background:#fff;color:#222;font-family:‘Times New Roman’,Times,serif;width:750px;transform-origin:top left;}
-.preview-inner{padding:22px 30px;position:relative;overflow:hidden;}
+.preview-inner{padding:22px 30px;position:relative;overflow:hidden;min-height:900px;}
 .prev-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
-.prev-logo img{height:76px;width:auto;object-fit:contain;}
+.prev-logo img{height:110px;width:auto;object-fit:contain;}
 .prev-info{text-align:right;font-size:12px;line-height:1.55;font-family:‘Lato’,sans-serif;padding-top:4px;}
 .prev-info .co{color:#1a5fa8;font-size:15px;font-weight:700;display:block;margin-bottom:3px;}
 .prev-info a{color:#1a5fa8;text-decoration:none;}
@@ -273,8 +273,14 @@ PREVIEW / PDF
 .prev-body ul{margin:1px 0 5px 26px;}
 .prev-body li{margin-bottom:1px;}
 .prev-divider{border:none;border-top:1px solid #e0e0e0;margin:8px 0;}
-.prev-watermark{position:absolute;bottom:16px;right:16px;pointer-events:none;z-index:0;}
-.prev-watermark img{width:180px;height:auto;opacity:0.20;}
+.prev-watermark{
+position:absolute;
+bottom:24px;right:24px;
+width:220px;height:220px;
+pointer-events:none;z-index:0;
+display:flex;align-items:flex-end;justify-content:flex-end;
+}
+.prev-watermark img{width:220px;height:220px;object-fit:contain;opacity:0.18;}
 
 /* ═══════════════════════════════════════════
 TOAST
@@ -1386,11 +1392,23 @@ function doSaveAsPDF() {
       var venue   = (ev.venueName || 'event').replace(/[^a-zA-Z0-9]/g,'-').toLowerCase();
       var filename = 'SK-Event-' + dateStr + '-' + venue + '.pdf';
 
-      pdf.save(filename);
+      // iOS Safari fix: use blob URL with anchor click
+      var pdfBlob = pdf.output('blob');
+      var blobUrl = URL.createObjectURL(pdfBlob);
+      var a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename;
+      a.target = '_blank'; // fallback for browsers that don't support download attr
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function() {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(blobUrl);
+      }, 1000);
 
       btn.innerHTML = origText;
       btn.disabled  = false;
-      toast('PDF downloaded to your Files!', false);
+      toast('PDF saved! Check your Downloads folder.', false);
     }).catch(function(err) {
       wrapper.style.transform = origTransform;
       wrapper.style.width     = origWidth;
