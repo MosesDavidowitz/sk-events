@@ -981,12 +981,52 @@ function onVenueInput() {
   venueSearchTimer = setTimeout(function() { searchVenue(q); }, 500);
 }
 
+// Default location bias: Brooklyn, NY (40.6782, -73.9442)
+// Will be overridden by device GPS if permission granted
+var venueBiasLat = 40.6782;
+var venueBiasLon = -73.9442;
+var venueBiasReady = false;
+
+function initLocationBias() {
+  if (venueBiasReady) return;
+  if (!navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(
+    function(pos) {
+      venueBiasLat = pos.coords.latitude;
+      venueBiasLon = pos.coords.longitude;
+      venueBiasReady = true;
+    },
+    function() { venueBiasReady = true; } // silently fall back to Brooklyn
+  );
+}
+
 function searchVenue(q) {
-  var url = 'https://nominatim.openstreetmap.org/search?format=json&limit=6&addressdetails=1&q=' + encodeURIComponent(q);
+  initLocationBias();
+  // Use Nominatim with viewbox bias around user location (~80km radius box)
+  var delta = 0.8; // ~80km
+  var viewbox = (venueBiasLon - delta) + ',' + (venueBiasLat + delta) + ',' +
+                (venueBiasLon + delta) + ',' + (venueBiasLat - delta);
+  // bounded=0 means results outside viewbox still show but are ranked lower
+  var url = 'https://nominatim.openstreetmap.org/search?format=json&limit=8&addressdetails=1' +
+            '&viewbox=' + viewbox + '&bounded=0' +
+            '&q=' + encodeURIComponent(q);
   fetch(url, {headers:{'Accept-Language':'en','User-Agent':'SK-Events/1.0'}})
     .then(function(r){ return r.json(); })
-    .then(function(data){ showLocDrop(data, q); })
+    .then(function(data){
+      // Sort: results inside the viewbox first
+      data.sort(function(a, b) {
+        var aIn = isInBox(parseFloat(a.lat), parseFloat(a.lon), venueBiasLat, venueBiasLon, delta);
+        var bIn = isInBox(parseFloat(b.lat), parseFloat(b.lon), venueBiasLat, venueBiasLon, delta);
+        return (bIn ? 1 : 0) - (aIn ? 1 : 0);
+      });
+      showLocDrop(data, q);
+    })
     .catch(function(){ showLocDrop([], q); });
+}
+
+function isInBox(lat, lon, cLat, cLon, delta) {
+  return lat >= cLat - delta && lat <= cLat + delta &&
+         lon >= cLon - delta && lon <= cLon + delta;
 }
 
 function buildAddress(a) {
