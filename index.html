@@ -72,7 +72,7 @@ border-bottom:3px solid transparent;margin-bottom:-1px;
 /* ═══════════════════════════════════════════
 SCREENS
 ═══════════════════════════════════════════ */
-.screen{display:none;flex:1;overflow:hidden;flex-direction:column;}
+.screen{display:none;flex:1;overflow:visible;flex-direction:column;}
 .screen.active{display:flex;}
 .scroll-area{flex:1;overflow-y:auto;padding:16px 14px 80px;-webkit-overflow-scrolling:touch;}
 
@@ -327,7 +327,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
 
 <!-- ═══════════ HOME SCREEN ═══════════ -->
 
-<div class="screen active" id="screen-home" style="flex-direction:column;overflow-y:auto;">
+<div class="screen active" id="screen-home" style="flex-direction:column;overflow-y:auto;flex:1;min-height:0;">
   <div class="home-hero">
     <img src="images/logo-W.png" alt="Shea Kaller" onerror="this.style.display='none'">
     <h1>Event Builder</h1>
@@ -368,7 +368,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   </div>
   <!-- Footer inside home screen -->
   <div style="background:#1a1d2e;text-align:center;padding:16px 14px;margin-top:auto;border-top:1px solid rgba(255,255,255,.08);flex-shrink:0;">
-    <span style="color:rgba(255,255,255,.45);font-size:12px;font-family:'Lato',sans-serif;letter-spacing:.03em;">A Davidowitz Project &copy; 2026 &nbsp;&bull;&nbsp; v3.33</span>
+    <span style="color:rgba(255,255,255,.45);font-size:12px;font-family:'Lato',sans-serif;letter-spacing:.03em;">A Davidowitz Project &copy; 2026 &nbsp;&bull;&nbsp; v3.1</span>
   </div>
 </div>
 <!-- Home footer - sticky dark banner, only shows on home screen -->
@@ -376,7 +376,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
 
-<div class="screen" id="screen-settings" style="flex-direction:column;">
+<div class="screen" id="screen-settings" style="flex-direction:column;flex:1;min-height:0;">
   <div class="tabs" id="tabs-settings" style="display:none;"><!-- hidden, settings has its own back --></div>
   <div class="scroll-area" id="settings-scroll">
 
@@ -443,7 +443,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
 
 <!-- ═══════════ EVENT SCREEN ═══════════ -->
 
-<div class="screen" id="screen-event" style="flex-direction:column;">
+<div class="screen" id="screen-event" style="flex-direction:column;flex:1;min-height:0;">
   <div class="tabs tabs-event">
     <button class="tab active" id="tab-details" onclick="switchEventTab('details')">&#9999;&#65038; Details</button>
     <button class="tab" id="tab-preview" onclick="switchEventTab('preview')">&#128065; Preview</button>
