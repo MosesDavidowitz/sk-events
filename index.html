@@ -382,7 +382,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v2.2
+  A Davidowitz Project &copy; 2026 - v2.4
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -400,9 +400,8 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
     <input type="hidden" id="nc-id">
     <div class="field" id="fd-nc-name"><label class="req-label">Full Name</label><input type="text" id="nc-name" placeholder="e.g. John Smith"><div class="err-msg">Name is required</div></div>
     <div class="field" id="fd-nc-email"><label class="req-label">Email Address</label><input type="email" id="nc-email" placeholder="john@example.com"><div class="err-msg">Valid email is required</div></div>
-    <div class="field"><label>Role / Instrument</label><input type="text" id="nc-role" placeholder="e.g. Trumpet"></div>
     <div class="field" id="fd-nc-type"><label class="req-label">Contact Type</label>
-      <select id="nc-type">
+      <select id="nc-type" onchange="onContactTypeChange()">
         <option value="">Select type...</option>
         <option value="band">Band Member</option>
         <option value="singer">Singer</option>
@@ -410,6 +409,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
       </select>
       <div class="err-msg">Please select a type</div>
     </div>
+    <div class="field" id="fd-nc-role" style="display:none;"><label>Instrument</label><input type="text" id="nc-role" placeholder="e.g. Trumpet"><div class="err-msg">Instrument is required</div></div>
     <div class="field" style="display:flex;align-items:center;gap:10px;">
       <input type="checkbox" id="nc-default" style="width:20px;height:20px;cursor:pointer;accent-color:var(--accent);flex-shrink:0;">
       <label for="nc-default" style="font-size:14px;color:var(--text);font-weight:600;letter-spacing:0;cursor:pointer;margin:0;">Default (auto-add to every new event)</label>
@@ -439,11 +439,11 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
 <div class="stoggle" onclick="toggleSec('sc-defaults',this)"><span>&#9881;&#65039; Default Values</span><span class="sarrow">&#8250;</span></div>
 <div class="sbody" id="sc-defaults">
   <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Pre-fill values for every new event.</p>
-  <div class="field"><label>Sound Check – Rhythm</label><input type="text" id="def-sc-rhythm" oninput="saveDefs()"></div>
-  <div class="field"><label>Sound Check – Horns</label><input type="text" id="def-sc-horns" oninput="saveDefs()"></div>
-  <div class="field"><label>KP Start</label><input type="text" id="def-kp-start" oninput="saveDefs()"></div>
+  <div class="field"><label>Sound Check – Rhythm</label><input type="time" id="def-sc-rhythm" oninput="saveDefs()"></div>
+  <div class="field"><label>Sound Check – Horns</label><input type="time" id="def-sc-horns" oninput="saveDefs()"></div>
+  <div class="field"><label>KP Start</label><input type="time" id="def-kp-start" oninput="saveDefs()"></div>
   <div class="field"><label>KP Note</label><input type="text" id="def-kp-note" oninput="saveDefs()"></div>
-  <div class="field"><label>Chuppah / Main Event Time</label><input type="text" id="def-chuppah" oninput="saveDefs()"></div>
+  <div class="field"><label>Chuppah / Main Event Time</label><input type="time" id="def-chuppah" oninput="saveDefs()"></div>
   <div class="field"><label>Dress Code</label><input type="text" id="def-dresscode" oninput="saveDefs()"></div>
   <div class="field"><label>Additional Notes</label><textarea id="def-notes" oninput="saveDefs()"></textarea></div>
 </div>
@@ -465,7 +465,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
       <div class="card-title">Event Info</div>
       <div class="field" id="fd-date"><label class="req-label">Date</label><input type="date" id="f-date" oninput="clearErr('fd-date');autoSave()"><div class="err-msg">Date is required</div></div>
       <div class="field" id="fd-type"><label class="req-label">Type of Event</label><select id="f-type" onchange="onTypeChange()"></select><div class="err-msg">Please select a type</div></div>
-      <div class="field" id="fd-custom" style="display:none;"><label>Custom Event Type</label><input type="text" id="f-type-custom" placeholder="Describe the event..." oninput="autoSave()"></div>
+      <div class="field" id="fd-custom" style="display:none;"><label class="req-label">Custom Event Type</label><input type="text" id="f-type-custom" placeholder="Describe the event..." oninput="autoSave()"><div class="err-msg">Custom event type is required</div></div>
       <!-- Venue search field - always a search box -->
       <div class="field" id="fd-venue-search">
         <label class="req-label">Venue / Location</label>
@@ -492,11 +492,11 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
     </div>
     <div class="card">
       <div class="card-title">Schedule</div>
-      <div class="field"><label>Sound Check – Rhythm</label><input type="text" id="f-sc-rhythm" oninput="autoSave()"></div>
-      <div class="field"><label>Sound Check – Horns</label><input type="text" id="f-sc-horns" oninput="autoSave()"></div>
-      <div class="field"><label>KP Start Time</label><input type="text" id="f-kp-start" oninput="autoSave()"></div>
+      <div class="field"><label>Sound Check – Rhythm</label><input type="time" id="f-sc-rhythm" oninput="autoSave()"></div>
+      <div class="field"><label>Sound Check – Horns</label><input type="time" id="f-sc-horns" oninput="autoSave()"></div>
+      <div class="field"><label>KP Start Time</label><input type="time" id="f-kp-start" oninput="autoSave()"></div>
       <div class="field"><label>KP Note</label><input type="text" id="f-kp-note" oninput="autoSave()"></div>
-      <div class="field"><label>Chuppah / Main Event Time</label><input type="text" id="f-chuppah" oninput="autoSave()"></div>
+      <div class="field"><label>Chuppah / Main Event Time</label><input type="time" id="f-chuppah" oninput="autoSave()"></div>
     </div>
     <div class="card">
       <div class="card-title">Band Members</div>
@@ -1214,6 +1214,8 @@ function validateEvent() {
   var ok = true;
   if (!gv('f-date'))  { showErr('fd-date');  ok=false; }
   if (!gv('f-type'))  { showErr('fd-type');  ok=false; }
+  if (gv('f-type') === 'Other' && !gv('f-type-custom').trim()) { showErr('fd-custom'); ok=false; }
+  else clearErr('fd-custom');
   if (!gv('f-venue') && !gv('f-venue-search')) { showErr('fd-venue-search'); ok=false; }
   return ok;
 }
@@ -1236,6 +1238,8 @@ function saveContact() {
   else clearErr('fd-nc-email');
   if (!ctype) { showErr('fd-nc-type'); ok=false; }
   else clearErr('fd-nc-type');
+  if (ctype === 'band' && !role) { showErr('fd-nc-role'); ok=false; }
+  else clearErr('fd-nc-role');
   if (!ok) { toast('Please fix the errors above', true); return; }
   if (editId) {
     var idx = contacts.findIndex(function(c){ return String(c.id)===String(editId); });
@@ -1258,6 +1262,22 @@ function cancelContactEdit() {
   document.getElementById('nc-cancel').style.display = 'none';
   document.getElementById('cf-title').textContent = 'Add New Contact';
   ['fd-nc-name','fd-nc-email','fd-nc-type'].forEach(clearErr);
+  onContactTypeChange();
+}
+function onContactTypeChange() {
+  var ctype = document.getElementById('nc-type').value;
+  var roleField = document.getElementById('fd-nc-role');
+  var roleInput = document.getElementById('nc-role');
+  var roleLabel = roleField ? roleField.querySelector('label') : null;
+  if (ctype === 'band') {
+    if (roleField) roleField.style.display = 'block';
+    if (roleLabel) { roleLabel.className = 'req-label'; }
+  } else {
+    if (roleField) roleField.style.display = 'none';
+    if (roleInput) roleInput.value = '';
+    if (roleLabel) roleLabel.className = '';
+    clearErr('fd-nc-role');
+  }
 }
 function editContact(id) {
   var c = contacts.find(function(c){ return c.id===id; });
@@ -1268,6 +1288,7 @@ function editContact(id) {
   document.getElementById('nc-role').value  = c.role||'';
   document.getElementById('nc-type').value  = c.ctype||'';
   document.getElementById('nc-default').checked = !!c.isDefault;
+  onContactTypeChange();
   document.getElementById('nc-cancel').style.display='block';
   document.getElementById('cf-title').textContent='Edit Contact';
   var fw=document.getElementById('contact-form-wrap');
@@ -1438,11 +1459,11 @@ function renderPreview() {
   var choir   = ev.choir   || [];
   var dc      = ev.dresscode || gv('f-dresscode') || '';
   var notes   = ev.notes   || gv('f-notes')       || '';
-  var scR = ev.scRhythm||gv('f-sc-rhythm')||'';
-  var scH = ev.scHorns||gv('f-sc-horns')||'';
-  var kpS = ev.kpStart||gv('f-kp-start')||'';
+  var scR = fmtTime(ev.scRhythm||gv('f-sc-rhythm')||'');
+  var scH = fmtTime(ev.scHorns||gv('f-sc-horns')||'');
+  var kpS = fmtTime(ev.kpStart||gv('f-kp-start')||'');
   var kpN = ev.kpNote||gv('f-kp-note')||'';
-  var chu = ev.chuppah||gv('f-chuppah')||'';
+  var chu = fmtTime(ev.chuppah||gv('f-chuppah')||'');
 
   var bandH = band.length
     ? band.map(function(m){return '<li>'+(m.role?'<strong>'+esc(m.role)+':</strong> ':'')+esc(m.name)+'</li>';}).join('')
@@ -1472,7 +1493,7 @@ function renderPreview() {
       '<p><strong>Type of Event:</strong> '+esc(type||'___')+'<br><strong>Location:</strong> '+esc(venue||'___')+(address?' \u2013 '+esc(address):'')+'</p>' +
       '<hr class="prev-divider">' +
       '<p><strong>Sound Check Schedule:</strong></p><ul><li>Rhythm: '+esc(scR)+'</li><li>Horns: '+esc(scH)+'</li></ul>' +
-      '<p><strong>Event Schedule:</strong></p><ul><li>KP Start time: '+esc(kpS)+(kpN?' ('+esc(kpN)+')':'')+'</li><li>Chuppah: '+esc(chu)+'</li></ul>' +
+      '<p><strong>Event Schedule:</strong></p><ul><li>KP Start time: '+esc(kpS)+(kpN?' ('+esc(kpN)+')':'')+'</li><li>Chuppah / Main Event: '+esc(chu)+'</li></ul>' +
       '<p><strong>Band Members:</strong></p><ul>'+bandH+'</ul>' +
       '<p><strong>Singers:</strong></p><ul>'+singerH+'</ul>' +
       (choirH ? '<p><strong>Groups / Choirs:</strong></p><ul>'+choirH+'</ul>' : '') +
@@ -1531,6 +1552,16 @@ function fmtDate(val){
   return['January','February','March','April','May','June','July','August','September','October','November','December'][m-1]+' '+d+', '+y;
 }
 function isValidEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+function fmtTime(val) {
+  if (!val) return '';
+  var parts = val.split(':');
+  if (parts.length < 2) return val;
+  var h = parseInt(parts[0], 10);
+  var m = parts[1];
+  var ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12; if (h === 0) h = 12;
+  return h + ':' + m + ' ' + ampm;
+}
 function toast(msg,isErr){
   var t=document.getElementById('toast');
   t.textContent=msg;
