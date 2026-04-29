@@ -259,20 +259,20 @@ PREVIEW / PDF
 .btn-email-crew{background:#2eaa7a;color:#fff;box-shadow:0 3px 10px rgba(46,170,122,.3);}
 .preview-scaler{width:100%;overflow:hidden;border-radius:4px;box-shadow:0 2px 16px rgba(0,0,0,.12);}
 .preview-wrapper{background:#fff;color:#222;font-family:‘Times New Roman’,Times,serif;width:750px;transform-origin:top left;}
-.preview-inner{padding:28px 36px;position:relative;overflow:hidden;}
+.preview-inner{padding:22px 30px;position:relative;overflow:hidden;}
 .prev-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
-.prev-logo img{height:90px;width:auto;object-fit:contain;}
-.prev-info{text-align:right;font-size:13px;line-height:1.65;font-family:‘Lato’,sans-serif;padding-top:8px;}
+.prev-logo img{height:76px;width:auto;object-fit:contain;}
+.prev-info{text-align:right;font-size:12px;line-height:1.55;font-family:‘Lato’,sans-serif;padding-top:4px;}
 .prev-info .co{color:#1a5fa8;font-size:15px;font-weight:700;display:block;margin-bottom:3px;}
 .prev-info a{color:#1a5fa8;text-decoration:none;}
-.prev-title{text-align:center;color:#1a5fa8;font-weight:700;font-size:19px;margin-bottom:14px;font-family:‘Lato’,sans-serif;letter-spacing:.03em;}
-.prev-body{font-size:13px;line-height:1.65;position:relative;z-index:1;}
-.prev-body p{margin-bottom:7px;}
-.prev-body ul{margin:2px 0 7px 28px;}
-.prev-body li{margin-bottom:2px;}
-.prev-divider{border:none;border-top:1px solid #e0e0e0;margin:10px 0;}
-.prev-watermark{position:absolute;bottom:20px;right:20px;pointer-events:none;z-index:0;}
-.prev-watermark img{width:260px;height:auto;opacity:0.22;}
+.prev-title{text-align:center;color:#1a5fa8;font-weight:700;font-size:18px;margin-bottom:10px;font-family:‘Lato’,sans-serif;letter-spacing:.03em;}
+.prev-body{font-size:12.5px;line-height:1.55;position:relative;z-index:1;}
+.prev-body p{margin-bottom:5px;}
+.prev-body ul{margin:1px 0 5px 26px;}
+.prev-body li{margin-bottom:1px;}
+.prev-divider{border:none;border-top:1px solid #e0e0e0;margin:8px 0;}
+.prev-watermark{position:absolute;bottom:16px;right:16px;pointer-events:none;z-index:0;}
+.prev-watermark img{width:180px;height:auto;opacity:0.20;}
 
 /* ═══════════════════════════════════════════
 TOAST
@@ -286,30 +286,24 @@ PRINT
 ═══════════════════════════════════════════ */
 @media print{
 *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
-@page{margin:12mm;size:A4 portrait;}
+@page{margin:8mm;size:A4 portrait;}
 html,body{background:#fff!important;height:auto!important;overflow:visible!important;margin:0!important;padding:0!important;}
 #app{display:block!important;height:auto!important;overflow:visible!important;}
 /* Hide everything except event screen preview tab */
 .topbar,.tabs,.tabs-event,
 #screen-home,#screen-settings,
 #tab-details-content,
-.preview-outer>.btn-print,
-.preview-outer>.btn-email-crew,
-#print-tip,#home-footer,#print-doc{display:none!important;}
+#btn-print-main,#btn-email-main,
+#print-tip-div,#home-footer{display:none!important;}
 /* Show event screen and preview tab */
 #screen-event{display:block!important;height:auto!important;overflow:visible!important;}
 #tab-preview-content{display:block!important;height:auto!important;overflow:visible!important;padding:0!important;}
-.preview-outer{padding:0!important;}
-/* Scale preview to fill page */
+.preview-outer{padding:0!important;margin:0!important;}
 .preview-scaler{width:100%!important;overflow:visible!important;}
-.preview-wrapper{
-width:100%!important;
-transform:none!important;
-box-shadow:none!important;
-border-radius:0!important;
-}
-.preview-inner{padding:16px 20px!important;}
-.prev-watermark img{opacity:0.18!important;}
+.preview-wrapper{width:100%!important;transform:none!important;box-shadow:none!important;border-radius:0!important;}
+.preview-inner{padding:12px 16px!important;}
+.prev-watermark{bottom:8px!important;right:8px!important;}
+.prev-watermark img{width:160px!important;opacity:0.18!important;}
 }
 </style>
 
@@ -522,9 +516,9 @@ border-radius:0!important;
   <!-- Preview tab -->
   <div id="tab-preview-content" class="scroll-area" style="display:none;">
     <div class="preview-outer">
-      <button class="btn-block btn-print" onclick="doPrint()">&#128424; Print / Save as PDF</button>
-      <button class="btn-block btn-email-crew" onclick="emailCrew()">&#9993; Email Crew</button>
-      <div id="print-tip" style="font-size:12px;color:#6b7280;background:#f8f9fc;border:1px solid #dde1ec;border-radius:8px;padding:10px 12px;margin-bottom:14px;line-height:1.5;">
+      <button id="btn-print-main" class="btn-block btn-print" onclick="doPrint()">&#128424; Print / Save as PDF</button>
+      <button id="btn-email-main" class="btn-block btn-email-crew" onclick="emailCrew()">&#9993; Email Crew</button>
+      <div id="print-tip-div" style="font-size:12px;color:#6b7280;background:#f8f9fc;border:1px solid #dde1ec;border-radius:8px;padding:10px 12px;margin-bottom:14px;line-height:1.5;">
         &#128247; <strong>iPhone tip:</strong> In the print dialog, tap <strong>Options</strong> and turn off <strong>Headers &amp; Footers</strong> to remove the URL and page numbers.
       </div>
       <div class="preview-scaler" id="pscaler">
