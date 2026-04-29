@@ -404,7 +404,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v6.4
+  A Davidowitz Project &copy; 2026 - v6.5
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -1820,7 +1820,7 @@ function shareEventWhatsApp(id){
   if(scR||scH||scS){msg+=nl+'*Sound Check Schedule*'+nl;if(scR)msg+='\u2022 Rhythm: '+scR+nl;if(scH)msg+='\u2022 Horns: '+scH+nl;if(scS)msg+='\u2022 Strings in Lobby: '+scS+nl;}
   var kpS=fmtTime(ev.kpStart||''),kpN=ev.kpNote||'',chu=fmtTime(ev.chuppah||'');
   if(kpS||kpN||chu){msg+=nl+'*Event Schedule*'+nl;if(kpS||kpN)msg+='\u2022 KP Start Time: '+(kpS||'')+(kpN?' ('+kpN+')':'')+nl;if(chu)msg+='\u2022 Chuppah / Main Event: '+chu+nl;}
-  var band=ev.band||[];if(band.length){msg+=nl+'*Band Members*'+nl;band.forEach(function(m){msg+='\u2022 '+(m.role?m.role+': ':'')+m.name+nl;});}
+  var band=ev.band||[];if(band.length){msg+=nl+'*Band Members*'+nl;band.forEach(function(m){msg+='\u2022 '+(m.role?'*'+m.role+'*: ':'')+m.name+nl;});}
   var singers=ev.singers||[];if(singers.length){msg+=nl+'*Singers*'+nl;singers.forEach(function(m){msg+='\u2022 '+m.name+nl;});}
   var choir=ev.choir||[];if(choir.length){msg+=nl+'*Groups / Choirs*'+nl;choir.forEach(function(m){msg+='\u2022 '+m.name+(ev.choirCount?' - '+ev.choirCount+' Members':'')+nl;});}
   if(ev.dresscode)msg+=nl+'*Dress Code*'+nl+'\u2022 '+ev.dresscode+nl;
