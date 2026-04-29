@@ -286,16 +286,24 @@ PRINT
 ═══════════════════════════════════════════ */
 @media print{
 *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-html,body{background:#fff!important;height:auto;overflow:visible;}
+html,body{background:#fff!important;height:auto;overflow:visible;margin:0;padding:0;}
 #app{height:auto;overflow:visible;}
-.topbar,.tabs,.screen:not(#screen-event){display:none!important;}
-#screen-event{display:flex!important;height:auto;}
-.tabs-event,.preview-outer>.btn-print,.preview-outer>.btn-email-crew{display:none!important;}
-#tab-preview-content{display:block!important;height:auto;overflow:visible;padding:0;}
-.preview-scaler{width:100%!important;}
-.preview-wrapper{width:100%!important;transform:none!important;box-shadow:none;}
-.preview-inner{padding:24px 36px;}
-.prev-watermark img{opacity:0.18;}
+/* Hide everything except the preview content */
+.topbar,.tabs,.tabs-event,
+#screen-home,#screen-settings,
+#tab-details-content,
+.preview-outer>.btn-print,
+.preview-outer>.btn-email-crew,
+#home-footer{display:none!important;}
+#screen-event{display:block!important;height:auto;overflow:visible;}
+#tab-preview-content{display:block!important;height:auto;overflow:visible;padding:0!important;}
+.preview-outer{padding:0!important;}
+.preview-scaler{width:100%!important;overflow:visible!important;}
+.preview-wrapper{width:100%!important;transform:none!important;box-shadow:none!important;border-radius:0!important;}
+.preview-inner{padding:20px 28px!important;}
+.prev-watermark img{opacity:0.18!important;}
+/* Remove browser-added URL and page number */
+@page{margin:0.5cm;size:A4;}
 }
 </style>
 
@@ -450,24 +458,28 @@ html,body{background:#fff!important;height:auto;overflow:visible;}
       <div class="field" id="fd-date"><label class="req-label">Date</label><input type="date" id="f-date" oninput="clearErr('fd-date');autoSave()"><div class="err-msg">Date is required</div></div>
       <div class="field" id="fd-type"><label class="req-label">Type of Event</label><select id="f-type" onchange="onTypeChange()"></select><div class="err-msg">Please select a type</div></div>
       <div class="field" id="fd-custom" style="display:none;"><label>Custom Event Type</label><input type="text" id="f-type-custom" placeholder="Describe the event..." oninput="autoSave()"></div>
-      <!-- Venue - single smart field like iPhone Calendar -->
+      <!-- Venue search field - always a search box -->
       <div class="field" id="fd-venue-search">
         <label class="req-label">Venue / Location</label>
         <div class="venue-wrap">
-          <input type="text" id="f-venue-search" placeholder="Type venue name or address..." oninput="onVenueInput()" autocomplete="off">
-          <button class="venue-clear" id="venue-clear-btn" onclick="clearVenue()" style="display:none;">&#10005;</button>
+          <input type="text" id="f-venue-search" placeholder="Search venue name or address..." oninput="onVenueInput()" autocomplete="off">
           <div class="loc-drop" id="loc-drop" style="display:none;"></div>
         </div>
         <div class="err-msg">Venue is required</div>
       </div>
-      <!-- These populate after selection or manual entry -->
-      <div class="field" id="fd-venue-name" style="display:none;">
-        <label>Venue Name <span id="venue-name-edit-hint" style="font-weight:400;color:var(--accent);font-size:11px;cursor:pointer;" onclick="unlockVenueField('f-venue')">(edit)</span></label>
-        <input type="text" id="f-venue" placeholder="Venue name">
-      </div>
-      <div class="field" id="fd-venue-addr" style="display:none;">
-        <label>Venue Address <span id="venue-addr-edit-hint" style="font-weight:400;color:var(--accent);font-size:11px;cursor:pointer;" onclick="unlockVenueField('f-address')">(edit)</span></label>
-        <input type="text" id="f-address" placeholder="Street, City, State ZIP">
+      <!-- Populated after selection - editable name + address -->
+      <div id="fd-venue-populated" style="display:none;">
+        <div class="field" id="fd-venue-name">
+          <label>Venue Name</label>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input type="text" id="f-venue" placeholder="Venue name" oninput="autoSave()" style="flex:1;">
+            <button onclick="clearVenue()" id="venue-clear-btn" style="background:#fff0f0;color:#d93025;border:1px solid #fdd;border-radius:8px;width:38px;height:46px;font-size:16px;cursor:pointer;flex-shrink:0;">&#10005;</button>
+          </div>
+        </div>
+        <div class="field" id="fd-venue-addr">
+          <label>Venue Address</label>
+          <input type="text" id="f-address" placeholder="Street, City, State ZIP" oninput="autoSave()">
+        </div>
       </div>
     </div>
     <div class="card">
@@ -818,9 +830,9 @@ function readFormIntoCurrentEvent() {
   currentEvent.date        = gv('f-date');
   currentEvent.type        = gv('f-type');
   currentEvent.typeCustom  = gv('f-type-custom');
-  currentEvent.venueName   = gv('f-venue') || gv('f-venue-search');
-  currentEvent.venueAddress= gv('f-address');
-  currentEvent.venueRaw    = gv('f-venue-search');
+  currentEvent.venueName    = gv('f-venue');
+  currentEvent.venueAddress = gv('f-address');
+  currentEvent.venueRaw     = gv('f-venue-search');
   currentEvent.scRhythm    = gv('f-sc-rhythm');
   currentEvent.scHorns     = gv('f-sc-horns');
   currentEvent.kpStart     = gv('f-kp-start');
@@ -846,13 +858,12 @@ function populateEventForm() {
   sv('f-dresscode',    currentEvent.dresscode   || '');
   sv('f-notes',        currentEvent.notes       || '');
   // Restore venue fields
+  sv('f-venue-search', ''); // search is always blank on load
   if (currentEvent.venueName) {
-    sv('f-venue-search', currentEvent.venueRaw || currentEvent.venueName);
-    showVenueSubFields(false);
+    venueSelected = true;
+    showVenuePopulated(false); // read-only until edit mode
   } else {
-    document.getElementById('fd-venue-name').style.display = 'none';
-    document.getElementById('fd-venue-addr').style.display = 'none';
-    document.getElementById('venue-clear-btn').style.display = 'none';
+    document.getElementById('fd-venue-populated').style.display = 'none';
   }
   // Custom type field
   document.getElementById('fd-custom').style.display = (currentEvent.type === 'Other') ? 'block' : 'none';
@@ -881,165 +892,120 @@ function toggleSec(id, el) {
 
 // ═══════════════════════════════════════════════════════════════
 // VENUE LOCATION SEARCH
-// Single field: search Nominatim → select from dropdown
-// OR type anything and press Enter/blur → use as venue name + manual address
 // ═══════════════════════════════════════════════════════════════
 var venueSearchTimer = null;
 var venueSelected = false;
 
 function onVenueInput() {
-  venueSelected = false;
   clearErr('fd-venue-search');
-  // Hide sub-fields while typing fresh query
-  document.getElementById('fd-venue-name').style.display = 'none';
-  document.getElementById('fd-venue-addr').style.display = 'none';
-  document.getElementById('venue-clear-btn').style.display = 'none';
-  sv('f-venue',''); sv('f-address','');
   var q = gv('f-venue-search').trim();
-  if (!q) { hideLoc(); return; }
-  // Show X button while typing
-  document.getElementById('venue-clear-btn').style.display = 'block';
-  if (q.length < 2) { hideLoc(); return; }
+  hideLoc();
+  if (!q) return;
   clearTimeout(venueSearchTimer);
   venueSearchTimer = setTimeout(function() { searchVenue(q); }, 500);
 }
 
 function searchVenue(q) {
   var url = 'https://nominatim.openstreetmap.org/search?format=json&limit=6&addressdetails=1&q=' + encodeURIComponent(q);
-  fetch(url, {headers:{'Accept-Language':'en','User-Agent':'SK-Events-App/1.0'}})
+  fetch(url, {headers:{'Accept-Language':'en','User-Agent':'SK-Events/1.0'}})
     .then(function(r){ return r.json(); })
     .then(function(data){ showLocDrop(data, q); })
-    .catch(function(){ hideLoc(); });
+    .catch(function(){ showLocDrop([], q); });
 }
 
 function buildAddress(a) {
-  // Build the most complete street address possible
   var parts = [];
-  if (a.house_number && a.road) {
-    parts.push(a.house_number + ' ' + a.road);
-  } else if (a.road) {
-    parts.push(a.road);
-  }
-  var city = a.city || a.town || a.village || a.hamlet || a.suburb || '';
+  if (a.house_number && a.road) parts.push(a.house_number + ' ' + a.road);
+  else if (a.road) parts.push(a.road);
+  var city = a.city || a.town || a.village || a.hamlet || '';
   if (city) parts.push(city);
   if (a.state) parts.push(a.state);
   if (a.postcode) parts.push(a.postcode);
-  if (a.country_code && a.country_code.toLowerCase() !== 'us') {
-    if (a.country) parts.push(a.country);
-  }
   return parts.join(', ');
 }
 
-function showLocDrop(results, originalQuery) {
+function showLocDrop(results, q) {
   var drop = document.getElementById('loc-drop');
   drop.innerHTML = '';
-  if (!results || !results.length) {
-    // No results — show "Use as venue name" option
-    var item = document.createElement('div');
-    item.className = 'loc-item';
-    item.innerHTML = '<div class="loc-name" style="color:var(--accent)">&#10149; Use "' + esc(originalQuery) + '" as venue name</div><div class="loc-addr">Enter address manually</div>';
-    item.addEventListener('mousedown', function(e){ e.preventDefault(); });
-    item.addEventListener('click', function(){ useManualVenue(originalQuery); });
-    drop.appendChild(item);
-    drop.style.display = 'block';
-    return;
-  }
-  results.forEach(function(r) {
+  // Add search results
+  (results||[]).forEach(function(r) {
     var a = r.address || {};
-    // Primary name: venue/building name if available, else first part of display
-    var venueName = r.name || a.amenity || a.building || a.leisure || a.tourism || r.display_name.split(',')[0].trim();
-    var fullAddr  = buildAddress(a);
-    var item = document.createElement('div');
-    item.className = 'loc-item';
-    item.innerHTML = '<div class="loc-name">' + esc(venueName) + '</div>' +
-                     '<div class="loc-addr">' + esc(fullAddr || r.display_name) + '</div>';
+    var name = r.name || a.amenity || a.building || r.display_name.split(',')[0].trim();
+    var addr = buildAddress(a) || r.display_name;
+    var item = document.createElement('div'); item.className = 'loc-item';
+    item.innerHTML = '<div class="loc-name">'+esc(name)+'</div><div class="loc-addr">'+esc(addr)+'</div>';
     item.addEventListener('mousedown', function(e){ e.preventDefault(); });
-    item.addEventListener('click', function(){ selectVenue(venueName, fullAddr || r.display_name, r); });
+    item.addEventListener('click', function(){ selectVenue(name, addr); });
     drop.appendChild(item);
   });
-  // Always add manual entry option at bottom
-  var manual = document.createElement('div');
-  manual.className = 'loc-item';
-  manual.style.borderTop = '1px dashed var(--border)';
-  manual.innerHTML = '<div class="loc-name" style="color:var(--accent)">&#9998; Enter manually</div><div class="loc-addr">Type venue name and address yourself</div>';
+  // Always show "Enter manually" option
+  var manual = document.createElement('div'); manual.className = 'loc-item';
+  manual.style.cssText = 'border-top:1px dashed #dde1ec;';
+  manual.innerHTML = '<div class="loc-name" style="color:var(--accent)">&#9998; Use "'+esc(q)+'" — enter address manually</div>';
   manual.addEventListener('mousedown', function(e){ e.preventDefault(); });
-  manual.addEventListener('click', function(){ useManualVenue(originalQuery); });
+  manual.addEventListener('click', function(){ useManualVenue(q); });
   drop.appendChild(manual);
   drop.style.display = 'block';
 }
 
-function selectVenue(name, addr, raw) {
+function selectVenue(name, addr) {
   venueSelected = true;
-  sv('f-venue-search', name);
-  sv('f-venue',  name);
+  sv('f-venue-search', '');  // clear search field
+  sv('f-venue', name);
   sv('f-address', addr);
   hideLoc();
-  // Show populated (locked) fields
-  showVenueSubFields(false);
+  showVenuePopulated(true); // editable
   clearErr('fd-venue-search');
   autoSave();
 }
 
 function useManualVenue(nameQuery) {
-  // User typed something and wants to use it as name + enter address manually
   venueSelected = true;
+  sv('f-venue-search', '');  // clear search field
   sv('f-venue', nameQuery);
   sv('f-address', '');
   hideLoc();
-  // Show editable sub-fields
-  showVenueSubFields(true);
+  showVenuePopulated(true); // fully editable
   clearErr('fd-venue-search');
-  // Focus the address field
-  setTimeout(function(){ var el=document.getElementById('f-address'); if(el) el.focus(); }, 100);
+  setTimeout(function(){ var el=document.getElementById('f-address'); if(el) el.focus(); }, 150);
   autoSave();
 }
 
-function showVenueSubFields(editable) {
-  document.getElementById('fd-venue-name').style.display = 'block';
-  document.getElementById('fd-venue-addr').style.display = 'block';
-  document.getElementById('venue-clear-btn').style.display = 'block';
+function showVenuePopulated(editable) {
+  var pop = document.getElementById('fd-venue-populated');
+  pop.style.display = 'block';
   var fv = document.getElementById('f-venue');
   var fa = document.getElementById('f-address');
+  var cb = document.getElementById('venue-clear-btn');
   if (editable) {
-    fv.removeAttribute('readonly'); fv.style.background=''; fv.style.color='';
-    fa.removeAttribute('readonly'); fa.style.background=''; fa.style.color='';
-    document.getElementById('venue-name-edit-hint').style.display = 'none';
-    document.getElementById('venue-addr-edit-hint').style.display = 'none';
+    [fv,fa].forEach(function(el){ if(el){el.removeAttribute('disabled');el.style.background='';el.style.color='';} });
+    if (cb) cb.style.display = 'block';
   } else {
-    fv.setAttribute('readonly','true'); fv.style.background='#f3f4f8'; fv.style.color='#555';
-    fa.setAttribute('readonly','true'); fa.style.background='#f3f4f8'; fa.style.color='#555';
-    document.getElementById('venue-name-edit-hint').style.display = 'inline';
-    document.getElementById('venue-addr-edit-hint').style.display = 'inline';
+    // View/read mode - disable fields and hide X
+    [fv,fa].forEach(function(el){ if(el){el.setAttribute('disabled','true');el.style.background='#f3f4f8';el.style.color='#555';} });
+    if (cb) cb.style.display = 'none';
   }
-}
-
-function unlockVenueField(fieldId) {
-  var el = document.getElementById(fieldId);
-  if (!el) return;
-  el.removeAttribute('readonly'); el.style.background=''; el.style.color='';
-  el.focus();
-  // Hide the edit hint
-  var hintId = fieldId === 'f-venue' ? 'venue-name-edit-hint' : 'venue-addr-edit-hint';
-  var hint = document.getElementById(hintId);
-  if (hint) hint.style.display = 'none';
 }
 
 function clearVenue() {
   venueSelected = false;
   sv('f-venue-search',''); sv('f-venue',''); sv('f-address','');
-  document.getElementById('fd-venue-name').style.display = 'none';
-  document.getElementById('fd-venue-addr').style.display = 'none';
-  document.getElementById('venue-clear-btn').style.display = 'none';
+  document.getElementById('fd-venue-populated').style.display = 'none';
   hideLoc();
   autoSave();
+  // Focus back on search
+  setTimeout(function(){ var el=document.getElementById('f-venue-search'); if(el) el.focus(); }, 100);
 }
 
-// Handle Enter key on venue search - treat typed value as manual venue
+function hideLoc() { var d=document.getElementById('loc-drop'); if(d) d.style.display='none'; }
+document.addEventListener('click', function(e) { if (!e.target.closest('.venue-wrap') && !e.target.closest('#fd-venue-populated')) hideLoc(); });
+
+// Enter key on venue search = use as manual venue name
 document.addEventListener('DOMContentLoaded', function() {
-  var vfield = document.getElementById('f-venue-search');
-  if (vfield) {
-    vfield.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' && !venueSelected) {
+  var vf = document.getElementById('f-venue-search');
+  if (vf) {
+    vf.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
         var q = this.value.trim();
         if (q) { hideLoc(); useManualVenue(q); }
         e.preventDefault();
@@ -1047,9 +1013,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
-
-function hideLoc() { var d=document.getElementById('loc-drop'); if(d) d.style.display='none'; }
-document.addEventListener('click', function(e) { if (!e.target.closest('.venue-wrap')) hideLoc(); });
 
 // ═══════════════════════════════════════════════════════════════
 // TYPE DROPDOWN
@@ -1437,7 +1400,7 @@ function emailCrew() {
   a.href='mailto:Info@Sheakallerband.com?cc='+encodeURIComponent(cc.join(','))+'&subject='+subj+'&body='+body;
   a.style.display='none'; document.body.appendChild(a); a.click();
   setTimeout(function(){document.body.removeChild(a);},300);
-  toast('Email opened \u2013 attach the PDF manually', false);
+  toast('Email opened to ' + cc.length + ' recipients', false);
 }
 
 // ═══════════════════════════════════════════════════════════════
