@@ -306,8 +306,8 @@ pointer-events:none;z-index:0;
 .bcast-item{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid var(–border);cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .bcast-item:last-child{border-bottom:none;}
 .bcast-item:active{background:#f5f7ff;}
-.bcast-check{width:26px;height:26px;border-radius:7px;border:2px solid var(–inp-border);background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px;font-weight:700;transition:background .15s,border-color .15s;}
-.bcast-check.checked{background:var(–accent);border-color:var(–accent);color:#fff;}
+.bcast-check{width:28px;height:28px;border-radius:7px;border:2.5px solid #aab0c8;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:17px;font-weight:900;transition:background .15s,border-color .15s;color:transparent;}
+.bcast-check.checked{background:#2eaa7a;border-color:#2eaa7a;color:#fff;}
 .bcast-item-info{flex:1;}
 .bcast-item-name{font-size:15px;font-weight:700;}
 .bcast-item-sub{font-size:12px;color:var(–muted);margin-top:2px;}
@@ -420,7 +420,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v3.8
+  A Davidowitz Project &copy; 2026 - v3.9
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -1717,7 +1717,7 @@ function filterBroadcast(){
     item.setAttribute('data-id', c.id);
     var isChk=broadcastSelected.indexOf(c.id)>=0;
     item.innerHTML=
-      '<div class="bcast-check'+(isChk?' checked':'')+'" id="bchk-'+c.id+'">'+(isChk?'&#10003;':'')+'</div>'+
+      '<div class="bcast-check'+(isChk?' checked':'')+'" id="bchk-'+c.id+'">'+(isChk?'&#10004;':'')+'</div>'+
       '<div class="bcast-item-info">'+
         '<div class="bcast-item-name">'+esc(c.name)+'</div>'+
         '<div class="bcast-item-sub">'+esc(c.role||'')+(c.email?' · '+esc(c.email):'')+(c.phone?' · '+esc(c.phone):'')+'</div>'+
@@ -1733,9 +1733,9 @@ function filterBroadcast(){
         var nowChk=broadcastSelected.indexOf(cid)>=0;
         if(chkEl){
           chkEl.className='bcast-check'+(nowChk?' checked':'');
-          chkEl.innerHTML=nowChk?'&#10003;':'';
+          chkEl.innerHTML=nowChk?'&#10004;':'';
         }
-        item.style.background=nowChk?'#f0f4ff':'';
+        item.style.background=nowChk?'#e8f7f1':'';
         updateBroadcastBtn();
       });
     })(c.id);
