@@ -450,18 +450,25 @@ html,body{background:#fff!important;height:auto;overflow:visible;}
       <div class="field" id="fd-date"><label class="req-label">Date</label><input type="date" id="f-date" oninput="clearErr('fd-date');autoSave()"><div class="err-msg">Date is required</div></div>
       <div class="field" id="fd-type"><label class="req-label">Type of Event</label><select id="f-type" onchange="onTypeChange()"></select><div class="err-msg">Please select a type</div></div>
       <div class="field" id="fd-custom" style="display:none;"><label>Custom Event Type</label><input type="text" id="f-type-custom" placeholder="Describe the event..." oninput="autoSave()"></div>
-      <!-- Venue location search -->
+      <!-- Venue - single smart field like iPhone Calendar -->
       <div class="field" id="fd-venue-search">
-        <label class="req-label">Venue Location</label>
+        <label class="req-label">Venue / Location</label>
         <div class="venue-wrap">
-          <input type="text" id="f-venue-search" placeholder="Start typing venue name..." oninput="onVenueInput()" autocomplete="off">
+          <input type="text" id="f-venue-search" placeholder="Type venue name or address..." oninput="onVenueInput()" autocomplete="off">
           <button class="venue-clear" id="venue-clear-btn" onclick="clearVenue()" style="display:none;">&#10005;</button>
           <div class="loc-drop" id="loc-drop" style="display:none;"></div>
         </div>
         <div class="err-msg">Venue is required</div>
       </div>
-      <div class="field" id="fd-venue-name" style="display:none;"><label>Venue Name</label><input type="text" id="f-venue" readonly style="background:#f3f4f8;color:#888;"></div>
-      <div class="field" id="fd-venue-addr" style="display:none;"><label>Venue Address</label><input type="text" id="f-address" readonly style="background:#f3f4f8;color:#888;"></div>
+      <!-- These populate after selection or manual entry -->
+      <div class="field" id="fd-venue-name" style="display:none;">
+        <label>Venue Name <span id="venue-name-edit-hint" style="font-weight:400;color:var(--accent);font-size:11px;cursor:pointer;" onclick="unlockVenueField('f-venue')">(edit)</span></label>
+        <input type="text" id="f-venue" placeholder="Venue name">
+      </div>
+      <div class="field" id="fd-venue-addr" style="display:none;">
+        <label>Venue Address <span id="venue-addr-edit-hint" style="font-weight:400;color:var(--accent);font-size:11px;cursor:pointer;" onclick="unlockVenueField('f-address')">(edit)</span></label>
+        <input type="text" id="f-address" placeholder="Street, City, State ZIP">
+      </div>
     </div>
     <div class="card">
       <div class="card-title">Schedule</div>
@@ -810,7 +817,7 @@ function readFormIntoCurrentEvent() {
   currentEvent.date        = gv('f-date');
   currentEvent.type        = gv('f-type');
   currentEvent.typeCustom  = gv('f-type-custom');
-  currentEvent.venueName   = gv('f-venue');
+  currentEvent.venueName   = gv('f-venue') || gv('f-venue-search');
   currentEvent.venueAddress= gv('f-address');
   currentEvent.venueRaw    = gv('f-venue-search');
   currentEvent.scRhythm    = gv('f-sc-rhythm');
@@ -837,11 +844,14 @@ function populateEventForm() {
   sv('f-chuppah',      currentEvent.chuppah     || '');
   sv('f-dresscode',    currentEvent.dresscode   || '');
   sv('f-notes',        currentEvent.notes       || '');
-  // Show/hide venue address fields
+  // Restore venue fields
   if (currentEvent.venueName) {
-    document.getElementById('fd-venue-name').style.display = 'block';
-    document.getElementById('fd-venue-addr').style.display = 'block';
-    document.getElementById('venue-clear-btn').style.display = 'block';
+    sv('f-venue-search', currentEvent.venueRaw || currentEvent.venueName);
+    showVenueSubFields(false);
+  } else {
+    document.getElementById('fd-venue-name').style.display = 'none';
+    document.getElementById('fd-venue-addr').style.display = 'none';
+    document.getElementById('venue-clear-btn').style.display = 'none';
   }
   // Custom type field
   document.getElementById('fd-custom').style.display = (currentEvent.type === 'Other') ? 'block' : 'none';
@@ -869,72 +879,175 @@ function toggleSec(id, el) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// VENUE LOCATION SEARCH (using Nominatim - free, no API key)
+// VENUE LOCATION SEARCH
+// Single field: search Nominatim → select from dropdown
+// OR type anything and press Enter/blur → use as venue name + manual address
 // ═══════════════════════════════════════════════════════════════
 var venueSearchTimer = null;
 var venueSelected = false;
+
 function onVenueInput() {
-  if (venueSelected) return;
+  venueSelected = false;
   clearErr('fd-venue-search');
-  var q = gv('f-venue-search');
-  if (!q || q.length < 3) { hideLoc(); return; }
+  // Hide sub-fields while typing fresh query
+  document.getElementById('fd-venue-name').style.display = 'none';
+  document.getElementById('fd-venue-addr').style.display = 'none';
+  document.getElementById('venue-clear-btn').style.display = 'none';
+  sv('f-venue',''); sv('f-address','');
+  var q = gv('f-venue-search').trim();
+  if (!q) { hideLoc(); return; }
+  // Show X button while typing
+  document.getElementById('venue-clear-btn').style.display = 'block';
+  if (q.length < 2) { hideLoc(); return; }
   clearTimeout(venueSearchTimer);
-  venueSearchTimer = setTimeout(function() { searchVenue(q); }, 400);
-  autoSave();
+  venueSearchTimer = setTimeout(function() { searchVenue(q); }, 500);
 }
+
 function searchVenue(q) {
-  var url = 'https://nominatim.openstreetmap.org/search?format=json&limit=5&addressdetails=1&q=' + encodeURIComponent(q);
-  fetch(url, {headers:{'Accept-Language':'en'}})
+  var url = 'https://nominatim.openstreetmap.org/search?format=json&limit=6&addressdetails=1&q=' + encodeURIComponent(q);
+  fetch(url, {headers:{'Accept-Language':'en','User-Agent':'SK-Events-App/1.0'}})
     .then(function(r){ return r.json(); })
-    .then(function(data){ showLocDrop(data); })
+    .then(function(data){ showLocDrop(data, q); })
     .catch(function(){ hideLoc(); });
 }
-function showLocDrop(results) {
+
+function buildAddress(a) {
+  // Build the most complete street address possible
+  var parts = [];
+  if (a.house_number && a.road) {
+    parts.push(a.house_number + ' ' + a.road);
+  } else if (a.road) {
+    parts.push(a.road);
+  }
+  var city = a.city || a.town || a.village || a.hamlet || a.suburb || '';
+  if (city) parts.push(city);
+  if (a.state) parts.push(a.state);
+  if (a.postcode) parts.push(a.postcode);
+  if (a.country_code && a.country_code.toLowerCase() !== 'us') {
+    if (a.country) parts.push(a.country);
+  }
+  return parts.join(', ');
+}
+
+function showLocDrop(results, originalQuery) {
   var drop = document.getElementById('loc-drop');
   drop.innerHTML = '';
-  if (!results || !results.length) { drop.style.display='none'; return; }
-  results.forEach(function(r) {
+  if (!results || !results.length) {
+    // No results — show "Use as venue name" option
     var item = document.createElement('div');
     item.className = 'loc-item';
-    var name = r.name || r.display_name.split(',')[0];
-    var addr = r.display_name;
-    item.innerHTML = '<div class="loc-name">'+esc(name)+'</div><div class="loc-addr">'+esc(addr)+'</div>';
+    item.innerHTML = '<div class="loc-name" style="color:var(--accent)">&#10149; Use "' + esc(originalQuery) + '" as venue name</div><div class="loc-addr">Enter address manually</div>';
     item.addEventListener('mousedown', function(e){ e.preventDefault(); });
-    item.addEventListener('click', function() { selectVenue(name, addr, r); });
+    item.addEventListener('click', function(){ useManualVenue(originalQuery); });
+    drop.appendChild(item);
+    drop.style.display = 'block';
+    return;
+  }
+  results.forEach(function(r) {
+    var a = r.address || {};
+    // Primary name: venue/building name if available, else first part of display
+    var venueName = r.name || a.amenity || a.building || a.leisure || a.tourism || r.display_name.split(',')[0].trim();
+    var fullAddr  = buildAddress(a);
+    var item = document.createElement('div');
+    item.className = 'loc-item';
+    item.innerHTML = '<div class="loc-name">' + esc(venueName) + '</div>' +
+                     '<div class="loc-addr">' + esc(fullAddr || r.display_name) + '</div>';
+    item.addEventListener('mousedown', function(e){ e.preventDefault(); });
+    item.addEventListener('click', function(){ selectVenue(venueName, fullAddr || r.display_name, r); });
     drop.appendChild(item);
   });
+  // Always add manual entry option at bottom
+  var manual = document.createElement('div');
+  manual.className = 'loc-item';
+  manual.style.borderTop = '1px dashed var(--border)';
+  manual.innerHTML = '<div class="loc-name" style="color:var(--accent)">&#9998; Enter manually</div><div class="loc-addr">Type venue name and address yourself</div>';
+  manual.addEventListener('mousedown', function(e){ e.preventDefault(); });
+  manual.addEventListener('click', function(){ useManualVenue(originalQuery); });
+  drop.appendChild(manual);
   drop.style.display = 'block';
 }
+
 function selectVenue(name, addr, raw) {
   venueSelected = true;
   sv('f-venue-search', name);
-  sv('f-venue', name);
-  // Build clean address from components
-  var a = raw.address || {};
-  var parts = [];
-  if (a.house_number && a.road) parts.push(a.house_number + ' ' + a.road);
-  else if (a.road) parts.push(a.road);
-  if (a.city || a.town || a.village) parts.push(a.city || a.town || a.village);
-  if (a.state) parts.push(a.state);
-  if (a.postcode) parts.push(a.postcode);
-  var cleanAddr = parts.length ? parts.join(', ') : addr;
-  sv('f-address', cleanAddr);
+  sv('f-venue',  name);
+  sv('f-address', addr);
   hideLoc();
-  document.getElementById('fd-venue-name').style.display = 'block';
-  document.getElementById('fd-venue-addr').style.display = 'block';
-  document.getElementById('venue-clear-btn').style.display = 'block';
+  // Show populated (locked) fields
+  showVenueSubFields(false);
   clearErr('fd-venue-search');
   autoSave();
 }
+
+function useManualVenue(nameQuery) {
+  // User typed something and wants to use it as name + enter address manually
+  venueSelected = true;
+  sv('f-venue', nameQuery);
+  sv('f-address', '');
+  hideLoc();
+  // Show editable sub-fields
+  showVenueSubFields(true);
+  clearErr('fd-venue-search');
+  // Focus the address field
+  setTimeout(function(){ var el=document.getElementById('f-address'); if(el) el.focus(); }, 100);
+  autoSave();
+}
+
+function showVenueSubFields(editable) {
+  document.getElementById('fd-venue-name').style.display = 'block';
+  document.getElementById('fd-venue-addr').style.display = 'block';
+  document.getElementById('venue-clear-btn').style.display = 'block';
+  var fv = document.getElementById('f-venue');
+  var fa = document.getElementById('f-address');
+  if (editable) {
+    fv.removeAttribute('readonly'); fv.style.background=''; fv.style.color='';
+    fa.removeAttribute('readonly'); fa.style.background=''; fa.style.color='';
+    document.getElementById('venue-name-edit-hint').style.display = 'none';
+    document.getElementById('venue-addr-edit-hint').style.display = 'none';
+  } else {
+    fv.setAttribute('readonly','true'); fv.style.background='#f3f4f8'; fv.style.color='#555';
+    fa.setAttribute('readonly','true'); fa.style.background='#f3f4f8'; fa.style.color='#555';
+    document.getElementById('venue-name-edit-hint').style.display = 'inline';
+    document.getElementById('venue-addr-edit-hint').style.display = 'inline';
+  }
+}
+
+function unlockVenueField(fieldId) {
+  var el = document.getElementById(fieldId);
+  if (!el) return;
+  el.removeAttribute('readonly'); el.style.background=''; el.style.color='';
+  el.focus();
+  // Hide the edit hint
+  var hintId = fieldId === 'f-venue' ? 'venue-name-edit-hint' : 'venue-addr-edit-hint';
+  var hint = document.getElementById(hintId);
+  if (hint) hint.style.display = 'none';
+}
+
 function clearVenue() {
   venueSelected = false;
   sv('f-venue-search',''); sv('f-venue',''); sv('f-address','');
   document.getElementById('fd-venue-name').style.display = 'none';
   document.getElementById('fd-venue-addr').style.display = 'none';
   document.getElementById('venue-clear-btn').style.display = 'none';
+  hideLoc();
   autoSave();
 }
-function hideLoc() { document.getElementById('loc-drop').style.display='none'; }
+
+// Handle Enter key on venue search - treat typed value as manual venue
+document.addEventListener('DOMContentLoaded', function() {
+  var vfield = document.getElementById('f-venue-search');
+  if (vfield) {
+    vfield.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !venueSelected) {
+        var q = this.value.trim();
+        if (q) { hideLoc(); useManualVenue(q); }
+        e.preventDefault();
+      }
+    });
+  }
+});
+
+function hideLoc() { var d=document.getElementById('loc-drop'); if(d) d.style.display='none'; }
 document.addEventListener('click', function(e) { if (!e.target.closest('.venue-wrap')) hideLoc(); });
 
 // ═══════════════════════════════════════════════════════════════
@@ -1128,7 +1241,7 @@ function validateEvent() {
   var ok = true;
   if (!gv('f-date'))  { showErr('fd-date');  ok=false; }
   if (!gv('f-type'))  { showErr('fd-type');  ok=false; }
-  if (!gv('f-venue')) { showErr('fd-venue-search'); ok=false; }
+  if (!gv('f-venue') && !gv('f-venue-search')) { showErr('fd-venue-search'); ok=false; }
   return ok;
 }
 
@@ -1261,11 +1374,11 @@ function renderPreview() {
     ? singers.map(function(m){return '<li>'+esc(m.name)+'</li>';}).join('')
     : '<li style="color:#999">N/A</li>';
 
-  var choirH = choir.map(function(m){
+  var choirH = choir.length ? choir.map(function(m){
     var label = esc(m.name);
     if (m.count) label += ' \u2013 ' + m.count + ' Members';
     return '<li>'+label+'</li>';
-  }).join('');
+  }).join('') : '';
 
   var dp = document.getElementById('doc-preview');
   if (!dp) return;
@@ -1283,7 +1396,8 @@ function renderPreview() {
       '<p><strong>Sound Check Schedule:</strong></p><ul><li>Rhythm: '+esc(scR)+'</li><li>Horns: '+esc(scH)+'</li></ul>' +
       '<p><strong>Event Schedule:</strong></p><ul><li>KP Start time: '+esc(kpS)+(kpN?' ('+esc(kpN)+')':'')+'</li><li>Chuppah: '+esc(chu)+'</li></ul>' +
       '<p><strong>Band Members:</strong></p><ul>'+bandH+'</ul>' +
-      '<p><strong>Singers:</strong></p><ul>'+singerH+(choirH?choirH:'')+'</ul>' +
+      '<p><strong>Singers:</strong></p><ul>'+singerH+'</ul>' +
+      (choirH ? '<p><strong>Groups / Choirs:</strong></p><ul>'+choirH+'</ul>' : '') +
       '<p><strong>Dress Code:</strong></p><ul><li>'+esc(dc)+'</li></ul>' +
       (notes?'<p>'+esc(notes)+'</p>':'') +
       '<p style="margin-top:22px;">We\'ll Keep you updated if anything changes</p>' +
