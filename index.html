@@ -418,7 +418,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v8.0
+  A Davidowitz Project &copy; 2026 - v8.3
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -575,6 +575,12 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
       <div class="card-title">Dress Code &amp; Notes</div>
       <div class="field"><label>Dress Code</label><input type="text" id="f-dresscode" oninput="autoSave()"></div>
       <div class="field"><label>Additional Notes</label><textarea id="f-notes" oninput="autoSave()"></textarea></div>
+      <div class="field">
+        <label>Internal Memo <span style="font-weight:400;font-size:11px;color:var(--muted);">(private — not on PDF)</span></label>
+        <textarea id="f-memo" placeholder="Private notes, reminders, logistics..." style="min-height:80px;" oninput="onMemoChange()"></textarea>
+        <button id="btn-save-memo" onclick="saveMemo()" disabled style="margin-top:8px;background:#ccc;color:#fff;border:none;border-radius:10px;padding:10px 20px;font-size:14px;font-weight:700;cursor:default;width:100%;-webkit-tap-highlight-color:transparent;transition:background .2s;">💾 Save Memo</button>
+        <div id="memo-saved-msg" style="display:none;text-align:center;color:#2eaa7a;font-size:12px;font-weight:600;margin-top:6px;">✓ Memo saved</div>
+      </div>
     </div>
   </div>
   <!-- Preview tab -->
@@ -803,7 +809,7 @@ function startNewEvent() {
     date:'', type:'', typeCustom:'', venueName:'', venueAddress:'',
     scRhythm:'', scHorns:'', scStrings:'', kpStart:'', kpNote:'', chuppah:'',
     band:[], singers:[], choir:[], choirCount:'',
-    dresscode:'', notes:'', venueRaw:'', status:'open'
+    dresscode:'', notes:'', memo:'', venueRaw:'', status:'open'
   };
   // Apply defaults
   var defs = lsGet(LS.defs, SEED_DEFS);
@@ -815,6 +821,7 @@ function startNewEvent() {
   currentEvent.chuppah   = defs['def-chuppah']     || '';
   currentEvent.dresscode = defs['def-dresscode']   || '';
   currentEvent.notes     = defs['def-notes']       || '';
+  currentEvent.memo      = ''; // memo is never a default
   // Apply default contacts
   currentEvent.band    = contacts.filter(function(c){return c.ctype==='band'   && c.isDefault;}).map(function(c){return {id:c.id,name:c.name,role:c.role};});
   currentEvent.singers = contacts.filter(function(c){return c.ctype==='singer' && c.isDefault;}).map(function(c){return {id:c.id,name:c.name};});
@@ -890,6 +897,7 @@ function enterEditMode() {
 function setEventEditMode(editable) {
   var fields = document.querySelectorAll('#tab-details-content input, #tab-details-content textarea, #tab-details-content select');
   fields.forEach(function(el) {
+    if (el.id === 'f-memo') return; // memo is always editable
     if (editable) {
       el.removeAttribute('disabled');
       el.style.background = '';
@@ -929,6 +937,35 @@ function saveCurrentEvent() {
   renderEventStatus();
   toast('Event saved! ✓', false);
 }
+function onMemoChange() {
+  var btn = document.getElementById('btn-save-memo');
+  if (!btn) return;
+  btn.disabled = false;
+  btn.style.background = 'var(--accent)';
+  btn.style.cursor = 'pointer';
+}
+function saveMemo() {
+  if (!currentEvent) return;
+  currentEvent.memo = gv('f-memo');
+  // Save memo without changing status (even if confirmed)
+  var idx = savedEvents.findIndex(function(e){ return e.id === currentEvent.id; });
+  if (idx >= 0) {
+    savedEvents[idx].memo = currentEvent.memo;
+    lsSet(LS.events, savedEvents);
+    // Show saved confirmation
+    var msg = document.getElementById('memo-saved-msg');
+    if (msg) {
+      msg.style.display = 'block';
+      setTimeout(function(){ msg.style.display = 'none'; }, 2000);
+      // Grey out button again — no unsaved changes
+      var btn=document.getElementById('btn-save-memo');
+      if(btn){btn.disabled=true;btn.style.background='#ccc';btn.style.cursor='default';}
+    }
+  } else {
+    toast('Save the event first before adding a memo', true);
+    return;
+  }
+}
 function autoSave() {
   if (!currentEvent || !isEditMode) return;
   readFormIntoCurrentEvent();
@@ -951,6 +988,7 @@ function readFormIntoCurrentEvent() {
   currentEvent.chuppah     = gv('f-chuppah');
   currentEvent.dresscode   = gv('f-dresscode');
   currentEvent.notes       = gv('f-notes');
+  // memo is saved independently via saveMemo(), not via autoSave()
 }
 function populateEventForm() {
   if (!currentEvent) return;
@@ -969,6 +1007,7 @@ function populateEventForm() {
   sv('f-chuppah',      currentEvent.chuppah     || '');
   sv('f-dresscode',    currentEvent.dresscode   || '');
   sv('f-notes',        currentEvent.notes       || '');
+  sv('f-memo',         currentEvent.memo        || '');
   // Restore venue fields
   sv('f-venue-search', ''); // search is always blank on load
   if (currentEvent.venueName) {
@@ -1707,6 +1746,7 @@ function persistCurrentEvent() {
 
 function emailCrew() {
   if (!validateEvent()) { toast('Please fill in required fields first', true); return; }
+  if (!confirm('Reminder: The PDF is not auto-attached.\n\nPlease download the PDF first, then attach it manually in the Mail app.\n\nContinue?')) return;
   var cc = gatherEmails();
   if (!cc.length) { toast('No emails found. Check contacts.', true); return; }
   var date  = fmtDate(currentEvent.date||gv('f-date'));
