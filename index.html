@@ -484,7 +484,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v13.2
+  A Davidowitz Project &copy; 2026 - v13.3
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -602,9 +602,9 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
     </div>
     <div class="card">
       <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">Event Info<span><button onclick="editCard('event-info')" id="btn-edit-event-info" style="background:#f0f4ff;color:var(--accent);border:1.5px solid #c8d0f0;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">&#9998; Edit</button><button onclick="saveCard('event-info')" id="btn-save-event-info" style="display:none;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">&#128190; Save</button></span></div>
-      <div class="field" id="fd-date"><label class="req-label">Date</label><input type="date" id="f-date" oninput="clearErr('fd-date');autoSave()"><div class="err-msg">Date is required</div></div>
-      <div class="field" id="fd-type"><label class="req-label">Type of Event</label><select id="f-type" onchange="onTypeChange()"></select><div class="err-msg">Please select a type</div></div>
-      <div class="field" id="fd-custom" style="display:none;"><label class="req-label">Custom Event Type</label><input type="text" id="f-type-custom" placeholder="Describe the event..." oninput="autoSave()"><div class="err-msg">Custom event type is required</div></div>
+      <div class="field" id="fd-date"><label class="req-label">Date</label><input type="date" id="f-date" oninput="markCardDirty('event-info');clearErr('fd-date');autoSave()"><div class="err-msg">Date is required</div></div>
+      <div class="field" id="fd-type"><label class="req-label">Type of Event</label><select id="f-type" onchange="markCardDirty('event-info');onTypeChange()"></select><div class="err-msg">Please select a type</div></div>
+      <div class="field" id="fd-custom" style="display:none;"><label class="req-label">Custom Event Type</label><input type="text" id="f-type-custom" placeholder="Describe the event..." oninput="markCardDirty('event-info');autoSave()"><div class="err-msg">Custom event type is required</div></div>
       <!-- Venue search field - always a search box -->
       <div class="field" id="fd-venue-search">
         <label class="req-label">Venue / Location</label>
@@ -623,12 +623,12 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
             <button onclick="clearVenue()" id="venue-clear-btn" style="background:#fff0f0;color:#d93025;border:1px solid #fdd;border-radius:8px;width:38px;height:46px;font-size:16px;cursor:pointer;flex-shrink:0;">&#10005;</button>
           </div>
         </div>
-        <div class="field"><label>Street Address</label><input type="text" id="f-addr-street" placeholder="123 Main St" oninput="autoSave()"></div>
+        <div class="field"><label>Street Address</label><input type="text" id="f-addr-street" placeholder="123 Main St" oninput="markCardDirty('event-info');autoSave()"></div>
         <div style="display:grid;grid-template-columns:1fr 80px;gap:8px;">
-          <div class="field" style="margin:0 0 13px;"><label>City</label><input type="text" id="f-addr-city" placeholder="Brooklyn" oninput="autoSave()"></div>
-          <div class="field" style="margin:0 0 13px;"><label>State</label><input type="text" id="f-addr-state" placeholder="NY" maxlength="2" oninput="autoSave()"></div>
+          <div class="field" style="margin:0 0 13px;"><label>City</label><input type="text" id="f-addr-city" placeholder="Brooklyn" oninput="markCardDirty('event-info');autoSave()"></div>
+          <div class="field" style="margin:0 0 13px;"><label>State</label><input type="text" id="f-addr-state" placeholder="NY" maxlength="2" oninput="markCardDirty('event-info');autoSave()"></div>
         </div>
-        <div class="field"><label>ZIP Code</label><input type="text" inputmode="numeric" id="f-addr-zip" placeholder="11201" maxlength="5" oninput="autoSave()"></div>
+        <div class="field"><label>ZIP Code</label><input type="text" inputmode="numeric" id="f-addr-zip" placeholder="11201" maxlength="5" oninput="markCardDirty('event-info');autoSave()"></div>
         <input type="hidden" id="f-address">
       </div>
 
@@ -644,16 +644,16 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
     </select></div>
   </div>
 
-  <div style="margin-top:12px;"><button onclick="saveCard('event-info')" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">&#128190; Save Event Info</button></div>
+  <div style="margin-top:12px;"><button id="btn-bottom-save-event-info" onclick="saveCard('event-info')" disabled style="width:100%;background:#ccc;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:default;-webkit-tap-highlight-color:transparent;opacity:0.7;transition:all .2s;">&#128190; Save Event Info</button></div>
 </div>
 <div class="card">
   <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">&#128100; Customer<span><button onclick="editCard('customer')" id="btn-edit-customer" style="background:#f0f4ff;color:var(--accent);border:1.5px solid #c8d0f0;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">&#9998; Edit</button><button onclick="saveCard('customer')" id="btn-save-customer" style="display:none;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">&#128190; Save</button></span></div>
-  <div class="field"><label>Customer Name</label><input type="text" id="f-customer-name" placeholder="e.g. Goldberg Family" oninput="autoSave()"></div>
-  <div class="field"><label>Email</label><input type="email" id="f-customer-email" placeholder="customer@email.com" oninput="autoSave()"></div>
-  <div class="field"><label>Phone</label><input type="text" inputmode="numeric" id="f-customer-phone" placeholder="e.g. (845) 555-1234" oninput="formatPhoneInput(this);autoSave()"></div>
-  <div class="field"><label>Notes</label><textarea id="f-customer-notes" placeholder="Additional notes about the customer..." oninput="autoSave()"></textarea></div>
+  <div class="field"><label>Customer Name</label><input type="text" id="f-customer-name" placeholder="e.g. Goldberg Family" oninput="markCardDirty('customer');autoSave()"></div>
+  <div class="field"><label>Email</label><input type="email" id="f-customer-email" placeholder="customer@email.com" oninput="markCardDirty('customer');autoSave()"></div>
+  <div class="field"><label>Phone</label><input type="text" inputmode="numeric" id="f-customer-phone" placeholder="e.g. (845) 555-1234" oninput="markCardDirty('customer');formatPhoneInput(this);autoSave()"></div>
+  <div class="field"><label>Notes</label><textarea id="f-customer-notes" placeholder="Additional notes about the customer..." oninput="markCardDirty('customer');autoSave()"></textarea></div>
 
-  <div style="margin-top:12px;"><button onclick="saveCard('customer')" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">&#128190; Save Customer</button></div>
+  <div style="margin-top:12px;"><button id="btn-bottom-save-customer" onclick="saveCard('customer')" disabled style="width:100%;background:#ccc;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:default;-webkit-tap-highlight-color:transparent;opacity:0.7;transition:all .2s;">&#128190; Save Customer</button></div>
 </div>
 
         <div class="card">
@@ -710,13 +710,13 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
 </div>
 <div class="card">
   <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">Schedule<span><button onclick="editCard('schedule')" id="btn-edit-schedule" style="background:#f0f4ff;color:var(--accent);border:1.5px solid #c8d0f0;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">&#9998; Edit</button><button onclick="saveCard('schedule')" id="btn-save-schedule" style="display:none;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">&#128190; Save</button></span></div>
-  <div class="field"><label>Sound Check – Rhythm (Main Ballroom)</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-rhythm" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-sc-rhythm')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
-  <div class="field"><label>Sound Check – Rhythm (Smorg)</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-rhythm-smorg" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-sc-rhythm-smorg')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
-  <div class="field"><label>Sound Check – Horns / Strings</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-horns" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-sc-horns')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
-  <div class="field"><label>Strings in Lobby</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-strings" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-sc-strings')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
-  <div class="field"><label>KP Start Time</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-kp-start" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-kp-start')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
-  <div class="field"><label>KP Note</label><input type="text" id="f-kp-note" oninput="autoSave()"></div>
-  <div class="field" class="field" id="fd-chuppah"><label class="req-label">Chuppah / Main Event Time</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-chuppah" oninput="autoSave();clearErr('fd-chuppah');"><button type="button" onclick="clearTimeField('f-chuppah')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div>
+  <div class="field"><label>Sound Check – Rhythm (Main Ballroom)</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-rhythm" oninput="markCardDirty('schedule');autoSave()"><button type="button" onclick="clearTimeField('f-sc-rhythm')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
+  <div class="field"><label>Sound Check – Rhythm (Smorg)</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-rhythm-smorg" oninput="markCardDirty('schedule');autoSave()"><button type="button" onclick="clearTimeField('f-sc-rhythm-smorg')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
+  <div class="field"><label>Sound Check – Horns / Strings</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-horns" oninput="markCardDirty('schedule');autoSave()"><button type="button" onclick="clearTimeField('f-sc-horns')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
+  <div class="field"><label>Strings in Lobby</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-strings" oninput="markCardDirty('schedule');autoSave()"><button type="button" onclick="clearTimeField('f-sc-strings')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
+  <div class="field"><label>KP Start Time</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-kp-start" oninput="markCardDirty('schedule');autoSave()"><button type="button" onclick="clearTimeField('f-kp-start')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
+  <div class="field"><label>KP Note</label><input type="text" id="f-kp-note" oninput="markCardDirty('schedule');autoSave()"></div>
+  <div class="field" class="field" id="fd-chuppah"><label class="req-label">Chuppah / Main Event Time</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-chuppah" oninput="markCardDirty('schedule');autoSave();clearErr('fd-chuppah');"><button type="button" onclick="clearTimeField('f-chuppah')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div>
   <div class="err-msg" id="err-fd-chuppah" style="display:none;">Chuppah / Main Event time is required</div></div>
 <div class="card">
   <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">Band Members<button class="btn-broadcast" onclick="openBroadcast('band')">&#128226; Broadcast</button></div>
@@ -737,8 +737,8 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
 </div>
 <div class="card">
   <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">Dress Code &amp; Notes<span><button onclick="editCard('dresscode')" id="btn-edit-dresscode" style="background:#f0f4ff;color:var(--accent);border:1.5px solid #c8d0f0;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">&#9998; Edit</button><button onclick="saveCard('dresscode')" id="btn-save-dresscode" style="display:none;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">&#128190; Save</button></span></div>
-  <div class="field"><label>Dress Code</label><input type="text" id="f-dresscode" oninput="autoSave()"></div>
-  <div class="field"><label>Additional Notes</label><textarea id="f-notes" oninput="autoSave()"></textarea></div>
+  <div class="field"><label>Dress Code</label><input type="text" id="f-dresscode" oninput="markCardDirty('dresscode');autoSave()"></div>
+  <div class="field"><label>Additional Notes</label><textarea id="f-notes" oninput="markCardDirty('dresscode');autoSave()"></textarea></div>
   <div class="field">
     <label>Internal Memo <span style="font-weight:400;font-size:11px;color:var(--muted);">(private — not on PDF)</span></label>
     <textarea id="f-memo" placeholder="Private notes, reminders, logistics..." style="min-height:80px;" oninput="onMemoChange()"></textarea>
@@ -746,10 +746,10 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
     <div id="memo-saved-msg" style="display:none;text-align:center;color:#2eaa7a;font-size:12px;font-weight:600;margin-top:6px;">✓ Memo saved</div>
   </div>
 
-  <div style="margin-top:12px;"><button onclick="saveCard('dresscode')" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">&#128190; Save Dresscode</button></div>
+  <div style="margin-top:12px;"><button id="btn-bottom-save-dresscode" onclick="saveCard('dresscode')" disabled style="width:100%;background:#ccc;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:default;-webkit-tap-highlight-color:transparent;opacity:0.7;transition:all .2s;">&#128190; Save Dress Code</button></div>
 </div>
 
-  <div style="margin-top:12px;"><button onclick="saveCard('schedule')" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">&#128190; Save Schedule</button></div>
+  <div style="margin-top:12px;"><button id="btn-bottom-save-schedule" onclick="saveCard('schedule')" disabled style="width:100%;background:#ccc;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:default;-webkit-tap-highlight-color:transparent;opacity:0.7;transition:all .2s;">&#128190; Save Schedule</button></div>
 </div>
 ```
 
@@ -1250,32 +1250,23 @@ function enterEditMode() {
   // Status does NOT change on Edit — only changes on Save
 }
 function setEventEditMode(editable) {
-  // All fields always editable - each card manages its own state
-  var fields = document.querySelectorAll('#tab-details-content input, #tab-details-content textarea, #tab-details-content select');
-  fields.forEach(function(el) {
-    if (el.id === 'f-memo') return;
-    // Only invoice fields get locked (they have own Edit button)
-    var invoiceIds = ['f-invoice-original','f-invoice-upgrade','f-invoice-deposit','f-invoice-paid'];
-    if (invoiceIds.indexOf(el.id) >= 0) return; // invoice manages itself
-    el.removeAttribute('disabled');
-    el.style.background = '';
-    el.style.color = '';
-    el.style.opacity = '1';
-    el.style.pointerEvents = 'auto';
-  });
-  ['f-invoice-original','f-invoice-upgrade','f-invoice-deposit','f-invoice-paid'].forEach(function(id){
+  // Invoice fields have their own edit button - lock them only
+  var invoiceIds = ['f-invoice-original','f-invoice-upgrade','f-invoice-deposit','f-invoice-paid'];
+  invoiceIds.forEach(function(id){
     var el=document.getElementById(id);if(!el)return;
     el.setAttribute('disabled','true');
-    el.style.color='#999';
     if(el.parentElement) el.parentElement.style.background='var(--inp)';
   });
-  var _sb=document.getElementById('btn-save-invoice'),_eb=document.getElementById('btn-edit-invoice');
-  if(_sb)_sb.style.display='none';if(_eb)_eb.style.display='inline-block';
-  // Always disable readonly venue fields
-  ['f-venue','f-address'].forEach(function(id){ var el=document.getElementById(id); if(el){el.setAttribute('disabled','true');el.style.background='#f3f4f8';el.style.color='#888';}});
-  // Band/singer add+remove always visible - lineup managed independently
-  var delBtns = document.querySelectorAll('.member-tag-del');
-  delBtns.forEach(function(b){ b.style.display = 'block'; });
+  var sb=document.getElementById('btn-save-invoice'), eb=document.getElementById('btn-edit-invoice');
+  if(sb) sb.style.display='none';
+  if(eb) eb.style.display='inline-block';
+  // Venue readonly fields
+  ['f-venue','f-address'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el){el.setAttribute('disabled','true');el.style.background='#f3f4f8';el.style.color='#888';}
+  });
+  // Band/singer buttons always visible
+  document.querySelectorAll('.member-tag-del').forEach(function(b){b.style.display='block';});
 }
 function saveCurrentEvent() {
   if (!validateEvent()) { toast('Please fill in all required fields', true); return; }
@@ -1473,14 +1464,16 @@ function populateEventForm() {
 // ═══════════════════════════════════════════════════════════════
 function switchEventTab(name) {
   setTimeout(renderEventStatus, 50);
-  document.getElementById('tab-details-content').style.display = (name==='details') ? 'block' : 'none';
-  document.getElementById('tab-preview-content').style.display = (name==='preview')  ? 'block' : 'none';
+  var dc = document.getElementById('tab-details-content');
+  var pc = document.getElementById('tab-preview-content');
+  if (dc) dc.style.display = (name==='details') ? 'block' : 'none';
+  if (pc) pc.style.display = (name==='preview')  ? 'block' : 'none';
   document.getElementById('tab-details').className = 'tab' + (name==='details' ? ' active' : '');
   document.getElementById('tab-preview').className = 'tab' + (name==='preview'  ? ' active' : '');
   if (name === 'preview') {
     renderPreview();
-    setTimeout(scalePreview, 100);
-    setTimeout(scalePreview, 400);
+    setTimeout(scalePreview, 50);
+    setTimeout(scalePreview, 300);
   }
 }
 function toggleSec(id, el) {
@@ -2800,12 +2793,30 @@ function saveCard(cardId) {
   readFormIntoCurrentEvent();
   var idx=savedEvents.findIndex(function(ev){return ev.id===currentEvent.id;});
   if(idx>=0){savedEvents[idx]=JSON.parse(JSON.stringify(currentEvent));lsSet(LS.events,savedEvents);}
-  var fields=CARD_FIELDS[cardId]||[];
-  fields.forEach(function(id){var el=document.getElementById(id);if(!el)return;el.setAttribute('disabled','true');el.style.background='#f3f4f8';el.style.color='#888';});
-  var eb=document.getElementById('btn-edit-'+cardId),sb=document.getElementById('btn-save-'+cardId);
-  if(eb)eb.style.display='inline-block';if(sb)sb.style.display='none';
+  markCardClean(cardId);
   renderEventStatus();updateARDashboard();
   toast('Saved!',false);
+}
+
+
+// ══ CARD CHANGE TRACKING ══
+function markCardDirty(cardId) {
+  var btn = document.getElementById('btn-bottom-save-'+cardId);
+  if(btn) {
+    btn.style.background = 'var(--accent)';
+    btn.style.opacity = '1';
+    btn.style.cursor = 'pointer';
+    btn.disabled = false;
+  }
+}
+function markCardClean(cardId) {
+  var btn = document.getElementById('btn-bottom-save-'+cardId);
+  if(btn) {
+    btn.style.background = '#ccc';
+    btn.style.opacity = '0.7';
+    btn.style.cursor = 'default';
+    btn.disabled = true;
+  }
 }
 
 window.addEventListener('DOMContentLoaded', function() {
