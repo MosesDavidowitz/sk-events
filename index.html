@@ -272,7 +272,7 @@ PREVIEW / PDF
 .btn-block{display:block;width:100%;margin-bottom:12px;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .btn-print{background:#4a5da8;color:#fff;box-shadow:0 3px 10px rgba(74,93,168,.3);}
 .btn-email-crew{background:#2eaa7a;color:#fff;box-shadow:0 3px 10px rgba(46,170,122,.3);}
-.preview-scaler{width:100%;overflow:hidden;border-radius:4px;box-shadow:0 2px 16px rgba(0,0,0,.12);}
+.preview-scaler{width:100%;border-radius:4px;box-shadow:0 2px 16px rgba(0,0,0,.12);}
 .preview-wrapper{background:#fff;color:#222;font-family:‘Times New Roman’,Times,serif;width:750px;transform-origin:top left;}
 .preview-inner{padding:22px 30px;position:relative;overflow:hidden;min-height:1060px;}
 .prev-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
@@ -484,7 +484,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v12.9
+  A Davidowitz Project &copy; 2026 - v13.1
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -1164,7 +1164,9 @@ function startNewEvent() {
   currentEvent.chuppah   = defs['def-chuppah']     || '';
   currentEvent.dresscode = defs['def-dresscode']   || '';
   currentEvent.notes     = defs['def-notes']       || '';
-  currentEvent.memo      = ''; // memo is never a default
+  currentEvent.memo='';
+  currentEvent.reqBand=parseInt(defs['def-req-band'])||0;
+  currentEvent.reqSingers=parseInt(defs['def-req-singers'])||0;
   // Apply default contacts
   currentEvent.band    = contacts.filter(function(c){return c.ctype==='band'   && c.isDefault;}).map(function(c){return {id:c.id,name:c.name,role:c.role};});
   currentEvent.singers = contacts.filter(function(c){return c.ctype==='singer' && c.isDefault;}).map(function(c){return {id:c.id,name:c.name};});
@@ -1261,10 +1263,9 @@ function setEventEditMode(editable) {
   if(_sb)_sb.style.display='none';if(_eb)_eb.style.display='inline-block';
   // Always disable readonly venue fields
   ['f-venue','f-address'].forEach(function(id){ var el=document.getElementById(id); if(el){el.setAttribute('disabled','true');el.style.background='#f3f4f8';el.style.color='#888';}});
-  var addBtns = document.querySelectorAll('.btn-add-member');
-  addBtns.forEach(function(b){ b.style.display = editable ? 'flex' : 'none'; });
+  // Band/singer add+remove always visible - lineup managed independently
   var delBtns = document.querySelectorAll('.member-tag-del');
-  delBtns.forEach(function(b){ b.style.display = editable ? 'block' : 'none'; });
+  delBtns.forEach(function(b){ b.style.display = 'block'; });
 }
 function saveCurrentEvent() {
   if (!validateEvent()) { toast('Please fill in all required fields', true); return; }
@@ -1463,14 +1464,13 @@ function populateEventForm() {
 function switchEventTab(name) {
   setTimeout(renderEventStatus, 50);
   document.getElementById('tab-details-content').style.display = (name==='details') ? 'block' : 'none';
-  document.getElementById('tab-preview-content').style.display  = (name==='preview')  ? 'block' : 'none';
-  document.getElementById('tab-details').className  = 'tab' + (name==='details' ? ' active' : '');
-  document.getElementById('tab-preview').className  = 'tab' + (name==='preview'  ? ' active' : '');
+  document.getElementById('tab-preview-content').style.display = (name==='preview')  ? 'block' : 'none';
+  document.getElementById('tab-details').className = 'tab' + (name==='details' ? ' active' : '');
+  document.getElementById('tab-preview').className = 'tab' + (name==='preview'  ? ' active' : '');
   if (name === 'preview') {
     renderPreview();
-    setTimeout(scalePreview, 50);
-    setTimeout(scalePreview, 200);
-    setTimeout(scalePreview, 600);
+    setTimeout(scalePreview, 100);
+    setTimeout(scalePreview, 400);
   }
 }
 function toggleSec(id, el) {
@@ -1941,13 +1941,14 @@ function renderContacts() {
 function scalePreview() {
   var sc=document.getElementById('pscaler'),wr=document.getElementById('pwrapper');
   if(!sc||!wr)return;
-  var w=sc.offsetWidth;
-  if(!w||w<10) w=window.innerWidth-28;
-  var scale=w/750;
-  wr.style.width='750px';
-  wr.style.transformOrigin='top left';
-  wr.style.transform='scale('+scale+')';
-  sc.style.height=(wr.scrollHeight*scale+20)+'px';
+  // Always use window width minus padding as the basis
+  var w = window.innerWidth - 28;
+  if(sc.offsetWidth > 0) w = sc.offsetWidth;
+  var scale = w / 750;
+  wr.style.width = '750px';
+  wr.style.transformOrigin = 'top left';
+  wr.style.transform = 'scale(' + scale + ')';
+  sc.style.height = (wr.scrollHeight * scale + 20) + 'px';
 }
 window.addEventListener('resize',scalePreview);
 
@@ -2476,18 +2477,12 @@ function showEventOptions(id,e){
 function closeEventOptions(){document.getElementById('event-options-popup').classList.remove('open');optionsEventId=null;}
 function openInvoicePDF(id){
   var ev=savedEvents.find(function(e){return e.id===id;});if(!ev)return;
-  isNewEvent=false;
-  isEditMode=false;
-  currentEvent=JSON.parse(JSON.stringify(ev));
-  populateEventForm();
-  showScreen('event');
+  isNewEvent=false;isEditMode=false;currentEvent=JSON.parse(JSON.stringify(ev));
+  populateEventForm();showScreen('event');
   switchEventTab('preview');
-  updateEventTopbar();
-  // Replace event preview with invoice preview
-  setTimeout(function(){
-    renderInvoicePreview(currentEvent);
-    scalePreview();
-  },200);
+  setTimeout(function(){renderInvoicePreview(currentEvent);},100);
+  setTimeout(scalePreview,200);
+  setTimeout(scalePreview,600);
 }
 function renderInvoicePreview(ev){
   var dp=document.getElementById('doc-preview');if(!dp)return;
