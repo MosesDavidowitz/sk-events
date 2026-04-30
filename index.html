@@ -474,7 +474,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v12.0
+  A Davidowitz Project &copy; 2026 - v12.2
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -674,11 +674,11 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
     <div class="preview-outer">
       <button id="btn-print-main" class="btn-block btn-print" onclick="doSaveAsPDF()">&#11123; Download PDF</button>
       <button id="btn-email-main" class="btn-block btn-email-crew" onclick="emailCrew()">&#9993; Email Crew</button>
-  <div class="preview-scaler" id="pscaler">
-    <div class="preview-wrapper" id="pwrapper">
-      <div class="preview-inner" id="doc-preview"></div>
-    </div>
-  </div>
+      <div class="preview-scaler" id="pscaler">
+        <div class="preview-wrapper" id="pwrapper">
+          <div class="preview-inner" id="doc-preview"></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -2389,16 +2389,13 @@ function openInvoicePDF(id){
   currentEvent=JSON.parse(JSON.stringify(ev));
   populateEventForm();
   showScreen('event');
-  // Switch to preview tab and render invoice
-  document.getElementById('tab-details-content').style.display='none';
-  document.getElementById('tab-preview-content').style.display='block';
-  document.getElementById('tab-details').className='tab';
-  document.getElementById('tab-preview').className='tab active';
+  switchEventTab('preview');
   updateEventTopbar();
+  // Replace event preview with invoice preview
   setTimeout(function(){
-    renderInvoicePreview(ev);
+    renderInvoicePreview(currentEvent);
     scalePreview();
-  },150);
+  },200);
 }
 function renderInvoicePreview(ev){
   var dp=document.getElementById('doc-preview');if(!dp)return;
