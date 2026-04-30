@@ -316,6 +316,12 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:opacity(.5);cursor:po
 .star-btn{color:#e0e0e0;transition:color .1s;user-select:none;-webkit-user-select:none;}
 .star-btn.active{color:#f5a623;}
 
+.status-badge{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:.04em;border:1px solid;}
+.status-open{background:#e8f0fe;color:#3347a0;border-color:#c8d0f0;}
+.status-confirmed{background:#e8f7f1;color:#1e7a50;border-color:#a3d9bf;}
+.status-reopened{background:#fff8e0;color:#9a6000;border-color:#f5c842;}
+.status-past{background:#f0f0f0;color:#888;border-color:#ddd;}
+
 /* ═══════════════════════════════════════════
 TOAST
 ═══════════════════════════════════════════ */
@@ -404,7 +410,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v6.5
+  A Davidowitz Project &copy; 2026 - v6.8
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -563,7 +569,11 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   <div id="tab-preview-content" class="scroll-area" style="display:none;">
     <div class="preview-outer">
       <button id="btn-print-main" class="btn-block btn-print" onclick="doSaveAsPDF()">&#11123; Download PDF</button>
-      <button id="btn-email-main" class="btn-block btn-email-crew" onclick="emailCrew()">&#9993; Email Crew</button>
+      <div id="event-status-bar" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:10px 14px;background:#fff;border-radius:12px;border:1px solid var(--border);">
+        <div style="font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.04em;text-transform:uppercase;">Status</div>
+        <div id="event-status-badge"></div>
+      </div>
+      <button id="btn-email-main" class="btn-block btn-email-crew" onclick="confirmAndEmail()">&#9993; Confirm &amp; Email Crew</button>
       <div class="preview-scaler" id="pscaler">
         <div class="preview-wrapper" id="pwrapper">
           <div class="preview-inner" id="doc-preview"></div>
@@ -781,7 +791,7 @@ function startNewEvent() {
     date:'', type:'', typeCustom:'', venueName:'', venueAddress:'',
     scRhythm:'', scHorns:'', scStrings:'', kpStart:'', kpNote:'', chuppah:'',
     band:[], singers:[], choir:[], choirCount:'',
-    dresscode:'', notes:'', venueRaw:''
+    dresscode:'', notes:'', venueRaw:'', status:'open'
   };
   // Apply defaults
   var defs = lsGet(LS.defs, SEED_DEFS);
@@ -822,7 +832,7 @@ function renderEventsList(eventsToShow) {
     var venueStr = ev.venueName || 'No venue';
     card.innerHTML = '<div class="event-card-info">' +
       '<div class="event-card-title">' + esc(typeStr) + ' \u2013 ' + esc(venueStr) + '</div>' +
-      '<div class="event-card-sub">' + esc(dateStr) + '</div>' +
+      '<div class="event-card-sub">' + esc(dateStr) + ' <span class="status-badge ' + statusClass(getEffectiveStatus(ev)) + '" style="font-size:9px;padding:2px 7px;">' + statusDot(getEffectiveStatus(ev)) + ' ' + statusLabel(getEffectiveStatus(ev)) + '</span></div>' +
       '</div>' +
       '<div style="display:flex;gap:6px;align-items:center;">' +
       '<button onclick="showEventOptions(\''+ev.id+'\',event)" style="background:#f0f2f7;color:#4a5da8;border:1.5px solid #c8d0f0;border-radius:8px;width:36px;height:36px;font-size:20px;cursor:pointer;flex-shrink:0;">&#8943;</button>' +
@@ -843,6 +853,7 @@ function openExistingEvent(id) {
   isNewEvent  = false;
   isEditMode  = false;
   currentEvent = JSON.parse(JSON.stringify(ev));
+  if (!currentEvent.status) currentEvent.status = 'open';
   populateEventForm();
   showScreen('event');
   switchEventTab('details');
@@ -862,6 +873,13 @@ function enterEditMode() {
   isEditMode = true;
   setEventEditMode(true);
   updateEventTopbar();
+  // Auto-reopen if confirmed
+  if (currentEvent && currentEvent.status === 'confirmed') {
+    currentEvent.status = 'reopened';
+    persistCurrentEvent();
+    renderEventStatus();
+    toast('Event reopened for editing', false);
+  }
 }
 function setEventEditMode(editable) {
   var fields = document.querySelectorAll('#tab-details-content input, #tab-details-content textarea, #tab-details-content select');
@@ -956,6 +974,7 @@ function populateEventForm() {
 // EVENT TABS
 // ═══════════════════════════════════════════════════════════════
 function switchEventTab(name) {
+  if (name === 'preview') { setTimeout(renderEventStatus, 50); }
   document.getElementById('tab-details-content').style.display = (name==='details') ? 'block' : 'none';
   document.getElementById('tab-preview-content').style.display  = (name==='preview')  ? 'block' : 'none';
   document.getElementById('tab-details').className  = 'tab' + (name==='details' ? ' active' : '');
@@ -1466,9 +1485,7 @@ function doSaveAsPDF() {
 
       // Build filename from event data
       var ev = currentEvent || {};
-      var dateStr = (ev.date || '').replace(/-/g,'') || 'event';
-      var venue   = (ev.venueName || 'event').replace(/[^a-zA-Z0-9]/g,'-').toLowerCase();
-      var filename = 'SK-Event-' + dateStr + '-' + venue + '.pdf';
+      var filename = (fmtDate(ev.date||'') || 'Event') + ' - Event Details.pdf';
 
       // iOS Safari fix: use blob URL with anchor click
       var pdfBlob = pdf.output('blob');
@@ -1579,6 +1596,84 @@ function gatherEmails() {
   });
   return emails;
 }
+// ═══════════════════════════════════════════════════════════════
+// EVENT STATUS
+// ═══════════════════════════════════════════════════════════════
+function getEffectiveStatus(ev) {
+  var status = ev.status || 'open';
+  // If open or reopened and date is in the past, show as 'past'
+  if ((status === 'open' || status === 'reopened') && ev.date) {
+    var d = new Date(ev.date + 'T00:00:00');
+    var today = new Date(); today.setHours(0,0,0,0);
+    if (d < today) return 'past';
+  }
+  return status;
+}
+function statusLabel(status) {
+  return {open:'Open', confirmed:'Confirmed', reopened:'Reopened', past:'Past'}[status] || 'Open';
+}
+function statusClass(status) {
+  return {open:'status-open', confirmed:'status-confirmed', reopened:'status-reopened', past:'status-past'}[status] || 'status-open';
+}
+function statusDot(status) {
+  return {open:'🔵', confirmed:'🟢', reopened:'🟡', past:'⚫'}[status] || '🔵';
+}
+function renderEventStatus() {
+  if (!currentEvent) return;
+  var eff = getEffectiveStatus(currentEvent);
+  var badge = document.getElementById('event-status-badge');
+  var btn   = document.getElementById('btn-email-main');
+  if (!badge || !btn) return;
+  badge.innerHTML = '<span class="status-badge ' + statusClass(eff) + '">' + statusDot(eff) + ' ' + statusLabel(eff) + '</span>';
+  if (eff === 'confirmed') {
+    btn.textContent = '↩ Reopen Event';
+    btn.style.background = '#f5a623';
+    btn.style.boxShadow = '0 3px 10px rgba(245,166,35,.3)';
+    btn.onclick = function(){ reopenEvent(); };
+  } else {
+    btn.innerHTML = '&#9993; Confirm &amp; Email Crew';
+    btn.style.background = '';
+    btn.style.boxShadow = '';
+    btn.onclick = function(){ confirmAndEmail(); };
+  }
+}
+function confirmAndEmail() {
+  // Email only — status is managed separately by toggleConfirmEvent
+  emailCrew();
+}
+function toggleConfirmEvent() {
+  if (!currentEvent) return;
+  var eff = getEffectiveStatus(currentEvent);
+  if (eff === 'confirmed') {
+    // Reopen
+    currentEvent.status = 'reopened';
+    persistCurrentEvent();
+    renderEventStatus();
+    toast('Event reopened', false);
+  } else {
+    // Confirm — validate required fields first
+    if (!currentEvent.date && !gv('f-date')) { toast('Please fill in the event date first', true); return; }
+    if (!currentEvent.type && !gv('f-type')) { toast('Please fill in the event type first', true); return; }
+    currentEvent.status = 'confirmed';
+    persistCurrentEvent();
+    renderEventStatus();
+    toast('✓ Event confirmed!', false);
+  }
+}
+function reopenEvent() {
+  if (!currentEvent) return;
+  currentEvent.status = 'reopened';
+  persistCurrentEvent();
+  renderEventStatus();
+  toast('Event reopened', false);
+}
+function persistCurrentEvent() {
+  var idx = savedEvents.findIndex(function(ev){ return ev.id === currentEvent.id; });
+  if (idx >= 0) savedEvents[idx] = currentEvent;
+  else savedEvents.push(currentEvent);
+  lsSet(LS.events, savedEvents);
+}
+
 function emailCrew() {
   if (!validateEvent()) { toast('Please fill in required fields first', true); return; }
   var cc = gatherEmails();
@@ -1650,7 +1745,22 @@ function renderStarRow(val){
 function onContactTypeChange(){var ctype=document.getElementById('nc-type').value;var rf=document.getElementById('fd-nc-role');var ri=document.getElementById('nc-role');var rl=rf?rf.querySelector('label'):null;if(ctype==='band'){if(rf)rf.style.display='block';if(rl)rl.className='req-label';}else{if(rf)rf.style.display='none';if(ri)ri.value='';if(rl)rl.className='';clearErr('fd-nc-role');}}
 
 // ── SEARCH EVENTS ──────────────────────────────────────────────
-function searchEvents(){var df=document.getElementById('events-date-filter').value;var list=document.getElementById('events-list');if(!savedEvents.length){list.innerHTML='<div class="events-list-empty">No saved events yet.<br>Create your first event above.</div>';return;}var filtered=df?savedEvents.filter(function(ev){return ev.date===df;}):savedEvents.slice();if(!filtered.length){list.innerHTML='<div class="events-list-empty">No events found for that date.</div>';return;}renderEventsList(filtered);}
+var activeStatusFilter=null;
+function toggleStatusFilter(s){
+  if(activeStatusFilter===s){clearStatusFilter();return;}
+  activeStatusFilter=s;
+  document.querySelectorAll('.status-filter-btn').forEach(function(b){b.classList.remove('active');});
+  var b=document.getElementById('sf-'+s);if(b)b.classList.add('active');
+  var cl=document.getElementById('sf-clear');if(cl)cl.style.display='inline-block';
+  searchEvents();
+}
+function clearStatusFilter(){
+  activeStatusFilter=null;
+  document.querySelectorAll('.status-filter-btn').forEach(function(b){b.classList.remove('active');});
+  var cl=document.getElementById('sf-clear');if(cl)cl.style.display='none';
+  searchEvents();
+}
+function searchEvents(){var df=document.getElementById('events-date-filter').value;var list=document.getElementById('events-list');if(!savedEvents.length){list.innerHTML='<div class="events-list-empty">No saved events yet.<br>Create your first event above.</div>';return;}var filtered=df?savedEvents.filter(function(ev){return ev.date===df;}):savedEvents.slice();if(activeStatusFilter){filtered=filtered.filter(function(ev){return getEffectiveStatus(ev)===activeStatusFilter;});}if(!filtered.length){list.innerHTML='<div class="events-list-empty">No events found for that date.</div>';return;}renderEventsList(filtered);}
 
 // ── BROADCAST ──────────────────────────────────────────────────
 var broadcastType='',broadcastSelected=[],bcastStarFilter=0;
