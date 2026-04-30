@@ -419,7 +419,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v7.6
+  A Davidowitz Project &copy; 2026 - v7.7
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -1641,12 +1641,16 @@ function confirmAndEmail() {
 }
 function renderEventStatus() {
   if (!currentEvent) return;
-  var eff = getEffectiveStatus(currentEvent);
-  // Update status badge
   var badge = document.getElementById('event-status-badge');
+  var btn   = document.getElementById('btn-confirm-event');
+  // New unsaved event — special state
+  if (isNewEvent) {
+    if (badge) badge.innerHTML = '<span class="status-badge" style="background:#f0f0f0;color:#999;border-color:#ddd;">&#9998; New — save first</span>';
+    if (btn) { btn.textContent = '✓ Confirm'; btn.style.background='#ccc'; btn.style.color='#fff'; btn.disabled=true; btn.style.opacity='0.5'; }
+    return;
+  }
+  var eff = getEffectiveStatus(currentEvent);
   if (badge) badge.innerHTML = '<span class="status-badge ' + statusClass(eff) + '">' + statusDot(eff) + ' ' + statusLabel(eff) + '</span>';
-  // Update confirm button (details tab only)
-  var btn = document.getElementById('btn-confirm-event');
   if (!btn) return;
   if (eff === 'confirmed') {
     btn.textContent = '↩ Reopen';
@@ -1670,6 +1674,7 @@ function renderEventStatus() {
 }
 function toggleConfirmEvent() {
   if (!currentEvent) return;
+  if (isNewEvent) { toast('Please save the event first', true); return; }
   var eff = getEffectiveStatus(currentEvent);
   if (eff === 'confirmed') {
     // Reopen
