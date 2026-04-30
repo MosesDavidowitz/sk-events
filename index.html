@@ -459,7 +459,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v11.2
+  A Davidowitz Project &copy; 2026 - v11.3
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -912,10 +912,7 @@ function updateSummaryPillStates() {
 var importedContacts = [];
 
 async function importFromContacts() {
-  if (!navigator.contacts || typeof navigator.contacts.select !== 'function') {
-    toast('Contact import not supported on this browser', true);
-    return;
-  }
+  // Feature check removed temporarily to test on iOS
   try {
     var props = ['name','email','tel'];
     var opts = {multiple: true};
