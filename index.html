@@ -484,7 +484,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v12.8
+  A Davidowitz Project &copy; 2026 - v12.9
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -652,7 +652,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   <div class="field"><label>Notes</label><textarea id="f-customer-notes" placeholder="Additional notes about the customer..." oninput="autoSave()"></textarea></div>
 </div>
 
-    <div class="card">
+        <div class="card">
   <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">
     &#128181; Invoice
     <div style="display:flex;align-items:center;gap:8px;">
@@ -661,40 +661,46 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
       <button id="btn-save-invoice" onclick="saveInvoice()" style="display:none;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">&#128190; Save</button>
     </div>
   </div>
-  <div class="field"><label>Original Price</label>
-    <div style="position:relative;">
-      <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-weight:700;pointer-events:none;">$</span>
-      <input type="number" inputmode="decimal" id="f-invoice-original" placeholder="0.00" min="0" step="0.01" oninput="updateInvoiceCalc()" style="padding-left:28px;" disabled>
+  <div class="field">
+    <label>Original Price</label>
+    <div style="display:flex;align-items:center;background:var(--inp);border:1.5px solid var(--inp-border);border-radius:10px;">
+      <span style="padding:0 6px 0 13px;font-size:15px;color:var(--muted);font-weight:700;">$</span>
+      <input type="number" inputmode="decimal" id="f-invoice-original" placeholder="0.00" min="0" step="0.01" oninput="updateInvoiceCalc()" style="flex:1;border:none;background:transparent;padding:13px 10px 13px 0;font-size:15px;font-family:'Lato',sans-serif;color:var(--text);outline:none;" disabled>
     </div>
   </div>
-  <div class="field"><label>Additional / Upgrade <span style="font-size:11px;font-weight:400;color:var(--muted);">(optional)</span></label>
-    <div style="position:relative;">
-      <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-weight:700;pointer-events:none;">$</span>
-      <input type="number" inputmode="decimal" id="f-invoice-upgrade" placeholder="0.00" min="0" step="0.01" oninput="updateInvoiceCalc()" style="padding-left:28px;" disabled>
+  <div class="field">
+    <label>Additional / Upgrade <span style="font-size:11px;font-weight:400;color:var(--muted);">(optional)</span></label>
+    <div style="display:flex;align-items:center;background:var(--inp);border:1.5px solid var(--inp-border);border-radius:10px;">
+      <span style="padding:0 6px 0 13px;font-size:15px;color:var(--muted);font-weight:700;">$</span>
+      <input type="number" inputmode="decimal" id="f-invoice-upgrade" placeholder="0.00" min="0" step="0.01" oninput="updateInvoiceCalc()" style="flex:1;border:none;background:transparent;padding:13px 10px 13px 0;font-size:15px;font-family:'Lato',sans-serif;color:var(--text);outline:none;" disabled>
     </div>
   </div>
-  <div class="field"><label>Total Price <span style="font-size:11px;font-weight:400;color:var(--muted);">(auto-calculated)</span></label>
-    <div style="position:relative;background:var(--bg);border:1.5px solid var(--inp-border);border-radius:10px;padding:13px 14px 13px 28px;">
-      <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-weight:700;">$</span>
-      <span id="inv-total-val" style="font-size:15px;font-weight:700;color:var(--text);">&#8212;</span>
+  <div class="field">
+    <label>Total Price <span style="font-size:11px;font-weight:400;color:var(--muted);">(auto-calculated)</span></label>
+    <div style="display:flex;align-items:center;background:var(--bg);border:1.5px solid var(--inp-border);border-radius:10px;">
+      <span style="padding:0 6px 0 13px;font-size:15px;color:var(--muted);font-weight:700;">$</span>
+      <div id="inv-total-val" style="flex:1;padding:13px 10px 13px 0;font-size:15px;font-weight:700;color:var(--muted);">&#8212;</div>
     </div>
   </div>
-  <div class="field"><label>Required Deposit <span style="font-size:11px;font-weight:400;color:var(--muted);">(for reference only)</span></label>
-    <div style="position:relative;">
-      <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-weight:700;pointer-events:none;">$</span>
-      <input type="number" inputmode="decimal" id="f-invoice-deposit" placeholder="0.00" min="0" step="0.01" oninput="updateInvoiceCalc()" style="padding-left:28px;" disabled>
+  <div class="field">
+    <label>Required Deposit <span style="font-size:11px;font-weight:400;color:var(--muted);">(for reference only)</span></label>
+    <div style="display:flex;align-items:center;background:var(--inp);border:1.5px solid var(--inp-border);border-radius:10px;">
+      <span style="padding:0 6px 0 13px;font-size:15px;color:var(--muted);font-weight:700;">$</span>
+      <input type="number" inputmode="decimal" id="f-invoice-deposit" placeholder="0.00" min="0" step="0.01" oninput="updateInvoiceCalc()" style="flex:1;border:none;background:transparent;padding:13px 10px 13px 0;font-size:15px;font-family:'Lato',sans-serif;color:var(--text);outline:none;" disabled>
     </div>
   </div>
-  <div class="field"><label>Amount Paid</label>
-    <div style="position:relative;">
-      <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-weight:700;pointer-events:none;">$</span>
-      <input type="number" inputmode="decimal" id="f-invoice-paid" placeholder="0.00" min="0" step="0.01" oninput="updateInvoiceCalc()" style="padding-left:28px;" disabled>
+  <div class="field">
+    <label>Amount Paid</label>
+    <div style="display:flex;align-items:center;background:var(--inp);border:1.5px solid var(--inp-border);border-radius:10px;">
+      <span style="padding:0 6px 0 13px;font-size:15px;color:var(--muted);font-weight:700;">$</span>
+      <input type="number" inputmode="decimal" id="f-invoice-paid" placeholder="0.00" min="0" step="0.01" oninput="updateInvoiceCalc()" style="flex:1;border:none;background:transparent;padding:13px 10px 13px 0;font-size:15px;font-family:'Lato',sans-serif;color:var(--text);outline:none;" disabled>
     </div>
   </div>
-  <div class="field" style="margin-bottom:0;"><label>Balance Due</label>
-    <div style="position:relative;background:var(--bg);border:1.5px solid var(--inp-border);border-radius:10px;padding:13px 14px 13px 28px;">
-      <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-weight:700;">$</span>
-      <div id="f-invoice-balance" style="font-size:15px;font-weight:900;color:var(--muted);">&#8212;</div>
+  <div class="field" style="margin-bottom:0;">
+    <label>Balance Due</label>
+    <div style="display:flex;align-items:center;background:var(--bg);border:1.5px solid var(--inp-border);border-radius:10px;">
+      <span style="padding:0 6px 0 13px;font-size:15px;font-weight:700;color:var(--muted);">$</span>
+      <div id="f-invoice-balance" style="flex:1;padding:13px 10px 13px 0;font-size:22px;font-weight:900;color:var(--muted);">&#8212;</div>
     </div>
   </div>
 </div>
@@ -741,11 +747,11 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   </div>
   <!-- Preview tab -->
   <div id="tab-preview-content" class="scroll-area" style="display:none;">
-    <div class="preview-outer">
+    <div class="preview-outer" style="min-height:300px;">
       <button id="btn-print-main" class="btn-block btn-print" onclick="doSaveAsPDF()">&#11123; Download PDF</button>
       <button id="btn-email-main" class="btn-block btn-email-crew" onclick="emailCrew()">&#9993; Email Crew</button>
       <div class="preview-scaler" id="pscaler">
-        <div class="preview-wrapper" id="pwrapper">
+        <div class="preview-wrapper" id="pwrapper" style="min-height:200px;">
           <div class="preview-inner" id="doc-preview"></div>
         </div>
       </div>
@@ -1245,7 +1251,12 @@ function setEventEditMode(editable) {
       el.style.color = '#888';
     }
   });
-  ['f-invoice-original','f-invoice-upgrade','f-invoice-deposit','f-invoice-paid'].forEach(function(id){var el=document.getElementById(id);if(!el)return;el.setAttribute('disabled','true');el.style.background='#f3f4f8';el.style.color='#888';});
+  ['f-invoice-original','f-invoice-upgrade','f-invoice-deposit','f-invoice-paid'].forEach(function(id){
+    var el=document.getElementById(id);if(!el)return;
+    el.setAttribute('disabled','true');
+    el.style.color='#999';
+    if(el.parentElement) el.parentElement.style.background='var(--inp)';
+  });
   var _sb=document.getElementById('btn-save-invoice'),_eb=document.getElementById('btn-edit-invoice');
   if(_sb)_sb.style.display='none';if(_eb)_eb.style.display='inline-block';
   // Always disable readonly venue fields
@@ -1457,7 +1468,9 @@ function switchEventTab(name) {
   document.getElementById('tab-preview').className  = 'tab' + (name==='preview'  ? ' active' : '');
   if (name === 'preview') {
     renderPreview();
-    requestAnimationFrame(function(){ requestAnimationFrame(scalePreview); });
+    setTimeout(scalePreview, 50);
+    setTimeout(scalePreview, 200);
+    setTimeout(scalePreview, 600);
   }
 }
 function toggleSec(id, el) {
@@ -1928,13 +1941,13 @@ function renderContacts() {
 function scalePreview() {
   var sc=document.getElementById('pscaler'),wr=document.getElementById('pwrapper');
   if(!sc||!wr)return;
-  var w=sc.offsetWidth||sc.getBoundingClientRect().width||(window.innerWidth-28);
-  if(w<10){setTimeout(scalePreview,150);return;}
+  var w=sc.offsetWidth;
+  if(!w||w<10) w=window.innerWidth-28;
   var scale=w/750;
   wr.style.width='750px';
   wr.style.transformOrigin='top left';
   wr.style.transform='scale('+scale+')';
-  sc.style.height=Math.round(wr.scrollHeight*scale)+'px';
+  sc.style.height=(wr.scrollHeight*scale+20)+'px';
 }
 window.addEventListener('resize',scalePreview);
 
@@ -2636,7 +2649,12 @@ function renderCalendar(){
 function validateCustomerEmail(){var v=gv('f-customer-email');if(v&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v))showErr('fd-customer-email');else clearErr('fd-customer-email');}
 function validateCustomerPhone(){var v=gv('f-customer-phone').replace(/\D/g,'');if(v&&v.length!==10)showErr('fd-customer-phone');else clearErr('fd-customer-phone');}
 function editInvoice(){
-  ['f-invoice-original','f-invoice-upgrade','f-invoice-deposit','f-invoice-paid'].forEach(function(id){var el=document.getElementById(id);if(!el)return;el.removeAttribute('disabled');el.style.background='';el.style.color='';});
+  ['f-invoice-original','f-invoice-upgrade','f-invoice-deposit','f-invoice-paid'].forEach(function(id){
+    var el=document.getElementById(id);if(!el)return;
+    el.removeAttribute('disabled');
+    el.style.color='var(--text)';
+    if(el.parentElement) el.parentElement.style.background='var(--inp)';
+  });
   var sb=document.getElementById('btn-save-invoice'),eb=document.getElementById('btn-edit-invoice');
   if(sb)sb.style.display='inline-block';if(eb)eb.style.display='none';
 }
@@ -2647,7 +2665,12 @@ function saveInvoice(){
   updateInvoiceCalc();
   var idx=savedEvents.findIndex(function(ev){return ev.id===currentEvent.id;});
   if(idx>=0){['invoiceOriginal','invoiceUpgrade','invoiceDeposit','invoicePaid','invoiceStatus'].forEach(function(k){savedEvents[idx][k]=currentEvent[k];});lsSet(LS.events,savedEvents);updateARDashboard();}
-  ['f-invoice-original','f-invoice-upgrade','f-invoice-deposit','f-invoice-paid'].forEach(function(id){var el=document.getElementById(id);if(!el)return;el.setAttribute('disabled','true');el.style.background='#f3f4f8';el.style.color='#888';});
+  ['f-invoice-original','f-invoice-upgrade','f-invoice-deposit','f-invoice-paid'].forEach(function(id){
+    var el=document.getElementById(id);if(!el)return;
+    el.setAttribute('disabled','true');
+    el.style.color='#999';
+    if(el.parentElement) el.parentElement.style.background='var(--inp)';
+  });
   var sb=document.getElementById('btn-save-invoice'),eb=document.getElementById('btn-edit-invoice');
   if(sb)sb.style.display='none';if(eb)eb.style.display='inline-block';
   toast('Invoice saved!',false);
@@ -2655,7 +2678,7 @@ function saveInvoice(){
 function updateInvoiceCalc(){
   var orig=parseFloat(gv('f-invoice-original'))||0,upgrade=parseFloat(gv('f-invoice-upgrade'))||0,paid=parseFloat(gv('f-invoice-paid'))||0;
   var total=orig+upgrade,bal=total-paid;
-  var tv=document.getElementById('inv-total-val');if(tv)tv.textContent=total>0?total.toFixed(2):'\u2014';
+  var tv=document.getElementById('inv-total-val');if(tv){tv.textContent=total>0?total.toFixed(2):'\u2014';tv.style.color=total>0?'var(--text)':'var(--muted)';}
   var bel=document.getElementById('f-invoice-balance');
   if(bel){if(total===0){bel.textContent='\u2014';bel.style.color='var(--muted)';}else{bel.textContent=(bal<0?'0.00':bal.toFixed(2));bel.style.color=bal>0?'var(--danger)':'var(--green)';}}
   if(!currentEvent)return;
