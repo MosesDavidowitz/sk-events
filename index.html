@@ -459,7 +459,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v11.3
+  A Davidowitz Project &copy; 2026 - v11.4
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -912,13 +912,20 @@ function updateSummaryPillStates() {
 var importedContacts = [];
 
 async function importFromContacts() {
-  // Feature check removed temporarily to test on iOS
+  // Step by step detection for debugging
+  if (!navigator.contacts) {
+    toast('Not supported: navigator.contacts is undefined', true);
+    return;
+  }
+  if (typeof navigator.contacts.select !== 'function') {
+    toast('Not supported: contacts.select not available', true);
+    return;
+  }
   try {
     var props = ['name','email','tel'];
     var opts = {multiple: true};
     var selected = await navigator.contacts.select(props, opts);
     if (!selected || !selected.length) return;
-
     importedContacts = selected.map(function(c, i) {
       return {
         _idx: i,
@@ -928,16 +935,14 @@ async function importFromContacts() {
         ctype: ''
       };
     }).filter(function(c){ return c.name; });
-
     if (!importedContacts.length) {
       toast('No valid contacts found', true);
       return;
     }
-
     renderImportList();
     document.getElementById('import-popup').classList.add('open');
   } catch(e) {
-    toast('Could not access contacts: ' + e.message, true);
+    toast('Error: ' + (e && (e.message || e.name) ? (e.name + ': ' + e.message) : String(e)), true);
   }
 }
 
