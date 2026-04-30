@@ -315,14 +315,16 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:opacity(.5);cursor:po
 
 .star-btn{color:#e0e0e0;transition:color .1s;user-select:none;-webkit-user-select:none;}
 .star-btn.active{color:#f5a623;}
-.status-filter-btn{background:#fff;color:#888;border:1.5px solid #dde1ec;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s;}
-.status-filter-btn.active{background:#1a1d2e;color:#fff;border-color:#1a1d2e;font-weight:700;}
 
 .status-badge{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:.04em;border:1px solid;}
 .status-open{background:#e8f0fe;color:#3347a0;border-color:#c8d0f0;}
 .status-confirmed{background:#e8f7f1;color:#1e7a50;border-color:#a3d9bf;}
 .status-reopened{background:#fff8e0;color:#9a6000;border-color:#f5c842;}
 .status-past{background:#f0f0f0;color:#888;border-color:#ddd;}
+
+.summary-pill{display:flex;align-items:center;gap:6px;border-radius:20px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;flex:1;justify-content:center;}
+.summary-pill:active{opacity:.8;}
+.summary-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 
 /* ═══════════════════════════════════════════
 TOAST
@@ -391,16 +393,29 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   </div>
   <div style="flex:1;min-height:0;padding:12px 14px 0;display:flex;flex-direction:column;" id="existing-events-section">
     <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.06);flex:1;min-height:0;display:flex;flex-direction:column;">
-      <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;">&#128197; Saved Events</div>
-      <div style="display:flex;gap:8px;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;">&#128197; Saved Events</div>
+        <button onclick="clearStatusFilter()" id="sf-clear" style="display:none;font-size:11px;font-weight:600;color:var(--accent);background:none;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;">✕ Clear all</button>
+      </div>
+      <div id="events-summary-bar" style="display:none;margin-bottom:10px;">
+        <div style="display:flex;gap:6px;">
+          <div class="summary-pill" id="summary-open" onclick="quickFilterStatus('open')" style="background:#e8f0fe;border:1.5px solid #c8d0f0;">
+            <span class="summary-dot" style="background:#4a5da8;"></span>
+            <span id="summary-open-count">0</span> Open
+          </div>
+          <div class="summary-pill" id="summary-confirmed" onclick="quickFilterStatus('confirmed')" style="background:#e8f7f1;border:1.5px solid #a3d9bf;">
+            <span class="summary-dot" style="background:#2eaa7a;"></span>
+            <span id="summary-confirmed-count">0</span> Confirmed
+          </div>
+          <div class="summary-pill" id="summary-reopened" onclick="quickFilterStatus('reopened')" style="background:#fff8e0;border:1.5px solid #f5c842;">
+            <span class="summary-dot" style="background:#f5a623;"></span>
+            <span id="summary-reopened-count">0</span> Reopened
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
         <input type="date" id="events-date-filter" style="flex:1;font-size:13px;padding:9px 10px;border:1.5px solid var(--inp-border);border-radius:10px;background:var(--bg);color:var(--text);outline:none;-webkit-appearance:none;" onchange="onDateFilterChange()">
         <button onclick="searchEvents()" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:9px 16px;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0;">Search</button>
-      </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
-        <button onclick="toggleStatusFilter('open')" id="sf-open" class="status-filter-btn">🔵 Open</button>
-        <button onclick="toggleStatusFilter('confirmed')" id="sf-confirmed" class="status-filter-btn">🟢 Confirmed</button>
-        <button onclick="toggleStatusFilter('reopened')" id="sf-reopened" class="status-filter-btn">🟡 Reopened</button>
-        <button onclick="clearStatusFilter()" id="sf-clear" style="display:none;background:#eee;color:#666;border:none;border-radius:20px;padding:5px 10px;font-size:12px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">✕ Clear</button>
       </div>
       <div id="events-list" style="flex:1;overflow-y:auto;min-height:0;padding-bottom:60px;"><div class="events-list-empty" style="padding:8px 0 2px;">Select a date or press Search to find events.</div></div>
     </div>
@@ -418,7 +433,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v8.3
+  A Davidowitz Project &copy; 2026 - v8.6
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -724,6 +739,7 @@ function showScreen(name) {
   var footer = document.getElementById('home-footer');
   if (name === 'home') {
     topbar.style.display = 'none';
+    updateSummaryBar();
     // existing-events-section is always visible — reset to hint state
     var evList = document.getElementById('events-list');
     if (evList) evList.innerHTML = '<div class="events-list-empty" style="padding:8px 0 2px;">Select a date or press Search to find events.</div>';
@@ -792,6 +808,52 @@ function openSettings() {
 }
 
 // home screen settings button (top right on home)
+function updateSummaryBar() {
+  if (!savedEvents || !savedEvents.length) {
+    var bar = document.getElementById('events-summary-bar');
+    if (bar) bar.style.display = 'none';
+    return;
+  }
+  var today = new Date(); today.setHours(0,0,0,0);
+  var counts = {open:0, confirmed:0, reopened:0};
+  savedEvents.forEach(function(ev) {
+    if (!ev.date) return;
+    var d = new Date(ev.date + 'T00:00:00');
+    if (d < today) return; // skip past events
+    var eff = getEffectiveStatus(ev);
+    if (counts[eff] !== undefined) counts[eff]++;
+  });
+  var total = counts.open + counts.confirmed + counts.reopened;
+  var bar = document.getElementById('events-summary-bar');
+  if (bar) bar.style.display = total > 0 ? 'block' : 'none';
+  var el;
+  el = document.getElementById('summary-open-count'); if(el) el.textContent = counts.open;
+  el = document.getElementById('summary-confirmed-count'); if(el) el.textContent = counts.confirmed;
+  el = document.getElementById('summary-reopened-count'); if(el) el.textContent = counts.reopened;
+  // Hide pills with 0
+  el = document.getElementById('summary-open'); if(el) el.style.display = counts.open > 0 ? 'flex' : 'none';
+  el = document.getElementById('summary-confirmed'); if(el) el.style.display = counts.confirmed > 0 ? 'flex' : 'none';
+  el = document.getElementById('summary-reopened'); if(el) el.style.display = counts.reopened > 0 ? 'flex' : 'none';
+}
+function quickFilterStatus(s) {
+  var i = activeStatusFilters.indexOf(s);
+  if (i >= 0) activeStatusFilters.splice(i, 1);
+  else activeStatusFilters = [s];
+  updateSummaryPillStates();
+  var cl = document.getElementById('sf-clear');
+  if (cl) cl.style.display = activeStatusFilters.length > 0 ? 'inline-block' : 'none';
+  searchEvents();
+}
+function updateSummaryPillStates() {
+  ['open','confirmed','reopened'].forEach(function(s) {
+    var pill = document.getElementById('summary-' + s);
+    if (!pill) return;
+    var isActive = activeStatusFilters.indexOf(s) >= 0;
+    pill.style.opacity = isActive ? '1' : '0.55';
+    pill.style.boxShadow = isActive ? 'inset 0 0 0 2px #1a1d2e' : 'none';
+    pill.style.fontWeight = isActive ? '800' : '700';
+  });
+}
 function updateHomeTopbar() {
   // On home screen: hide topbar completely (hero has logo+title)
   document.getElementById('topbar').style.display = 'none';
@@ -935,7 +997,8 @@ function saveCurrentEvent() {
   setEventEditMode(false);
   updateEventTopbar();
   renderEventStatus();
-  toast('Event saved! ✓', false);
+  toast('Event saved! \u2713', false);
+  updateSummaryBar();
 }
 function onMemoChange() {
   var btn = document.getElementById('btn-save-memo');
@@ -1820,10 +1883,9 @@ var activeStatusFilters=[];
 function toggleStatusFilter(s){
   var i=activeStatusFilters.indexOf(s);
   if(i>=0) activeStatusFilters.splice(i,1); else activeStatusFilters.push(s);
-  var b=document.getElementById('sf-'+s);
-  if(b) b.classList.toggle('active', activeStatusFilters.indexOf(s)>=0);
-  var cl=document.getElementById('sf-clear');
+  updateSummaryPillStates();
   var dfv=document.getElementById('events-date-filter');
+  var cl=document.getElementById('sf-clear');
   if(cl) cl.style.display=(activeStatusFilters.length>0||(dfv&&dfv.value))?'inline-block':'none';
   searchEvents();
 }
@@ -1831,10 +1893,11 @@ function onDateFilterChange(){
   var df=document.getElementById('events-date-filter');
   var cl=document.getElementById('sf-clear');
   if(cl) cl.style.display=(activeStatusFilters.length>0||(df&&df.value))?'inline-block':'none';
+  searchEvents();
 }
 function clearStatusFilter(){
   activeStatusFilters=[];
-  document.querySelectorAll('.status-filter-btn').forEach(function(b){b.classList.remove('active');});
+  updateSummaryPillStates();
   var df=document.getElementById('events-date-filter');if(df)df.value='';
   var cl=document.getElementById('sf-clear');if(cl)cl.style.display='none';
   searchEvents();
