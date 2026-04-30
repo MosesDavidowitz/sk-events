@@ -459,7 +459,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v11.1
+  A Davidowitz Project &copy; 2026 - v11.2
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -912,8 +912,8 @@ function updateSummaryPillStates() {
 var importedContacts = [];
 
 async function importFromContacts() {
-  if (!('contacts' in navigator) || !('ContactsManager' in window)) {
-    toast('Contact import requires iOS 14.5+ Safari', true);
+  if (!navigator.contacts || typeof navigator.contacts.select !== 'function') {
+    toast('Contact import not supported on this browser', true);
     return;
   }
   try {
