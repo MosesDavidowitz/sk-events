@@ -444,15 +444,15 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
         <div style="display:flex;gap:6px;">
           <div class="summary-pill" id="summary-open" onclick="quickFilterStatus('open')" style="background:#e8f0fe;border:1.5px solid #c8d0f0;">
             <span class="summary-dot" style="background:#4a5da8;"></span>
-            <span id="summary-open-count">0</span> Open
+            <span id="summary-open-count">0</span> Needs Staffing
           </div>
           <div class="summary-pill" id="summary-confirmed" onclick="quickFilterStatus('confirmed')" style="background:#e8f7f1;border:1.5px solid #a3d9bf;">
             <span class="summary-dot" style="background:#2eaa7a;"></span>
-            <span id="summary-confirmed-count">0</span> Confirmed
+            <span id="summary-confirmed-count">0</span> Staffed
           </div>
           <div class="summary-pill" id="summary-reopened" onclick="quickFilterStatus('reopened')" style="background:#fff8e0;border:1.5px solid #f5c842;">
             <span class="summary-dot" style="background:#f5a623;"></span>
-            <span id="summary-reopened-count">0</span> Reopened
+            <span id="summary-reopened-count">0</span> Reopened" style="display:none!
           </div>
         </div>
       </div>
@@ -484,7 +484,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v12.4
+  A Davidowitz Project &copy; 2026 - v12.8
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -563,6 +563,19 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   <div class="field"><label>KP Start</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="def-kp-start" oninput="saveDefs()"><button type="button" onclick="clearTimeField('def-kp-start')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
   <div class="field"><label>KP Note</label><input type="text" id="def-kp-note" oninput="saveDefs()"></div>
   <div class="field" id="fd-chuppah"><label class="req-label">Chuppah / Main Event Time</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="def-chuppah" oninput="saveDefs()"><button type="button" onclick="clearTimeField('def-chuppah')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
+  <div style="border-top:1px solid var(--border);margin:14px 0;padding-top:12px;">
+    <div style="font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;">Default Required Staffing</div>
+    <div class="field"><label>Required Band Members (default)</label>
+      <select id="def-req-band" onchange="saveDefs()" style="padding:10px 12px;font-size:15px;border-radius:10px;border:1.5px solid var(--inp-border);background:#fff;width:100%;-webkit-appearance:none;">
+        <option value="0">Not set</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option>
+      </select>
+    </div>
+    <div class="field"><label>Required Singers (default)</label>
+      <select id="def-req-singers" onchange="saveDefs()" style="padding:10px 12px;font-size:15px;border-radius:10px;border:1.5px solid var(--inp-border);background:#fff;width:100%;-webkit-appearance:none;">
+        <option value="0">Not set</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option>
+      </select>
+    </div>
+  </div>
   <div class="field"><label>Dress Code</label><input type="text" id="def-dresscode" oninput="saveDefs()"></div>
   <div class="field"><label>Additional Notes</label><textarea id="def-notes" oninput="saveDefs()"></textarea></div>
 </div>
@@ -583,12 +596,12 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   <!-- Details tab -->
   <div id="tab-details-content" class="scroll-area" style="display:block;">
     <div style="text-align:right;font-size:11px;color:var(--muted);padding:0 2px 6px;"><span style="color:var(--danger);font-weight:700;">*</span> Required fields</div>
-    <div id="event-status-bar" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#fff;border-radius:12px;border:1px solid var(--border);margin-bottom:12px;">
+    <div id="event-status-bar" style="padding:10px 14px;background:#fff;border-radius:12px;border:1px solid var(--border);margin-bottom:12px;display:flex;align-items:center;gap:10px;">
       <div id="event-status-badge"></div>
-      <button id="btn-confirm-event" onclick="toggleConfirmEvent()" style="-webkit-tap-highlight-color:transparent;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Lato',sans-serif;background:#2eaa7a;color:#fff;min-width:90px;">✓ Confirm</button>
+      <div id="event-staffing-detail" style="font-size:12px;color:var(--muted);"></div>
     </div>
     <div class="card">
-      <div class="card-title">Event Info</div>
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">Event Info<span><button onclick="editCard('event-info')" id="btn-edit-event-info" style="background:#f0f4ff;color:var(--accent);border:1.5px solid #c8d0f0;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">&#9998; Edit</button><button onclick="saveCard('event-info')" id="btn-save-event-info" style="display:none;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">&#128190; Save</button></span></div>
       <div class="field" id="fd-date"><label class="req-label">Date</label><input type="date" id="f-date" oninput="clearErr('fd-date');autoSave()"><div class="err-msg">Date is required</div></div>
       <div class="field" id="fd-type"><label class="req-label">Type of Event</label><select id="f-type" onchange="onTypeChange()"></select><div class="err-msg">Please select a type</div></div>
       <div class="field" id="fd-custom" style="display:none;"><label class="req-label">Custom Event Type</label><input type="text" id="f-type-custom" placeholder="Describe the event..." oninput="autoSave()"><div class="err-msg">Custom event type is required</div></div>
@@ -618,17 +631,28 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
         <div class="field"><label>ZIP Code</label><input type="text" inputmode="numeric" id="f-addr-zip" placeholder="11201" maxlength="5" oninput="autoSave()"></div>
         <input type="hidden" id="f-address">
       </div>
-    </div>
-    <div class="card">
-      <div class="card-title">&#128100; Customer</div>
-      <div class="field"><label>Customer Name</label><input type="text" id="f-customer-name" placeholder="e.g. Goldberg Family" oninput="autoSave()"></div>
-      <div class="field"><label>Email</label><input type="email" id="f-customer-email" placeholder="customer@email.com" oninput="autoSave()"></div>
-      <div class="field"><label>Phone</label><input type="text" inputmode="numeric" id="f-customer-phone" placeholder="e.g. (845) 555-1234" oninput="formatPhoneInput(this);autoSave()"></div>
-      <div class="field"><label>Notes</label><textarea id="f-customer-notes" placeholder="Additional notes about the customer..." oninput="autoSave()"></textarea></div>
-    </div>
 
 ```
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;padding:10px;background:var(--bg);border-radius:10px;">
+    <div><label style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;display:block;">Required Band Members</label>
+    <select id="f-req-band" onchange="autoSave();renderBandList();" style="width:100%;padding:10px 12px;font-size:15px;border-radius:10px;border:1.5px solid var(--inp-border);background:#fff;-webkit-appearance:none;">
+      <option value="0">Not set</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option>
+    </select></div>
+    <div><label style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;display:block;">Required Singers</label>
+    <select id="f-req-singers" onchange="autoSave();renderSingerList();" style="width:100%;padding:10px 12px;font-size:15px;border-radius:10px;border:1.5px solid var(--inp-border);background:#fff;-webkit-appearance:none;">
+      <option value="0">Not set</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option>
+    </select></div>
+  </div>
+</div>
 <div class="card">
+  <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">&#128100; Customer<span><button onclick="editCard('customer')" id="btn-edit-customer" style="background:#f0f4ff;color:var(--accent);border:1.5px solid #c8d0f0;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">&#9998; Edit</button><button onclick="saveCard('customer')" id="btn-save-customer" style="display:none;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">&#128190; Save</button></span></div>
+  <div class="field"><label>Customer Name</label><input type="text" id="f-customer-name" placeholder="e.g. Goldberg Family" oninput="autoSave()"></div>
+  <div class="field"><label>Email</label><input type="email" id="f-customer-email" placeholder="customer@email.com" oninput="autoSave()"></div>
+  <div class="field"><label>Phone</label><input type="text" inputmode="numeric" id="f-customer-phone" placeholder="e.g. (845) 555-1234" oninput="formatPhoneInput(this);autoSave()"></div>
+  <div class="field"><label>Notes</label><textarea id="f-customer-notes" placeholder="Additional notes about the customer..." oninput="autoSave()"></textarea></div>
+</div>
+
+    <div class="card">
   <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">
     &#128181; Invoice
     <div style="display:flex;align-items:center;gap:8px;">
@@ -638,31 +662,44 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
     </div>
   </div>
   <div class="field"><label>Original Price</label>
-    <div style="position:relative;"><span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;font-weight:700;pointer-events:none;">$</span>
-    <input type="number" inputmode="decimal" id="f-invoice-original" placeholder="0.00" min="0" step="0.01" oninput="updateInvoiceCalc()" style="padding-left:26px;font-size:17px;font-weight:700;" disabled></div>
+    <div style="position:relative;">
+      <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-weight:700;pointer-events:none;">$</span>
+      <input type="number" inputmode="decimal" id="f-invoice-original" placeholder="0.00" min="0" step="0.01" oninput="updateInvoiceCalc()" style="padding-left:28px;" disabled>
+    </div>
   </div>
-  <div class="field"><label>Additional / Upgrade Amount <span style="font-size:11px;font-weight:400;color:var(--muted);">(optional)</span></label>
-    <div style="position:relative;"><span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;font-weight:700;pointer-events:none;">$</span>
-    <input type="number" inputmode="decimal" id="f-invoice-upgrade" placeholder="0.00" min="0" step="0.01" oninput="updateInvoiceCalc()" style="padding-left:26px;font-size:17px;font-weight:700;" disabled></div>
+  <div class="field"><label>Additional / Upgrade <span style="font-size:11px;font-weight:400;color:var(--muted);">(optional)</span></label>
+    <div style="position:relative;">
+      <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-weight:700;pointer-events:none;">$</span>
+      <input type="number" inputmode="decimal" id="f-invoice-upgrade" placeholder="0.00" min="0" step="0.01" oninput="updateInvoiceCalc()" style="padding-left:28px;" disabled>
+    </div>
   </div>
   <div class="field"><label>Total Price <span style="font-size:11px;font-weight:400;color:var(--muted);">(auto-calculated)</span></label>
-    <div style="padding:13px 14px 13px 26px;background:var(--bg);border-radius:10px;font-size:17px;font-weight:700;color:var(--text);position:relative;border:1.5px solid var(--inp-border);">
-    <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;font-weight:700;">$</span><span id="inv-total-val">&#8212;</span></div>
+    <div style="position:relative;background:var(--bg);border:1.5px solid var(--inp-border);border-radius:10px;padding:13px 14px 13px 28px;">
+      <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-weight:700;">$</span>
+      <span id="inv-total-val" style="font-size:15px;font-weight:700;color:var(--text);">&#8212;</span>
+    </div>
   </div>
   <div class="field"><label>Required Deposit <span style="font-size:11px;font-weight:400;color:var(--muted);">(for reference only)</span></label>
-    <div style="position:relative;"><span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;font-weight:700;pointer-events:none;">$</span>
-    <input type="number" inputmode="decimal" id="f-invoice-deposit" placeholder="0.00" min="0" step="0.01" oninput="updateInvoiceCalc()" style="padding-left:26px;font-size:17px;font-weight:700;" disabled></div>
+    <div style="position:relative;">
+      <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-weight:700;pointer-events:none;">$</span>
+      <input type="number" inputmode="decimal" id="f-invoice-deposit" placeholder="0.00" min="0" step="0.01" oninput="updateInvoiceCalc()" style="padding-left:28px;" disabled>
+    </div>
   </div>
   <div class="field"><label>Amount Paid</label>
-    <div style="position:relative;"><span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;font-weight:700;pointer-events:none;">$</span>
-    <input type="number" inputmode="decimal" id="f-invoice-paid" placeholder="0.00" min="0" step="0.01" oninput="updateInvoiceCalc()" style="padding-left:26px;font-size:17px;font-weight:700;" disabled></div>
+    <div style="position:relative;">
+      <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-weight:700;pointer-events:none;">$</span>
+      <input type="number" inputmode="decimal" id="f-invoice-paid" placeholder="0.00" min="0" step="0.01" oninput="updateInvoiceCalc()" style="padding-left:28px;" disabled>
+    </div>
   </div>
   <div class="field" style="margin-bottom:0;"><label>Balance Due</label>
-    <div id="f-invoice-balance" style="padding:13px 14px;background:var(--bg);border-radius:10px;font-size:26px;font-weight:900;color:var(--muted);">&#8212;</div>
+    <div style="position:relative;background:var(--bg);border:1.5px solid var(--inp-border);border-radius:10px;padding:13px 14px 13px 28px;">
+      <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-weight:700;">$</span>
+      <div id="f-invoice-balance" style="font-size:15px;font-weight:900;color:var(--muted);">&#8212;</div>
+    </div>
   </div>
 </div>
 <div class="card">
-  <div class="card-title">Schedule</div>
+  <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">Schedule<span><button onclick="editCard('schedule')" id="btn-edit-schedule" style="background:#f0f4ff;color:var(--accent);border:1.5px solid #c8d0f0;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">&#9998; Edit</button><button onclick="saveCard('schedule')" id="btn-save-schedule" style="display:none;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">&#128190; Save</button></span></div>
   <div class="field"><label>Sound Check – Rhythm (Main Ballroom)</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-rhythm" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-sc-rhythm')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
   <div class="field"><label>Sound Check – Rhythm (Smorg)</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-rhythm-smorg" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-sc-rhythm-smorg')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
   <div class="field"><label>Sound Check – Horns / Strings</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-horns" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-sc-horns')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
@@ -689,7 +726,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   <button class="btn-add-member" id="btn-add-choir" onclick="openPopup('choir')">&#43; Add Choir / Group</button>
 </div>
 <div class="card">
-  <div class="card-title">Dress Code &amp; Notes</div>
+  <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">Dress Code &amp; Notes<span><button onclick="editCard('dresscode')" id="btn-edit-dresscode" style="background:#f0f4ff;color:var(--accent);border:1.5px solid #c8d0f0;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">&#9998; Edit</button><button onclick="saveCard('dresscode')" id="btn-save-dresscode" style="display:none;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">&#128190; Save</button></span></div>
   <div class="field"><label>Dress Code</label><input type="text" id="f-dresscode" oninput="autoSave()"></div>
   <div class="field"><label>Additional Notes</label><textarea id="f-notes" oninput="autoSave()"></textarea></div>
   <div class="field">
@@ -847,7 +884,7 @@ function loadAll() {
 }
 function saveDefs() {
   var d = {};
-  ['def-sc-rhythm','def-sc-horns','def-sc-strings','def-kp-start','def-kp-note','def-chuppah','def-dresscode','def-notes'].forEach(function(k) {
+  ['def-sc-rhythm','def-sc-horns','def-sc-strings','def-kp-start','def-kp-note','def-chuppah','def-dresscode','def-notes','def-req-band','def-req-singers'].forEach(function(k) {
     var el = document.getElementById(k); if (el) d[k] = el.value;
   });
   lsSet(LS.defs, d);
@@ -1181,12 +1218,11 @@ function openExistingEvent(id) {
 }
 function updateEventTopbar() {
   if (isEditMode) {
-    setTopbar(isNewEvent ? 'New Event' : 'Edit Event', '\u2190 Home', 'Save', 'saveEvent');
+    setTopbar(isNewEvent ? 'New Event' : 'Event Details', '← Home', 'Save', 'saveEvent');
     document.getElementById('topbar-back').setAttribute('data-back','goHome');
   } else {
-    setTopbar('Event Details', '\u2190 Home', 'Edit', 'editEvent');
+    setTopbar('Event Details', '← Home', null, null);
     document.getElementById('topbar-back').setAttribute('data-back','goHome');
-    document.getElementById('topbar-btn').className = 'btn-top btn-navy';
   }
 }
 function enterEditMode() {
@@ -1222,14 +1258,8 @@ function setEventEditMode(editable) {
 function saveCurrentEvent() {
   if (!validateEvent()) { toast('Please fill in all required fields', true); return; }
   readFormIntoCurrentEvent();
-  // Status on save: confirmed → reopened (edits were made)
-  if (currentEvent.status === 'confirmed') {
-    currentEvent.status = 'reopened';
-    setTimeout(function(){ toast('Event reopened', false); }, 300);
-  } else if (currentEvent.date) {
-    var sd=new Date(currentEvent.date+'T00:00:00'),st=new Date();st.setHours(0,0,0,0);
-    if(sd>=st && (!currentEvent.status||currentEvent.status==='open')) currentEvent.status='open';
-  }
+  // Status auto-calculated from staffing
+
   var idx = savedEvents.findIndex(function(e){ return e.id === currentEvent.id; });
   if (idx >= 0) savedEvents[idx] = currentEvent;
   else savedEvents.push(currentEvent);
@@ -1345,6 +1375,8 @@ function readFormIntoCurrentEvent() {
   currentEvent.customerName=gv('f-customer-name');currentEvent.customerEmail=gv('f-customer-email');
   currentEvent.customerPhone=gv('f-customer-phone');currentEvent.customerNotes=gv('f-customer-notes');
   currentEvent.scRhythmSmorg=gv('f-sc-rhythm-smorg');
+  currentEvent.reqBand=parseInt(gv('f-req-band'))||0;
+  currentEvent.reqSingers=parseInt(gv('f-req-singers'))||0;
   currentEvent.venueRaw     = gv('f-venue-search');
   currentEvent.scRhythm    = gv('f-sc-rhythm');
   currentEvent.scHorns     = gv('f-sc-horns');
@@ -1376,6 +1408,8 @@ function populateEventForm() {
   sv('f-customer-name',currentEvent.customerName||'');sv('f-customer-email',currentEvent.customerEmail||'');
   sv('f-customer-phone',currentEvent.customerPhone||'');sv('f-customer-notes',currentEvent.customerNotes||'');
   sv('f-sc-rhythm-smorg',currentEvent.scRhythmSmorg||'');
+  sv('f-req-band',currentEvent.reqBand||0);
+  sv('f-req-singers',currentEvent.reqSingers||0);
   sv('f-invoice-original',currentEvent.invoiceOriginal||'');sv('f-invoice-upgrade',currentEvent.invoiceUpgrade||'');
   sv('f-invoice-deposit',currentEvent.invoiceDeposit||'');sv('f-invoice-paid',currentEvent.invoicePaid||'');
   sv('f-sc-rhythm',    currentEvent.scRhythm    || '');
@@ -1422,9 +1456,8 @@ function switchEventTab(name) {
   document.getElementById('tab-details').className  = 'tab' + (name==='details' ? ' active' : '');
   document.getElementById('tab-preview').className  = 'tab' + (name==='preview'  ? ' active' : '');
   if (name === 'preview') {
-    var pc = document.getElementById('tab-preview-content');
-    if(pc) pc.style.display = 'block';
-    setTimeout(function(){ renderPreview(); scalePreview(); }, 150);
+    renderPreview();
+    requestAnimationFrame(function(){ requestAnimationFrame(scalePreview); });
   }
 }
 function toggleSec(id, el) {
@@ -1616,14 +1649,22 @@ function renderBandList() {
   var na   = document.getElementById('band-na');
   if (!currentEvent) return;
   renderMemberTags(list, currentEvent.band || [], 'band');
-  na.style.display = ((currentEvent.band||[]).length === 0) ? 'block' : 'none';
+  na.style.display=((currentEvent.band||[]).length===0)?'block':'none';
+  var _rb=currentEvent.reqBand||0,_hb=(currentEvent.band||[]).length;
+  var _bdisp=document.getElementById('band-count-display');
+  if(_bdisp){_bdisp.textContent=_rb>0?(_hb+'/'+_rb+' added'):'';_bdisp.style.color=_hb>=_rb&&_rb>0?'var(--green)':'var(--danger)';}
+  renderEventStatus();
 }
 function renderSingerList() {
   var list = document.getElementById('singer-list');
   var na   = document.getElementById('singer-na');
   if (!currentEvent) return;
   renderMemberTags(list, currentEvent.singers || [], 'singer');
-  na.style.display = ((currentEvent.singers||[]).length === 0) ? 'block' : 'none';
+  na.style.display=((currentEvent.singers||[]).length===0)?'block':'none';
+  var _rs=currentEvent.reqSingers||0,_hs=(currentEvent.singers||[]).length;
+  var _sdisp=document.getElementById('singer-count-display');
+  if(_sdisp){_sdisp.textContent=_rs>0?(_hs+'/'+_rs+' added'):'';_sdisp.style.color=_hs>=_rs&&_rs>0?'var(--green)':'var(--danger)';}
+  renderEventStatus();
 }
 function renderChoirList() {
   var list = document.getElementById('choir-list');
@@ -1887,8 +1928,12 @@ function renderContacts() {
 function scalePreview() {
   var sc=document.getElementById('pscaler'),wr=document.getElementById('pwrapper');
   if(!sc||!wr)return;
-  var scale=sc.offsetWidth/750;
-  wr.style.transform='scale('+scale+')';wr.style.width='750px';
+  var w=sc.offsetWidth||sc.getBoundingClientRect().width||(window.innerWidth-28);
+  if(w<10){setTimeout(scalePreview,150);return;}
+  var scale=w/750;
+  wr.style.width='750px';
+  wr.style.transformOrigin='top left';
+  wr.style.transform='scale('+scale+')';
   sc.style.height=Math.round(wr.scrollHeight*scale)+'px';
 }
 window.addEventListener('resize',scalePreview);
@@ -2076,23 +2121,23 @@ function gatherEmails() {
 // EVENT STATUS
 // ═══════════════════════════════════════════════════════════════
 function getEffectiveStatus(ev) {
-  var status = ev.status || 'open';
-  // If open or reopened and date is in the past, show as 'past'
-  if ((status === 'open' || status === 'reopened') && ev.date) {
-    var d = new Date(ev.date + 'T00:00:00');
-    var today = new Date(); today.setHours(0,0,0,0);
-    if (d < today) return 'past';
-  }
+  var defs=lsGet(LS.defs,SEED_DEFS);
+  var reqBand=parseInt(ev.reqBand)||parseInt(defs['def-req-band'])||0;
+  var reqSingers=parseInt(ev.reqSingers)||parseInt(defs['def-req-singers'])||0;
+  var hasBand=(ev.band||[]).length,hasSingers=(ev.singers||[]).length;
+  var staffed=(reqBand===0||hasBand>=reqBand)&&(reqSingers===0||hasSingers>=reqSingers);
+  var status=staffed?'confirmed':'open';
+  if(ev.date){var d=new Date(ev.date+'T00:00:00'),today=new Date();today.setHours(0,0,0,0);if(d<today)return'past';}
   return status;
 }
 function statusLabel(status) {
-  return {open:'Open', confirmed:'Confirmed', reopened:'Reopened', past:'Past'}[status] || 'Open';
+  return {open:'Not Staffed', confirmed:'Staffed', past:'Past'}[status] || 'Not Staffed';
 }
 function statusClass(status) {
-  return {open:'status-open', confirmed:'status-confirmed', reopened:'status-reopened', past:'status-past'}[status] || 'status-open';
+  return {open:'status-open', confirmed:'status-confirmed', past:'status-past'}[status] || 'status-open';
 }
 function statusDot(status) {
-  return {open:'🔵', confirmed:'🟢', reopened:'🟡', past:'⚫'}[status] || '🔵';
+  return {open:'🔵', confirmed:'🟢', past:'⚫'}[status] || '🔵';
 }
 
 function confirmAndEmail() {
@@ -2100,37 +2145,13 @@ function confirmAndEmail() {
   emailCrew();
 }
 function renderEventStatus() {
-  if (!currentEvent) return;
-  var badge = document.getElementById('event-status-badge');
-  var btn   = document.getElementById('btn-confirm-event');
-  // New unsaved event — special state
-  if (isNewEvent) {
-    if (badge) badge.innerHTML = '<span class="status-badge" style="background:#f0f0f0;color:#999;border-color:#ddd;">&#9998; New — save first</span>';
-    if (btn) { btn.textContent = '✓ Confirm'; btn.style.background='#ccc'; btn.style.color='#fff'; btn.disabled=true; btn.style.opacity='0.5'; }
-    return;
-  }
-  var eff = getEffectiveStatus(currentEvent);
-  if (badge) badge.innerHTML = '<span class="status-badge ' + statusClass(eff) + '">' + statusDot(eff) + ' ' + statusLabel(eff) + '</span>';
-  if (!btn) return;
-  if (eff === 'confirmed') {
-    btn.textContent = '↩ Reopen';
-    btn.style.background = '#f5a623';
-    btn.style.color = '#fff';
-    btn.disabled = false;
-    btn.style.opacity = '1';
-  } else if (eff === 'past') {
-    btn.textContent = '✓ Confirm';
-    btn.style.background = '#ccc';
-    btn.style.color = '#fff';
-    btn.disabled = true;
-    btn.style.opacity = '0.5';
-  } else {
-    btn.textContent = '✓ Confirm';
-    btn.style.background = '#2eaa7a';
-    btn.style.color = '#fff';
-    btn.disabled = false;
-    btn.style.opacity = '1';
-  }
+  if(!currentEvent)return;
+  var badge=document.getElementById('event-status-badge');
+  var detail=document.getElementById('event-staffing-detail');
+  if(isNewEvent){if(badge)badge.innerHTML='<span class="status-badge" style="background:#f0f0f0;color:#999;border-color:#ddd;">&#9998; New Event</span>';if(detail)detail.textContent='';return;}
+  var eff=getEffectiveStatus(currentEvent);
+  if(badge)badge.innerHTML='<span class="status-badge '+statusClass(eff)+'">'+statusDot(eff)+' '+statusLabel(eff)+'</span>';
+  if(detail){var rb=currentEvent.reqBand||0,rs=currentEvent.reqSingers||0,hb=(currentEvent.band||[]).length,hs=(currentEvent.singers||[]).length,parts=[];if(rb>0)parts.push(hb+'/'+rb+' band');if(rs>0)parts.push(hs+'/'+rs+' singers');detail.textContent=parts.join(' · ');}
 }
 function toggleConfirmEvent() {
   if (!currentEvent) return;
@@ -2636,7 +2657,7 @@ function updateInvoiceCalc(){
   var total=orig+upgrade,bal=total-paid;
   var tv=document.getElementById('inv-total-val');if(tv)tv.textContent=total>0?total.toFixed(2):'\u2014';
   var bel=document.getElementById('f-invoice-balance');
-  if(bel){if(total===0){bel.textContent='\u2014';bel.style.color='var(--muted)';}else{bel.textContent='$'+(bal<0?'0.00':bal.toFixed(2));bel.style.color=bal>0?'var(--danger)':'var(--green)';}}
+  if(bel){if(total===0){bel.textContent='\u2014';bel.style.color='var(--muted)';}else{bel.textContent=(bal<0?'0.00':bal.toFixed(2));bel.style.color=bal>0?'var(--danger)':'var(--green)';}}
   if(!currentEvent)return;
   var s='na';if(total>0){if(paid>=total)s='paid';else if(paid>0)s='partial';else s='unpaid';}
   currentEvent.invoiceStatus=s;renderInvoiceStatus();
@@ -2730,6 +2751,35 @@ function openFeedback(){
   a.href='mailto:MosesDavidowitz@gmail.com?subject='+encodeURIComponent('Feedback - SK Music App')+'&body='+encodeURIComponent(msg.trim()+info);
   a.style.display='none';document.body.appendChild(a);a.click();setTimeout(function(){document.body.removeChild(a);},300);
 }
+
+// ══ PER-CARD EDIT/SAVE ══
+var CARD_FIELDS = {
+  'event-info': ['f-date','f-type','f-type-custom','f-venue-search','f-addr-street','f-addr-city','f-addr-state','f-addr-zip'],
+  'customer': ['f-customer-name','f-customer-email','f-customer-phone','f-customer-notes'],
+  'schedule': ['f-sc-rhythm','f-sc-rhythm-smorg','f-sc-horns','f-sc-strings','f-kp-start','f-kp-note','f-chuppah'],
+  'dresscode': ['f-dresscode','f-notes'],
+  'band': ['f-req-band'],
+  'singers': ['f-req-singers']
+};
+function editCard(cardId) {
+  var fields=CARD_FIELDS[cardId]||[];
+  fields.forEach(function(id){var el=document.getElementById(id);if(!el||el.id==='f-venue'||el.id==='f-address')return;el.removeAttribute('disabled');el.style.background='';el.style.color='';});
+  var eb=document.getElementById('btn-edit-'+cardId),sb=document.getElementById('btn-save-'+cardId);
+  if(eb)eb.style.display='none';if(sb)sb.style.display='inline-block';
+}
+function saveCard(cardId) {
+  if(!currentEvent)return;
+  readFormIntoCurrentEvent();
+  var idx=savedEvents.findIndex(function(ev){return ev.id===currentEvent.id;});
+  if(idx>=0){savedEvents[idx]=JSON.parse(JSON.stringify(currentEvent));lsSet(LS.events,savedEvents);}
+  var fields=CARD_FIELDS[cardId]||[];
+  fields.forEach(function(id){var el=document.getElementById(id);if(!el)return;el.setAttribute('disabled','true');el.style.background='#f3f4f8';el.style.color='#888';});
+  var eb=document.getElementById('btn-edit-'+cardId),sb=document.getElementById('btn-save-'+cardId);
+  if(eb)eb.style.display='inline-block';if(sb)sb.style.display='none';
+  renderEventStatus();updateARDashboard();
+  toast('Saved!',false);
+}
+
 window.addEventListener('DOMContentLoaded', function() {
   loadAll();
   rebuildTypeSelect();
