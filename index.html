@@ -295,7 +295,7 @@ pointer-events:none;z-index:0;
 .prev-watermark img{width:210px;height:210px;object-fit:contain;opacity:0.18;display:block;}
 
 /* TIME INPUT */
-input[type=time]{-webkit-appearance:none;appearance:none;width:auto;display:inline-block;background:var(–inp);border:1.5px solid var(–inp-border);border-radius:10px;padding:11px 14px;font-size:15px;font-family:‘Lato’,sans-serif;color:var(–text);min-width:130px;max-width:160px;cursor:pointer;}
+input[type=time]{-webkit-appearance:none;appearance:none;width:100%;max-width:180px;display:inline-block;background:var(–inp);border:1.5px solid var(–inp-border);border-radius:10px;padding:11px 14px;font-size:15px;font-family:‘Lato’,sans-serif;color:var(–text);cursor:pointer;}
 input[type=time]::-webkit-date-and-time-value{text-align:left;}
 input[type=date]::-webkit-calendar-picker-indicator{filter:opacity(.5);cursor:pointer;}
 /* BROADCAST */
@@ -413,6 +413,16 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
     <h1>Event Builder</h1>
     <p>SK Music Production Inc</p>
   </div>
+  <div style="flex-shrink:0;padding:12px 14px 0;">
+    <div id="ar-dashboard" style="display:none;background:#fff;border:1px solid var(--border);border-radius:16px;padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;">&#128200; Accounts Receivable</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center;">
+        <div style="background:#fff0f0;border-radius:10px;padding:10px 6px;"><div id="ar-open-bal" style="font-size:16px;font-weight:900;color:var(--danger);">$0</div><div style="font-size:10px;color:var(--muted);font-weight:700;margin-top:2px;">Open Balance</div></div>
+        <div style="background:#fff8e0;border-radius:10px;padding:10px 6px;"><div id="ar-partial" style="font-size:16px;font-weight:900;color:#9a6000;">$0</div><div style="font-size:10px;color:var(--muted);font-weight:700;margin-top:2px;">Partially Paid</div></div>
+        <div style="background:#e8f7f1;border-radius:10px;padding:10px 6px;"><div id="ar-paid-full" style="font-size:16px;font-weight:900;color:var(--green);">$0</div><div style="font-size:10px;color:var(--muted);font-weight:700;margin-top:2px;">Fully Paid</div></div>
+      </div>
+    </div>
+  </div>
   <div style="flex-shrink:0;padding:16px 14px 0;">
     <div class="home-btn" onclick="startNewEvent()">
       <div class="home-btn-icon blue">&#10133;</div>
@@ -474,7 +484,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v12.2
+  A Davidowitz Project &copy; 2026 - v12.3
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -547,8 +557,8 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
 <div class="stoggle" onclick="toggleSec('sc-defaults',this)"><span>&#9881;&#65039; Default Values</span><span class="sarrow">&#8250;</span></div>
 <div class="sbody" id="sc-defaults">
   <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Pre-fill values for every new event.</p>
-  <div class="field"><label>Sound Check – Rhythm</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="def-sc-rhythm" oninput="saveDefs()"><button type="button" onclick="clearTimeField('def-sc-rhythm')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
-  <div class="field"><label>Sound Check – Horns</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="def-sc-horns" oninput="saveDefs()"><button type="button" onclick="clearTimeField('def-sc-horns')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
+  <div class="field"><label>Sound Check – Rhythm (Main Ballroom)</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="def-sc-rhythm" oninput="saveDefs()"><button type="button" onclick="clearTimeField('def-sc-rhythm')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
+  <div class="field"><label>Sound Check – Horns / Strings</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="def-sc-horns" oninput="saveDefs()"><button type="button" onclick="clearTimeField('def-sc-horns')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
   <div class="field"><label>Strings in Lobby</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="def-sc-strings" oninput="saveDefs()"><button type="button" onclick="clearTimeField('def-sc-strings')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
   <div class="field"><label>KP Start</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="def-kp-start" oninput="saveDefs()"><button type="button" onclick="clearTimeField('def-kp-start')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
   <div class="field"><label>KP Note</label><input type="text" id="def-kp-note" oninput="saveDefs()"></div>
@@ -557,6 +567,9 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   <div class="field"><label>Additional Notes</label><textarea id="def-notes" oninput="saveDefs()"></textarea></div>
 </div>
 
+  <div style="padding:24px 0 8px;text-align:center;">
+    <button onclick="openFeedback()" style="background:none;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 20px;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;-webkit-tap-highlight-color:transparent;">&#128172; Send Feedback</button>
+  </div>
   </div>
 </div>
 
@@ -597,10 +610,13 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
             <button onclick="clearVenue()" id="venue-clear-btn" style="background:#fff0f0;color:#d93025;border:1px solid #fdd;border-radius:8px;width:38px;height:46px;font-size:16px;cursor:pointer;flex-shrink:0;">&#10005;</button>
           </div>
         </div>
-        <div class="field" id="fd-venue-addr">
-          <label>Venue Address</label>
-          <input type="text" id="f-address" placeholder="Street, City, State ZIP" oninput="autoSave()">
+        <div class="field"><label>Street Address</label><input type="text" id="f-addr-street" placeholder="123 Main St" oninput="autoSave()"></div>
+        <div style="display:grid;grid-template-columns:1fr 80px;gap:8px;">
+          <div class="field" style="margin:0 0 13px;"><label>City</label><input type="text" id="f-addr-city" placeholder="Brooklyn" oninput="autoSave()"></div>
+          <div class="field" style="margin:0 0 13px;"><label>State</label><input type="text" id="f-addr-state" placeholder="NY" maxlength="2" oninput="autoSave()"></div>
         </div>
+        <div class="field"><label>ZIP Code</label><input type="text" inputmode="numeric" id="f-addr-zip" placeholder="11201" maxlength="5" oninput="autoSave()"></div>
+        <input type="hidden" id="f-address">
       </div>
     </div>
     <div class="card">
@@ -632,9 +648,43 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
       </div>
     </div>
     <div class="card">
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">
+        &#128181; Invoice
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div id="invoice-status-badge"></div>
+          <button onclick="editInvoice()" id="btn-edit-invoice" style="background:#f0f4ff;color:var(--accent);border:1.5px solid #c8d0f0;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">&#9998; Edit</button>
+          <button id="btn-save-invoice" onclick="saveInvoice()" style="display:none;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">&#128190; Save</button>
+        </div>
+      </div>
+      <div class="field"><label>Original Price</label>
+        <div style="position:relative;"><span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;font-weight:700;pointer-events:none;">$</span>
+        <input type="number" inputmode="decimal" id="f-invoice-original" placeholder="0.00" min="0" step="0.01" oninput="updateInvoiceCalc()" style="padding-left:26px;font-size:17px;font-weight:700;" disabled></div>
+      </div>
+      <div class="field"><label>Additional / Upgrade Amount <span style="font-size:11px;font-weight:400;color:var(--muted);">(optional)</span></label>
+        <div style="position:relative;"><span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;font-weight:700;pointer-events:none;">$</span>
+        <input type="number" inputmode="decimal" id="f-invoice-upgrade" placeholder="0.00" min="0" step="0.01" oninput="updateInvoiceCalc()" style="padding-left:26px;font-size:17px;font-weight:700;" disabled></div>
+      </div>
+      <div class="field"><label>Total Price <span style="font-size:11px;font-weight:400;color:var(--muted);">(auto-calculated)</span></label>
+        <div style="padding:13px 14px 13px 26px;background:var(--bg);border-radius:10px;font-size:17px;font-weight:700;color:var(--text);position:relative;border:1.5px solid var(--inp-border);">
+        <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;font-weight:700;">$</span><span id="inv-total-val">&#8212;</span></div>
+      </div>
+      <div class="field"><label>Required Deposit <span style="font-size:11px;font-weight:400;color:var(--muted);">(for reference only)</span></label>
+        <div style="position:relative;"><span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;font-weight:700;pointer-events:none;">$</span>
+        <input type="number" inputmode="decimal" id="f-invoice-deposit" placeholder="0.00" min="0" step="0.01" oninput="updateInvoiceCalc()" style="padding-left:26px;font-size:17px;font-weight:700;" disabled></div>
+      </div>
+      <div class="field"><label>Amount Paid</label>
+        <div style="position:relative;"><span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;font-weight:700;pointer-events:none;">$</span>
+        <input type="number" inputmode="decimal" id="f-invoice-paid" placeholder="0.00" min="0" step="0.01" oninput="updateInvoiceCalc()" style="padding-left:26px;font-size:17px;font-weight:700;" disabled></div>
+      </div>
+      <div class="field" style="margin-bottom:0;"><label>Balance Due</label>
+        <div id="f-invoice-balance" style="padding:13px 14px;background:var(--bg);border-radius:10px;font-size:26px;font-weight:900;color:var(--muted);">&#8212;</div>
+      </div>
+    </div>
+    <div class="card">
       <div class="card-title">Schedule</div>
-      <div class="field"><label>Sound Check – Rhythm</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-rhythm" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-sc-rhythm')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
-      <div class="field"><label>Sound Check – Horns</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-horns" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-sc-horns')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
+      <div class="field"><label>Sound Check – Rhythm (Main Ballroom)</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-rhythm" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-sc-rhythm')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
+      <div class="field"><label>Sound Check – Rhythm (Smorg)</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-rhythm-smorg" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-sc-rhythm-smorg')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
+      <div class="field"><label>Sound Check – Horns / Strings</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-horns" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-sc-horns')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
       <div class="field"><label>Strings in Lobby</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-strings" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-sc-strings')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
       <div class="field"><label>KP Start Time</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-kp-start" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-kp-start')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
       <div class="field"><label>KP Note</label><input type="text" id="f-kp-note" oninput="autoSave()"></div>
@@ -1116,6 +1166,7 @@ function renderEventsList(eventsToShow) {
     var dateStr = fmtDate(ev.date) || 'No date';
     var typeStr = ev.typeCustom || ev.type || 'Event';
     var venueStr = ev.venueName || 'No venue';
+    card.addEventListener('click', function(e){ if(e.target.closest('button')) return; openExistingEvent(ev.id); });
     card.innerHTML = '<div class="event-card-info">' +
       '<div class="event-card-title">' + esc(typeStr) + ' \u2013 ' + esc(venueStr) + '</div>' +
       '<div class="event-card-sub">' + esc(dateStr) + ' <span class="status-badge ' + statusClass(getEffectiveStatus(ev)) + '" style="font-size:9px;padding:2px 7px;">' + statusDot(getEffectiveStatus(ev)) + ' ' + statusLabel(getEffectiveStatus(ev)) + '</span>' + (ev.invoiceStatus && ev.invoiceStatus !== 'unpaid' ? ' <span class="invoice-status-badge ' + invoiceStatusClass(ev.invoiceStatus) + '" style="font-size:9px;padding:2px 7px;">' + invoiceStatusLabel(ev.invoiceStatus) + '</span>' : '') + (ev.customerName ? ' <span style="font-size:10px;color:var(--muted);">· ' + esc(ev.customerName) + '</span>' : '') + '</div>' +
@@ -1387,7 +1438,7 @@ function switchEventTab(name) {
   document.getElementById('tab-preview-content').style.display  = (name==='preview')  ? 'block' : 'none';
   document.getElementById('tab-details').className  = 'tab' + (name==='details' ? ' active' : '');
   document.getElementById('tab-preview').className  = 'tab' + (name==='preview'  ? ' active' : '');
-  if (name === 'preview') { renderPreview(); setTimeout(scalePreview, 100); }
+  if (name === 'preview') { setTimeout(function(){ renderPreview(); scalePreview(); }, 80); }
 }
 function toggleSec(id, el) {
   var b = document.getElementById(id);
@@ -2390,8 +2441,7 @@ function showEventOptions(id,e){
   if(e)e.stopPropagation();
   var ev=savedEvents.find(function(ev){return ev.id===id;});if(!ev)return;
   var list=document.getElementById('event-options-list');list.innerHTML='';
-  var b1=document.createElement('button');b1.className='options-row';b1.innerHTML='<span>Event Details</span><span class="options-row-icon">&#128196;</span>';
-  b1.addEventListener('click',function(){closeEventOptions();openExistingEvent(id);});list.appendChild(b1);
+
   var b2=document.createElement('button');b2.className='options-row options-row-wa';
   b2.innerHTML='<span>Share via WhatsApp</span><span class="options-row-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.118 1.532 5.847L.057 23.882l6.196-1.448A11.934 11.934 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.806 9.806 0 01-5.001-1.368l-.36-.214-3.68.859.899-3.573-.235-.375A9.813 9.813 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182c5.43 0 9.818 4.388 9.818 9.818 0 5.43-4.388 9.818-9.818 9.818z"/></svg></span>';
   b2.addEventListener('click',function(){closeEventOptions();shareEventWhatsApp(id);});list.appendChild(b2);
@@ -2618,8 +2668,7 @@ function invoiceStatusClass(s){return {na:'',unpaid:'inv-unpaid',partial:'inv-pa
 function openInvoicePDF(id){
   var ev=savedEvents.find(function(e){return e.id===id;});if(!ev)return;
   isNewEvent=false;isEditMode=false;currentEvent=JSON.parse(JSON.stringify(ev));
-  populateEventForm();showScreen('event');
-  switchEventTab('preview');
+  populateEventForm();showScreen('event');switchEventTab('preview');
   setTimeout(function(){renderInvoicePreview(currentEvent);scalePreview();},250);
 }
 function renderInvoicePreview(ev){
@@ -2634,31 +2683,25 @@ function renderInvoicePreview(ev){
   var sC={na:'#888',unpaid:'#d93025',partial:'#3347a0',paid:'#1e7a50'};
   var invNum='INV-'+(ev.date||'').replace(/-/g,'').slice(2)+'-'+String(ev.id).slice(-4).toUpperCase();
   dp.innerHTML=
-    '<div class="prev-header">'+
-    '<div class="prev-logo"><img src="images/logo.png" alt="Shea Kaller" onerror="this.onerror=null"></div>'+
-    '<div class="prev-info"><span class="co">SK Music Production Inc</span>845-445-6100<br><a href="mailto:Info@Sheakallerband.com">Info@Sheakallerband.com</a></div>'+
-    '</div>'+
+    '<div class="prev-header"><div class="prev-logo"><img src="images/logo.png" alt="Shea Kaller" onerror="this.onerror=null"></div>'+
+    '<div class="prev-info"><span class="co">SK Music Production Inc</span>845-445-6100<br><a href="mailto:Info@Sheakallerband.com">Info@Sheakallerband.com</a></div></div>'+
     '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #1a1d2e;font-family:Lato,sans-serif;">'+
     '<div><div style="font-size:28px;font-weight:900;color:#1a1d2e;">INVOICE</div><div style="font-size:12px;color:#888;margin-top:2px;">'+esc(invNum)+'</div></div>'+
-    '<div style="background:'+(sC[status]||'#888')+';color:#fff;padding:6px 16px;border-radius:20px;font-size:12px;font-weight:900;letter-spacing:.05em;">'+(sL[status]||'N/A')+'</div>'+
-    '</div>'+
+    '<div style="background:'+(sC[status]||'#888')+';color:#fff;padding:6px 16px;border-radius:20px;font-size:12px;font-weight:900;letter-spacing:.05em;">'+(sL[status]||'N/A')+'</div></div>'+
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;font-family:Lato,sans-serif;">'+
     '<div><div style="font-size:10px;font-weight:700;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;">Bill To</div>'+
     '<div style="font-size:14px;font-weight:700;color:#1a1d2e;">'+(cust?esc(cust):'&mdash;')+'</div>'+
     (ev.customerEmail?'<div style="font-size:12px;color:#888;">'+esc(ev.customerEmail)+'</div>':'')+
     (ev.customerPhone?'<div style="font-size:12px;color:#888;">'+esc(ev.customerPhone)+'</div>':'')+
-    '</div>'+
-    '<div><div style="font-size:10px;font-weight:700;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;">Event Details</div>'+
+    '</div><div><div style="font-size:10px;font-weight:700;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;">Event Details</div>'+
     '<div style="font-size:13px;"><strong>Date:</strong> '+esc(date||'&mdash;')+'</div>'+
     '<div style="font-size:13px;"><strong>Type:</strong> '+esc(evType||'&mdash;')+'</div>'+
     '<div style="font-size:13px;"><strong>Venue:</strong> '+esc(venue||'&mdash;')+(addr?' &ndash; '+esc(addr):'')+'</div>'+
     '</div></div>'+
     '<table style="width:100%;border-collapse:collapse;font-family:Lato,sans-serif;margin-bottom:16px;">'+
     '<thead><tr style="background:#1a1d2e;color:#fff;"><th style="padding:10px 14px;text-align:left;font-size:12px;">DESCRIPTION</th><th style="padding:10px 14px;text-align:right;font-size:12px;">AMOUNT</th></tr></thead>'+
-    '<tbody><tr style="border-bottom:1px solid #eee;">'+
-    '<td style="padding:12px 14px;font-size:14px;">Event Performance &mdash; SK Music Production Inc'+(upgrade>0?' (incl. $'+upgrade.toFixed(2)+' upgrades)':'')+'</td>'+
-    '<td style="padding:12px 14px;text-align:right;font-size:14px;font-weight:700;">$'+total.toFixed(2)+'</td>'+
-    '</tr></tbody></table>'+
+    '<tbody><tr style="border-bottom:1px solid #eee;"><td style="padding:12px 14px;font-size:14px;">Event Performance &mdash; SK Music Production Inc'+(upgrade>0?' (incl. $'+upgrade.toFixed(2)+' upgrades)':'')+'</td>'+
+    '<td style="padding:12px 14px;text-align:right;font-size:14px;font-weight:700;">$'+total.toFixed(2)+'</td></tr></tbody></table>'+
     '<div style="margin-left:auto;width:260px;font-family:Lato,sans-serif;">'+
     (orig>0&&upgrade>0?'<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee;font-size:13px;"><span style="color:#888;">Original Price</span><span>$'+orig.toFixed(2)+'</span></div>':'')+
     (upgrade>0?'<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee;font-size:13px;"><span style="color:#888;">Upgrade / Additional</span><span>$'+upgrade.toFixed(2)+'</span></div>':'')+
@@ -2666,8 +2709,7 @@ function renderInvoicePreview(ev){
     (deposit>0?'<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee;font-size:13px;"><span style="color:#888;">Required Deposit</span><span>$'+deposit.toFixed(2)+'</span></div>':'')+
     (paid>0?'<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee;font-size:13px;"><span style="color:#888;">Amount Paid</span><span style="color:#2eaa7a;font-weight:700;">&minus; $'+paid.toFixed(2)+'</span></div>':'')+
     '<div style="display:flex;justify-content:space-between;padding:10px 0;font-size:17px;font-weight:900;border-top:2px solid #1a1d2e;margin-top:4px;">'+
-    '<span>Balance Due</span><span style="color:'+(bal<=0?'#2eaa7a':'#d93025')+';">$'+bal.toFixed(2)+'</span></div>'+
-    '</div>'+
+    '<span>Balance Due</span><span style="color:'+(bal<=0?'#2eaa7a':'#d93025')+';">$'+bal.toFixed(2)+'</span></div></div>'+
     '<div style="margin-top:24px;padding-top:12px;border-top:1px solid #eee;font-size:11px;color:#aaa;font-family:Lato,sans-serif;text-align:center;">Thank you for your business! Please make checks payable to SK Music Production Inc.<br>Questions? Call 845-445-6100 or email Info@Sheakallerband.com</div>'+
     '<div class="prev-watermark"><img src="images/logo.png" alt="" onerror="this.onerror=null"></div>';
   setTimeout(scalePreview,50);
@@ -2690,7 +2732,7 @@ function updateARDashboard(){
 }
 function openFeedback(){
   var msg=prompt('Enter your feedback:');if(!msg||!msg.trim())return;
-  var info='\n\n---\nBrowser: '+navigator.userAgent.substring(0,120)+'\nApp: SK Music v11.9';
+  var info='\n\n---\nBrowser: '+navigator.userAgent.substring(0,120)+'\nApp: SK Music v12.3';
   var a=document.createElement('a');
   a.href='mailto:MosesDavidowitz@gmail.com?subject='+encodeURIComponent('Feedback - SK Music App')+'&body='+encodeURIComponent(msg.trim()+info);
   a.style.display='none';document.body.appendChild(a);a.click();setTimeout(function(){document.body.removeChild(a);},300);
