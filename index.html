@@ -459,7 +459,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v11.5
+  A Davidowitz Project &copy; 2026 - v11.7
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -914,7 +914,7 @@ var importedContacts = [];
 async function importFromContacts() {
   // Step by step detection for debugging
   if (!navigator.contacts) {
-    toast('Not supported: navigator.contacts is undefined', true);
+    toast('This feature is not yet available. Coming soon!', true);
     return;
   }
   if (typeof navigator.contacts.select !== 'function') {
