@@ -315,6 +315,8 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:opacity(.5);cursor:po
 
 .star-btn{color:#e0e0e0;transition:color .1s;user-select:none;-webkit-user-select:none;}
 .star-btn.active{color:#f5a623;}
+.status-filter-btn{background:#f0f2f7;color:var(–text);border:1.5px solid var(–inp-border);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.status-filter-btn.active{background:var(–accent);color:#fff;border-color:var(–accent);}
 
 .status-badge{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:.04em;border:1px solid;}
 .status-open{background:#e8f0fe;color:#3347a0;border-color:#c8d0f0;}
@@ -391,8 +393,15 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
     <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.06);flex:1;min-height:0;display:flex;flex-direction:column;">
       <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;">&#128197; Saved Events</div>
       <div style="display:flex;gap:8px;margin-bottom:10px;">
-        <input type="date" id="events-date-filter" style="flex:1;font-size:13px;padding:9px 10px;border:1.5px solid var(--inp-border);border-radius:10px;background:var(--bg);color:var(--text);outline:none;-webkit-appearance:none;">
+        <input type="date" id="events-date-filter" style="flex:1;font-size:13px;padding:9px 10px;border:1.5px solid var(--inp-border);border-radius:10px;background:var(--bg);color:var(--text);outline:none;-webkit-appearance:none;" onchange="onDateFilterChange()">
         <button onclick="searchEvents()" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:9px 16px;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0;">Search</button>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
+        <button onclick="toggleStatusFilter('open')" id="sf-open" class="status-filter-btn">🔵 Open</button>
+        <button onclick="toggleStatusFilter('confirmed')" id="sf-confirmed" class="status-filter-btn">🟢 Confirmed</button>
+        <button onclick="toggleStatusFilter('reopened')" id="sf-reopened" class="status-filter-btn">🟡 Reopened</button>
+        <button onclick="toggleStatusFilter('past')" id="sf-past" class="status-filter-btn">⚫ Past</button>
+        <button onclick="clearStatusFilter()" id="sf-clear" style="display:none;background:#eee;color:#666;border:none;border-radius:20px;padding:5px 10px;font-size:12px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;">✕ Clear</button>
       </div>
       <div id="events-list" style="flex:1;overflow-y:auto;min-height:0;padding-bottom:60px;"><div class="events-list-empty" style="padding:8px 0 2px;">Select a date or press Search to find events.</div></div>
     </div>
@@ -410,7 +419,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v6.8
+  A Davidowitz Project &copy; 2026 - v7.6
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -504,6 +513,10 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   </div>
   <!-- Details tab -->
   <div id="tab-details-content" class="scroll-area" style="display:block;">
+    <div id="event-status-bar" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#fff;border-radius:12px;border:1px solid var(--border);margin-bottom:12px;">
+      <div id="event-status-badge"></div>
+      <button id="btn-confirm-event" onclick="toggleConfirmEvent()" style="-webkit-tap-highlight-color:transparent;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Lato',sans-serif;background:#2eaa7a;color:#fff;min-width:90px;">✓ Confirm</button>
+    </div>
     <div class="card">
       <div class="card-title">Event Info</div>
       <div class="field" id="fd-date"><label class="req-label">Date</label><input type="date" id="f-date" oninput="clearErr('fd-date');autoSave()"><div class="err-msg">Date is required</div></div>
@@ -569,17 +582,17 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   <div id="tab-preview-content" class="scroll-area" style="display:none;">
     <div class="preview-outer">
       <button id="btn-print-main" class="btn-block btn-print" onclick="doSaveAsPDF()">&#11123; Download PDF</button>
-      <div id="event-status-bar" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:10px 14px;background:#fff;border-radius:12px;border:1px solid var(--border);">
-        <div style="font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.04em;text-transform:uppercase;">Status</div>
-        <div id="event-status-badge"></div>
-      </div>
-      <button id="btn-email-main" class="btn-block btn-email-crew" onclick="confirmAndEmail()">&#9993; Confirm &amp; Email Crew</button>
-      <div class="preview-scaler" id="pscaler">
-        <div class="preview-wrapper" id="pwrapper">
-          <div class="preview-inner" id="doc-preview"></div>
-        </div>
-      </div>
+
+```
+  <button id="btn-email-main" class="btn-block btn-email-crew" onclick="emailCrew()">&#9993; Email Crew</button>
+  <div class="preview-scaler" id="pscaler">
+    <div class="preview-wrapper" id="pwrapper">
+      <div class="preview-inner" id="doc-preview"></div>
     </div>
+  </div>
+</div>
+```
+
   </div>
 </div>
 
@@ -873,13 +886,7 @@ function enterEditMode() {
   isEditMode = true;
   setEventEditMode(true);
   updateEventTopbar();
-  // Auto-reopen if confirmed
-  if (currentEvent && currentEvent.status === 'confirmed') {
-    currentEvent.status = 'reopened';
-    persistCurrentEvent();
-    renderEventStatus();
-    toast('Event reopened for editing', false);
-  }
+  // Status does NOT change on Edit — only changes on Save
 }
 function setEventEditMode(editable) {
   var fields = document.querySelectorAll('#tab-details-content input, #tab-details-content textarea, #tab-details-content select');
@@ -904,6 +911,14 @@ function setEventEditMode(editable) {
 function saveCurrentEvent() {
   if (!validateEvent()) { toast('Please fill in all required fields', true); return; }
   readFormIntoCurrentEvent();
+  // Status on save: confirmed → reopened (edits were made)
+  if (currentEvent.status === 'confirmed') {
+    currentEvent.status = 'reopened';
+    setTimeout(function(){ toast('Event reopened', false); }, 300);
+  } else if (currentEvent.date) {
+    var sd=new Date(currentEvent.date+'T00:00:00'),st=new Date();st.setHours(0,0,0,0);
+    if(sd>=st && (!currentEvent.status||currentEvent.status==='open')) currentEvent.status='open';
+  }
   var idx = savedEvents.findIndex(function(e){ return e.id === currentEvent.id; });
   if (idx >= 0) savedEvents[idx] = currentEvent;
   else savedEvents.push(currentEvent);
@@ -912,6 +927,7 @@ function saveCurrentEvent() {
   isEditMode = false;
   setEventEditMode(false);
   updateEventTopbar();
+  renderEventStatus();
   toast('Event saved! ✓', false);
 }
 function autoSave() {
@@ -974,7 +990,7 @@ function populateEventForm() {
 // EVENT TABS
 // ═══════════════════════════════════════════════════════════════
 function switchEventTab(name) {
-  if (name === 'preview') { setTimeout(renderEventStatus, 50); }
+  setTimeout(renderEventStatus, 50);
   document.getElementById('tab-details-content').style.display = (name==='details') ? 'block' : 'none';
   document.getElementById('tab-preview-content').style.display  = (name==='preview')  ? 'block' : 'none';
   document.getElementById('tab-details').className  = 'tab' + (name==='details' ? ' active' : '');
@@ -1618,28 +1634,39 @@ function statusClass(status) {
 function statusDot(status) {
   return {open:'🔵', confirmed:'🟢', reopened:'🟡', past:'⚫'}[status] || '🔵';
 }
-function renderEventStatus() {
-  if (!currentEvent) return;
-  var eff = getEffectiveStatus(currentEvent);
-  var badge = document.getElementById('event-status-badge');
-  var btn   = document.getElementById('btn-email-main');
-  if (!badge || !btn) return;
-  badge.innerHTML = '<span class="status-badge ' + statusClass(eff) + '">' + statusDot(eff) + ' ' + statusLabel(eff) + '</span>';
-  if (eff === 'confirmed') {
-    btn.textContent = '↩ Reopen Event';
-    btn.style.background = '#f5a623';
-    btn.style.boxShadow = '0 3px 10px rgba(245,166,35,.3)';
-    btn.onclick = function(){ reopenEvent(); };
-  } else {
-    btn.innerHTML = '&#9993; Confirm &amp; Email Crew';
-    btn.style.background = '';
-    btn.style.boxShadow = '';
-    btn.onclick = function(){ confirmAndEmail(); };
-  }
-}
+
 function confirmAndEmail() {
   // Email only — status is managed separately by toggleConfirmEvent
   emailCrew();
+}
+function renderEventStatus() {
+  if (!currentEvent) return;
+  var eff = getEffectiveStatus(currentEvent);
+  // Update status badge
+  var badge = document.getElementById('event-status-badge');
+  if (badge) badge.innerHTML = '<span class="status-badge ' + statusClass(eff) + '">' + statusDot(eff) + ' ' + statusLabel(eff) + '</span>';
+  // Update confirm button (details tab only)
+  var btn = document.getElementById('btn-confirm-event');
+  if (!btn) return;
+  if (eff === 'confirmed') {
+    btn.textContent = '↩ Reopen';
+    btn.style.background = '#f5a623';
+    btn.style.color = '#fff';
+    btn.disabled = false;
+    btn.style.opacity = '1';
+  } else if (eff === 'past') {
+    btn.textContent = '✓ Confirm';
+    btn.style.background = '#ccc';
+    btn.style.color = '#fff';
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
+  } else {
+    btn.textContent = '✓ Confirm';
+    btn.style.background = '#2eaa7a';
+    btn.style.color = '#fff';
+    btn.disabled = false;
+    btn.style.opacity = '1';
+  }
 }
 function toggleConfirmEvent() {
   if (!currentEvent) return;
@@ -1745,22 +1772,30 @@ function renderStarRow(val){
 function onContactTypeChange(){var ctype=document.getElementById('nc-type').value;var rf=document.getElementById('fd-nc-role');var ri=document.getElementById('nc-role');var rl=rf?rf.querySelector('label'):null;if(ctype==='band'){if(rf)rf.style.display='block';if(rl)rl.className='req-label';}else{if(rf)rf.style.display='none';if(ri)ri.value='';if(rl)rl.className='';clearErr('fd-nc-role');}}
 
 // ── SEARCH EVENTS ──────────────────────────────────────────────
-var activeStatusFilter=null;
+var activeStatusFilters=[];
 function toggleStatusFilter(s){
-  if(activeStatusFilter===s){clearStatusFilter();return;}
-  activeStatusFilter=s;
-  document.querySelectorAll('.status-filter-btn').forEach(function(b){b.classList.remove('active');});
-  var b=document.getElementById('sf-'+s);if(b)b.classList.add('active');
-  var cl=document.getElementById('sf-clear');if(cl)cl.style.display='inline-block';
+  var i=activeStatusFilters.indexOf(s);
+  if(i>=0) activeStatusFilters.splice(i,1); else activeStatusFilters.push(s);
+  var b=document.getElementById('sf-'+s);
+  if(b) b.classList.toggle('active', activeStatusFilters.indexOf(s)>=0);
+  var cl=document.getElementById('sf-clear');
+  var dfv=document.getElementById('events-date-filter');
+  if(cl) cl.style.display=(activeStatusFilters.length>0||(dfv&&dfv.value))?'inline-block':'none';
   searchEvents();
 }
+function onDateFilterChange(){
+  var df=document.getElementById('events-date-filter');
+  var cl=document.getElementById('sf-clear');
+  if(cl) cl.style.display=(activeStatusFilters.length>0||(df&&df.value))?'inline-block':'none';
+}
 function clearStatusFilter(){
-  activeStatusFilter=null;
+  activeStatusFilters=[];
   document.querySelectorAll('.status-filter-btn').forEach(function(b){b.classList.remove('active');});
+  var df=document.getElementById('events-date-filter');if(df)df.value='';
   var cl=document.getElementById('sf-clear');if(cl)cl.style.display='none';
   searchEvents();
 }
-function searchEvents(){var df=document.getElementById('events-date-filter').value;var list=document.getElementById('events-list');if(!savedEvents.length){list.innerHTML='<div class="events-list-empty">No saved events yet.<br>Create your first event above.</div>';return;}var filtered=df?savedEvents.filter(function(ev){return ev.date===df;}):savedEvents.slice();if(activeStatusFilter){filtered=filtered.filter(function(ev){return getEffectiveStatus(ev)===activeStatusFilter;});}if(!filtered.length){list.innerHTML='<div class="events-list-empty">No events found for that date.</div>';return;}renderEventsList(filtered);}
+function searchEvents(){var df=document.getElementById('events-date-filter').value;var list=document.getElementById('events-list');if(!savedEvents.length){list.innerHTML='<div class="events-list-empty">No saved events yet.<br>Create your first event above.</div>';return;}var filtered=df?savedEvents.filter(function(ev){return ev.date===df;}):savedEvents.slice();if(activeStatusFilters.length>0){filtered=filtered.filter(function(ev){return activeStatusFilters.indexOf(getEffectiveStatus(ev))>=0;});}if(!filtered.length){list.innerHTML='<div class="events-list-empty">No events found for that date.</div>';return;}renderEventsList(filtered);}
 
 // ── BROADCAST ──────────────────────────────────────────────────
 var broadcastType='',broadcastSelected=[],bcastStarFilter=0;
