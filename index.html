@@ -326,6 +326,15 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:opacity(.5);cursor:po
 .summary-pill:active{opacity:.8;}
 .summary-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 
+.cal-day-header{font-size:10px;font-weight:700;color:var(–muted);padding:2px 0;text-transform:uppercase;}
+.cal-day{font-size:13px;padding:6px 2px;border-radius:8px;position:relative;min-height:32px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;}
+.cal-day.today{background:#f0f4ff;font-weight:700;color:var(–accent);}
+.cal-day.other-month{color:#ccc;}
+.cal-day.has-events{cursor:pointer;}
+.cal-day.has-events:active{background:#f5f7ff;}
+.cal-dot-row{display:flex;gap:2px;margin-top:2px;flex-wrap:wrap;justify-content:center;}
+.cal-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+
 /* ═══════════════════════════════════════════
 TOAST
 ═══════════════════════════════════════════ */
@@ -390,6 +399,17 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
       </div>
       <div class="home-btn-arrow">&#8250;</div>
     </div>
+
+  </div>
+  <div id="cal-section" style="display:block;flex-shrink:0;padding:0 14px;margin-top:0;">
+    <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <button onclick="calPrev()" style="background:none;border:none;font-size:22px;cursor:pointer;padding:4px 10px;color:var(--accent);">&#8249;</button>
+        <div id="cal-title" style="font-weight:700;font-size:15px;color:var(--text);"></div>
+        <button onclick="calNext()" style="background:none;border:none;font-size:22px;cursor:pointer;padding:4px 10px;color:var(--accent);">&#8250;</button>
+      </div>
+      <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;"></div>
+    </div>
   </div>
   <div style="flex:1;min-height:0;padding:12px 14px 0;display:flex;flex-direction:column;" id="existing-events-section">
     <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.06);flex:1;min-height:0;display:flex;flex-direction:column;">
@@ -413,8 +433,9 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
           </div>
         </div>
       </div>
-      <div style="display:flex;gap:8px;margin-bottom:8px;">
-        <input type="date" id="events-date-filter" style="flex:1;font-size:13px;padding:9px 10px;border:1.5px solid var(--inp-border);border-radius:10px;background:var(--bg);color:var(--text);outline:none;-webkit-appearance:none;" onchange="onDateFilterChange()">
+      <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center;">
+        <div id="cal-date-display" style="flex:1;font-size:13px;padding:9px 10px;border:1.5px solid var(--inp-border);border-radius:10px;background:var(--bg);color:var(--muted);min-height:40px;display:flex;align-items:center;">Select a date from the calendar above</div>
+        <input type="hidden" id="events-date-filter">
         <button onclick="searchEvents()" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:9px 16px;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;flex-shrink:0;">Search</button>
       </div>
       <div id="events-list" style="flex:1;overflow-y:auto;min-height:0;padding-bottom:60px;"><div class="events-list-empty" style="padding:8px 0 2px;">Select a date or press Search to find events.</div></div>
@@ -433,7 +454,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v8.6
+  A Davidowitz Project &copy; 2026 - v8.8
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -740,6 +761,7 @@ function showScreen(name) {
   if (name === 'home') {
     topbar.style.display = 'none';
     updateSummaryBar();
+    if (calOpen) renderCalendar();
     // existing-events-section is always visible — reset to hint state
     var evList = document.getElementById('events-list');
     if (evList) evList.innerHTML = '<div class="events-list-empty" style="padding:8px 0 2px;">Select a date or press Search to find events.</div>';
@@ -1893,12 +1915,13 @@ function onDateFilterChange(){
   var df=document.getElementById('events-date-filter');
   var cl=document.getElementById('sf-clear');
   if(cl) cl.style.display=(activeStatusFilters.length>0||(df&&df.value))?'inline-block':'none';
-  searchEvents();
 }
 function clearStatusFilter(){
   activeStatusFilters=[];
   updateSummaryPillStates();
   var df=document.getElementById('events-date-filter');if(df)df.value='';
+  var disp=document.getElementById('cal-date-display');
+  if(disp){disp.textContent='Select a date from the calendar above';disp.style.color='var(--muted)';}
   var cl=document.getElementById('sf-clear');if(cl)cl.style.display='none';
   searchEvents();
 }
@@ -2081,11 +2104,72 @@ function shareEventWhatsApp(id){
   window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
 }
 
+// ═══════════════════════════════════════════════════════════════
+// CALENDAR
+// ═══════════════════════════════════════════════════════════════
+var calYear=new Date().getFullYear(), calMonth=new Date().getMonth(), calOpen=true;
+function toggleCalendar(){
+  calOpen=!calOpen;
+  var sec=document.getElementById('cal-section');
+  var arr=document.getElementById('cal-arrow');
+  if(sec)sec.style.display=calOpen?'block':'none';
+  if(arr)arr.style.transform=calOpen?'rotate(90deg)':'';
+  if(calOpen)renderCalendar();
+}
+function calPrev(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCalendar();}
+function calNext(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCalendar();}
+function renderCalendar(){
+  var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var days=['Su','Mo','Tu','We','Th','Fr','Sa'];
+  document.getElementById('cal-title').textContent=months[calMonth]+' '+calYear;
+  var evMap={};
+  savedEvents.forEach(function(ev){if(!ev.date)return;if(!evMap[ev.date])evMap[ev.date]=[];evMap[ev.date].push(ev);});
+  var grid=document.getElementById('cal-grid');
+  grid.innerHTML='';
+  days.forEach(function(d){var h=document.createElement('div');h.className='cal-day-header';h.textContent=d;grid.appendChild(h);});
+  var firstDay=new Date(calYear,calMonth,1).getDay();
+  var daysInMonth=new Date(calYear,calMonth+1,0).getDate();
+  var daysInPrev=new Date(calYear,calMonth,0).getDate();
+  var today=new Date();
+  var todayStr=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+  var statusColors={open:'#4a5da8',confirmed:'#2eaa7a',reopened:'#f5a623',past:'#aaa'};
+  for(var i=0;i<firstDay;i++){var pd=document.createElement('div');pd.className='cal-day other-month';pd.textContent=daysInPrev-firstDay+i+1;grid.appendChild(pd);}
+  for(var day=1;day<=daysInMonth;day++){
+    var dateStr=calYear+'-'+String(calMonth+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+    var evs=evMap[dateStr]||[];
+    var cell=document.createElement('div');
+    cell.className='cal-day'+(dateStr===todayStr?' today':'')+(evs.length?' has-events':'');
+    cell.innerHTML='<span>'+day+'</span>';
+    if(evs.length){
+      var dotRow=document.createElement('div');dotRow.className='cal-dot-row';
+      evs.slice(0,3).forEach(function(ev){var dot=document.createElement('span');dot.className='cal-dot';dot.style.background=statusColors[getEffectiveStatus(ev)]||'#aaa';dotRow.appendChild(dot);});
+      cell.appendChild(dotRow);
+      (function(ds, displayStr){cell.addEventListener('click',function(){
+        // Set hidden date input
+        document.getElementById('events-date-filter').value=ds;
+        // Update display label
+        var disp=document.getElementById('cal-date-display');
+        if(disp){disp.textContent=displayStr;disp.style.color='var(--text)';}
+        // Show clear button
+        var cl=document.getElementById('sf-clear');if(cl)cl.style.display='inline-block';
+        // Search and scroll
+        searchEvents();
+        setTimeout(function(){document.getElementById('existing-events-section').scrollIntoView({behavior:'smooth'});},100);
+      });})(dateStr, months[calMonth]+' '+day+', '+calYear);
+    }
+    grid.appendChild(cell);
+  }
+  var total=firstDay+daysInMonth;
+  var rem=total%7===0?0:7-(total%7);
+  for(var j=1;j<=rem;j++){var nd=document.createElement('div');nd.className='cal-day other-month';nd.textContent=j;grid.appendChild(nd);}
+}
+
 window.addEventListener('DOMContentLoaded', function() {
   loadAll();
   rebuildTypeSelect();
   showScreen('home');
   updateHomeTopbar();
+  renderCalendar();
   // events-list hint is set by showScreen('home') on load
 });
 </script>
