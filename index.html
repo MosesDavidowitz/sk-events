@@ -274,7 +274,7 @@ PREVIEW / PDF
 .btn-email-crew{background:#2eaa7a;color:#fff;box-shadow:0 3px 10px rgba(46,170,122,.3);}
 .preview-scaler{width:100%;border-radius:4px;box-shadow:0 2px 16px rgba(0,0,0,.12);}
 .preview-wrapper{background:#fff;color:#222;font-family:‘Times New Roman’,Times,serif;width:750px;transform-origin:top left;}
-.preview-inner{padding:22px 30px;position:relative;overflow:hidden;min-height:1060px;}
+.preview-inner{padding:22px 30px;position:relative;min-height:1060px;}
 .prev-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
 .prev-logo img{height:110px;width:auto;object-fit:contain;}
 .prev-info{text-align:right;font-size:12px;line-height:1.55;font-family:‘Lato’,sans-serif;padding-top:4px;}
@@ -484,7 +484,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v13.1
+  A Davidowitz Project &copy; 2026 - v13.2
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -594,7 +594,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
     <button class="tab" id="tab-preview" onclick="switchEventTab('preview')">&#128065; Preview</button>
   </div>
   <!-- Details tab -->
-  <div id="tab-details-content" class="scroll-area" style="display:block;">
+  <div id="tab-details-content" style="display:block;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 14px 80px;">
     <div style="text-align:right;font-size:11px;color:var(--muted);padding:0 2px 6px;"><span style="color:var(--danger);font-weight:700;">*</span> Required fields</div>
     <div id="event-status-bar" style="padding:10px 14px;background:#fff;border-radius:12px;border:1px solid var(--border);margin-bottom:12px;display:flex;align-items:center;gap:10px;">
       <div id="event-status-badge"></div>
@@ -643,6 +643,8 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
       <option value="0">Not set</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option>
     </select></div>
   </div>
+
+  <div style="margin-top:12px;"><button onclick="saveCard('event-info')" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">&#128190; Save Event Info</button></div>
 </div>
 <div class="card">
   <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">&#128100; Customer<span><button onclick="editCard('customer')" id="btn-edit-customer" style="background:#f0f4ff;color:var(--accent);border:1.5px solid #c8d0f0;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">&#9998; Edit</button><button onclick="saveCard('customer')" id="btn-save-customer" style="display:none;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">&#128190; Save</button></span></div>
@@ -650,6 +652,8 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   <div class="field"><label>Email</label><input type="email" id="f-customer-email" placeholder="customer@email.com" oninput="autoSave()"></div>
   <div class="field"><label>Phone</label><input type="text" inputmode="numeric" id="f-customer-phone" placeholder="e.g. (845) 555-1234" oninput="formatPhoneInput(this);autoSave()"></div>
   <div class="field"><label>Notes</label><textarea id="f-customer-notes" placeholder="Additional notes about the customer..." oninput="autoSave()"></textarea></div>
+
+  <div style="margin-top:12px;"><button onclick="saveCard('customer')" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">&#128190; Save Customer</button></div>
 </div>
 
         <div class="card">
@@ -741,12 +745,17 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
     <button id="btn-save-memo" onclick="saveMemo()" disabled style="margin-top:8px;background:#ccc;color:#fff;border:none;border-radius:10px;padding:10px 20px;font-size:14px;font-weight:700;cursor:default;width:100%;-webkit-tap-highlight-color:transparent;transition:background .2s;">💾 Save Memo</button>
     <div id="memo-saved-msg" style="display:none;text-align:center;color:#2eaa7a;font-size:12px;font-weight:600;margin-top:6px;">✓ Memo saved</div>
   </div>
+
+  <div style="margin-top:12px;"><button onclick="saveCard('dresscode')" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">&#128190; Save Dresscode</button></div>
+</div>
+
+  <div style="margin-top:12px;"><button onclick="saveCard('schedule')" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">&#128190; Save Schedule</button></div>
 </div>
 ```
 
-  </div>
   <!-- Preview tab -->
-  <div id="tab-preview-content" class="scroll-area" style="display:none;">
+
+  <div id="tab-preview-content" style="display:none;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 14px 40px;">
     <div class="preview-outer" style="min-height:300px;">
       <button id="btn-print-main" class="btn-block btn-print" onclick="doSaveAsPDF()">&#11123; Download PDF</button>
       <button id="btn-email-main" class="btn-block btn-email-crew" onclick="emailCrew()">&#9993; Email Crew</button>
@@ -958,12 +967,10 @@ function topbarAction() {
   else if (action === 'editEvent') enterEditMode();
 }
 function goHome() {
-  // Check for unsaved changes on new events
-  if (isEditMode && currentEvent) {
-    // Check if any data has been entered
+  if (isNewEvent && currentEvent) {
     var hasData = currentEvent.date || currentEvent.venueName || (currentEvent.band||[]).length || (currentEvent.singers||[]).length;
     if (hasData) {
-      if (!confirm('You have unsaved changes. Go back to home without saving?')) {
+      if (!confirm('This event has not been created yet. Go back without creating it?')) {
         return;
       }
     }
@@ -1225,10 +1232,13 @@ function openExistingEvent(id) {
   setEventEditMode(false);
 }
 function updateEventTopbar() {
-  if (isEditMode) {
-    setTopbar(isNewEvent ? 'New Event' : 'Event Details', '← Home', 'Save', 'saveEvent');
+  if (isNewEvent) {
+    setTopbar('New Event', '← Home', 'Create Event', 'saveEvent');
     document.getElementById('topbar-back').setAttribute('data-back','goHome');
+    document.getElementById('topbar-btn').className = 'btn-top btn-green';
   } else {
+    // Show status label only - no edit/save button (cards have their own)
+    var eff = currentEvent ? getEffectiveStatus(currentEvent) : 'open';
     setTopbar('Event Details', '← Home', null, null);
     document.getElementById('topbar-back').setAttribute('data-back','goHome');
   }
@@ -1240,18 +1250,18 @@ function enterEditMode() {
   // Status does NOT change on Edit — only changes on Save
 }
 function setEventEditMode(editable) {
+  // All fields always editable - each card manages its own state
   var fields = document.querySelectorAll('#tab-details-content input, #tab-details-content textarea, #tab-details-content select');
   fields.forEach(function(el) {
-    if (el.id === 'f-memo') return; // memo is always editable
-    if (editable) {
-      el.removeAttribute('disabled');
-      el.style.background = '';
-      el.style.color = '';
-    } else {
-      el.setAttribute('disabled','true');
-      el.style.background = '#f3f4f8';
-      el.style.color = '#888';
-    }
+    if (el.id === 'f-memo') return;
+    // Only invoice fields get locked (they have own Edit button)
+    var invoiceIds = ['f-invoice-original','f-invoice-upgrade','f-invoice-deposit','f-invoice-paid'];
+    if (invoiceIds.indexOf(el.id) >= 0) return; // invoice manages itself
+    el.removeAttribute('disabled');
+    el.style.background = '';
+    el.style.color = '';
+    el.style.opacity = '1';
+    el.style.pointerEvents = 'auto';
   });
   ['f-invoice-original','f-invoice-upgrade','f-invoice-deposit','f-invoice-paid'].forEach(function(id){
     var el=document.getElementById(id);if(!el)return;
