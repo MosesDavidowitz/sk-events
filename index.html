@@ -484,7 +484,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v12.3
+  A Davidowitz Project &copy; 2026 - v12.4
 </div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
@@ -626,98 +626,81 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
       <div class="field"><label>Phone</label><input type="text" inputmode="numeric" id="f-customer-phone" placeholder="e.g. (845) 555-1234" oninput="formatPhoneInput(this);autoSave()"></div>
       <div class="field"><label>Notes</label><textarea id="f-customer-notes" placeholder="Additional notes about the customer..." oninput="autoSave()"></textarea></div>
     </div>
-    <div class="card">
-      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">&#128181; Invoice <div id="invoice-status-badge"></div></div>
-      <div style="margin-bottom:4px;">
-        <div class="field">
-          <label>Total Price</label>
-          <div style="position:relative;"><span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;font-weight:700;">$</span><input type="number" inputmode="decimal" id="f-invoice-total" placeholder="0.00" min="0" step="0.01" oninput="autoSave();updateInvoiceCalc()" style="padding-left:26px;font-size:17px;font-weight:700;"></div>
-        </div>
-        <div class="field">
-          <label>Deposit Amount</label>
-          <div style="position:relative;"><span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;font-weight:700;">$</span><input type="number" inputmode="decimal" id="f-invoice-deposit" placeholder="0.00" min="0" step="0.01" oninput="autoSave();updateInvoiceCalc()" style="padding-left:26px;font-size:17px;font-weight:700;"></div>
-        </div>
-        <div class="field">
-          <label>Amount Paid</label>
-          <div style="position:relative;"><span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;font-weight:700;">$</span><input type="number" inputmode="decimal" id="f-invoice-paid" placeholder="0.00" min="0" step="0.01" oninput="autoSave();updateInvoiceCalc()" style="padding-left:26px;font-size:17px;font-weight:700;"></div>
-        </div>
-        <div class="field" style="margin-bottom:0;">
-          <label>Balance Due</label>
-          <div id="f-invoice-balance" style="padding:13px 14px;background:var(--bg);border-radius:10px;font-size:26px;font-weight:900;color:var(--green);">$0.00</div>
-        </div>
-      </div>
+
+```
+<div class="card">
+  <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">
+    &#128181; Invoice
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div id="invoice-status-badge"></div>
+      <button onclick="editInvoice()" id="btn-edit-invoice" style="background:#f0f4ff;color:var(--accent);border:1.5px solid #c8d0f0;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">&#9998; Edit</button>
+      <button id="btn-save-invoice" onclick="saveInvoice()" style="display:none;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">&#128190; Save</button>
     </div>
-    <div class="card">
-      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">
-        &#128181; Invoice
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div id="invoice-status-badge"></div>
-          <button onclick="editInvoice()" id="btn-edit-invoice" style="background:#f0f4ff;color:var(--accent);border:1.5px solid #c8d0f0;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">&#9998; Edit</button>
-          <button id="btn-save-invoice" onclick="saveInvoice()" style="display:none;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;">&#128190; Save</button>
-        </div>
-      </div>
-      <div class="field"><label>Original Price</label>
-        <div style="position:relative;"><span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;font-weight:700;pointer-events:none;">$</span>
-        <input type="number" inputmode="decimal" id="f-invoice-original" placeholder="0.00" min="0" step="0.01" oninput="updateInvoiceCalc()" style="padding-left:26px;font-size:17px;font-weight:700;" disabled></div>
-      </div>
-      <div class="field"><label>Additional / Upgrade Amount <span style="font-size:11px;font-weight:400;color:var(--muted);">(optional)</span></label>
-        <div style="position:relative;"><span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;font-weight:700;pointer-events:none;">$</span>
-        <input type="number" inputmode="decimal" id="f-invoice-upgrade" placeholder="0.00" min="0" step="0.01" oninput="updateInvoiceCalc()" style="padding-left:26px;font-size:17px;font-weight:700;" disabled></div>
-      </div>
-      <div class="field"><label>Total Price <span style="font-size:11px;font-weight:400;color:var(--muted);">(auto-calculated)</span></label>
-        <div style="padding:13px 14px 13px 26px;background:var(--bg);border-radius:10px;font-size:17px;font-weight:700;color:var(--text);position:relative;border:1.5px solid var(--inp-border);">
-        <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;font-weight:700;">$</span><span id="inv-total-val">&#8212;</span></div>
-      </div>
-      <div class="field"><label>Required Deposit <span style="font-size:11px;font-weight:400;color:var(--muted);">(for reference only)</span></label>
-        <div style="position:relative;"><span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;font-weight:700;pointer-events:none;">$</span>
-        <input type="number" inputmode="decimal" id="f-invoice-deposit" placeholder="0.00" min="0" step="0.01" oninput="updateInvoiceCalc()" style="padding-left:26px;font-size:17px;font-weight:700;" disabled></div>
-      </div>
-      <div class="field"><label>Amount Paid</label>
-        <div style="position:relative;"><span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;font-weight:700;pointer-events:none;">$</span>
-        <input type="number" inputmode="decimal" id="f-invoice-paid" placeholder="0.00" min="0" step="0.01" oninput="updateInvoiceCalc()" style="padding-left:26px;font-size:17px;font-weight:700;" disabled></div>
-      </div>
-      <div class="field" style="margin-bottom:0;"><label>Balance Due</label>
-        <div id="f-invoice-balance" style="padding:13px 14px;background:var(--bg);border-radius:10px;font-size:26px;font-weight:900;color:var(--muted);">&#8212;</div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title">Schedule</div>
-      <div class="field"><label>Sound Check – Rhythm (Main Ballroom)</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-rhythm" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-sc-rhythm')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
-      <div class="field"><label>Sound Check – Rhythm (Smorg)</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-rhythm-smorg" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-sc-rhythm-smorg')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
-      <div class="field"><label>Sound Check – Horns / Strings</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-horns" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-sc-horns')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
-      <div class="field"><label>Strings in Lobby</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-strings" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-sc-strings')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
-      <div class="field"><label>KP Start Time</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-kp-start" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-kp-start')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
-      <div class="field"><label>KP Note</label><input type="text" id="f-kp-note" oninput="autoSave()"></div>
-      <div class="field" class="field" id="fd-chuppah"><label class="req-label">Chuppah / Main Event Time</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-chuppah" oninput="autoSave();clearErr('fd-chuppah');"><button type="button" onclick="clearTimeField('f-chuppah')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div>
-      <div class="err-msg" id="err-fd-chuppah" style="display:none;">Chuppah / Main Event time is required</div></div>
-    <div class="card">
-      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">Band Members<button class="btn-broadcast" onclick="openBroadcast('band')">&#128226; Broadcast</button></div>
-      <div id="band-list" class="member-list"></div>
-      <div id="band-na" style="font-size:13px;color:var(--muted);margin-bottom:8px;display:none;">N/A</div>
-      <button class="btn-add-member" id="btn-add-band" onclick="openPopup('band')">&#43; Add Band Member</button>
-    </div>
-    <div class="card">
-      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">Singers<button class="btn-broadcast" onclick="openBroadcast('singer')">&#128226; Broadcast</button></div>
-      <div id="singer-list" class="member-list"></div>
-      <div id="singer-na" style="font-size:13px;color:var(--muted);margin-bottom:8px;display:none;">N/A</div>
-      <button class="btn-add-member" id="btn-add-singer" onclick="openPopup('singer')">&#43; Add Singer</button>
-    </div>
-    <div class="card">
-      <div class="card-title">Choir / Group <span style="font-weight:400;font-size:11px;color:var(--muted);">(optional)</span></div>
-      <div id="choir-list" class="member-list"></div>
-      <button class="btn-add-member" id="btn-add-choir" onclick="openPopup('choir')">&#43; Add Choir / Group</button>
-    </div>
-    <div class="card">
-      <div class="card-title">Dress Code &amp; Notes</div>
-      <div class="field"><label>Dress Code</label><input type="text" id="f-dresscode" oninput="autoSave()"></div>
-      <div class="field"><label>Additional Notes</label><textarea id="f-notes" oninput="autoSave()"></textarea></div>
-      <div class="field">
-        <label>Internal Memo <span style="font-weight:400;font-size:11px;color:var(--muted);">(private — not on PDF)</span></label>
-        <textarea id="f-memo" placeholder="Private notes, reminders, logistics..." style="min-height:80px;" oninput="onMemoChange()"></textarea>
-        <button id="btn-save-memo" onclick="saveMemo()" disabled style="margin-top:8px;background:#ccc;color:#fff;border:none;border-radius:10px;padding:10px 20px;font-size:14px;font-weight:700;cursor:default;width:100%;-webkit-tap-highlight-color:transparent;transition:background .2s;">💾 Save Memo</button>
-        <div id="memo-saved-msg" style="display:none;text-align:center;color:#2eaa7a;font-size:12px;font-weight:600;margin-top:6px;">✓ Memo saved</div>
-      </div>
-    </div>
+  </div>
+  <div class="field"><label>Original Price</label>
+    <div style="position:relative;"><span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;font-weight:700;pointer-events:none;">$</span>
+    <input type="number" inputmode="decimal" id="f-invoice-original" placeholder="0.00" min="0" step="0.01" oninput="updateInvoiceCalc()" style="padding-left:26px;font-size:17px;font-weight:700;" disabled></div>
+  </div>
+  <div class="field"><label>Additional / Upgrade Amount <span style="font-size:11px;font-weight:400;color:var(--muted);">(optional)</span></label>
+    <div style="position:relative;"><span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;font-weight:700;pointer-events:none;">$</span>
+    <input type="number" inputmode="decimal" id="f-invoice-upgrade" placeholder="0.00" min="0" step="0.01" oninput="updateInvoiceCalc()" style="padding-left:26px;font-size:17px;font-weight:700;" disabled></div>
+  </div>
+  <div class="field"><label>Total Price <span style="font-size:11px;font-weight:400;color:var(--muted);">(auto-calculated)</span></label>
+    <div style="padding:13px 14px 13px 26px;background:var(--bg);border-radius:10px;font-size:17px;font-weight:700;color:var(--text);position:relative;border:1.5px solid var(--inp-border);">
+    <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;font-weight:700;">$</span><span id="inv-total-val">&#8212;</span></div>
+  </div>
+  <div class="field"><label>Required Deposit <span style="font-size:11px;font-weight:400;color:var(--muted);">(for reference only)</span></label>
+    <div style="position:relative;"><span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;font-weight:700;pointer-events:none;">$</span>
+    <input type="number" inputmode="decimal" id="f-invoice-deposit" placeholder="0.00" min="0" step="0.01" oninput="updateInvoiceCalc()" style="padding-left:26px;font-size:17px;font-weight:700;" disabled></div>
+  </div>
+  <div class="field"><label>Amount Paid</label>
+    <div style="position:relative;"><span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;font-weight:700;pointer-events:none;">$</span>
+    <input type="number" inputmode="decimal" id="f-invoice-paid" placeholder="0.00" min="0" step="0.01" oninput="updateInvoiceCalc()" style="padding-left:26px;font-size:17px;font-weight:700;" disabled></div>
+  </div>
+  <div class="field" style="margin-bottom:0;"><label>Balance Due</label>
+    <div id="f-invoice-balance" style="padding:13px 14px;background:var(--bg);border-radius:10px;font-size:26px;font-weight:900;color:var(--muted);">&#8212;</div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-title">Schedule</div>
+  <div class="field"><label>Sound Check – Rhythm (Main Ballroom)</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-rhythm" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-sc-rhythm')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
+  <div class="field"><label>Sound Check – Rhythm (Smorg)</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-rhythm-smorg" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-sc-rhythm-smorg')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
+  <div class="field"><label>Sound Check – Horns / Strings</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-horns" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-sc-horns')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
+  <div class="field"><label>Strings in Lobby</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-strings" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-sc-strings')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
+  <div class="field"><label>KP Start Time</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-kp-start" oninput="autoSave()"><button type="button" onclick="clearTimeField('f-kp-start')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
+  <div class="field"><label>KP Note</label><input type="text" id="f-kp-note" oninput="autoSave()"></div>
+  <div class="field" class="field" id="fd-chuppah"><label class="req-label">Chuppah / Main Event Time</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-chuppah" oninput="autoSave();clearErr('fd-chuppah');"><button type="button" onclick="clearTimeField('f-chuppah')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div>
+  <div class="err-msg" id="err-fd-chuppah" style="display:none;">Chuppah / Main Event time is required</div></div>
+<div class="card">
+  <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">Band Members<button class="btn-broadcast" onclick="openBroadcast('band')">&#128226; Broadcast</button></div>
+  <div id="band-list" class="member-list"></div>
+  <div id="band-na" style="font-size:13px;color:var(--muted);margin-bottom:8px;display:none;">N/A</div>
+  <button class="btn-add-member" id="btn-add-band" onclick="openPopup('band')">&#43; Add Band Member</button>
+</div>
+<div class="card">
+  <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">Singers<button class="btn-broadcast" onclick="openBroadcast('singer')">&#128226; Broadcast</button></div>
+  <div id="singer-list" class="member-list"></div>
+  <div id="singer-na" style="font-size:13px;color:var(--muted);margin-bottom:8px;display:none;">N/A</div>
+  <button class="btn-add-member" id="btn-add-singer" onclick="openPopup('singer')">&#43; Add Singer</button>
+</div>
+<div class="card">
+  <div class="card-title">Choir / Group <span style="font-weight:400;font-size:11px;color:var(--muted);">(optional)</span></div>
+  <div id="choir-list" class="member-list"></div>
+  <button class="btn-add-member" id="btn-add-choir" onclick="openPopup('choir')">&#43; Add Choir / Group</button>
+</div>
+<div class="card">
+  <div class="card-title">Dress Code &amp; Notes</div>
+  <div class="field"><label>Dress Code</label><input type="text" id="f-dresscode" oninput="autoSave()"></div>
+  <div class="field"><label>Additional Notes</label><textarea id="f-notes" oninput="autoSave()"></textarea></div>
+  <div class="field">
+    <label>Internal Memo <span style="font-weight:400;font-size:11px;color:var(--muted);">(private — not on PDF)</span></label>
+    <textarea id="f-memo" placeholder="Private notes, reminders, logistics..." style="min-height:80px;" oninput="onMemoChange()"></textarea>
+    <button id="btn-save-memo" onclick="saveMemo()" disabled style="margin-top:8px;background:#ccc;color:#fff;border:none;border-radius:10px;padding:10px 20px;font-size:14px;font-weight:700;cursor:default;width:100%;-webkit-tap-highlight-color:transparent;transition:background .2s;">💾 Save Memo</button>
+    <div id="memo-saved-msg" style="display:none;text-align:center;color:#2eaa7a;font-size:12px;font-weight:600;margin-top:6px;">✓ Memo saved</div>
+  </div>
+</div>
+```
+
   </div>
   <!-- Preview tab -->
   <div id="tab-preview-content" class="scroll-area" style="display:none;">
@@ -1438,7 +1421,11 @@ function switchEventTab(name) {
   document.getElementById('tab-preview-content').style.display  = (name==='preview')  ? 'block' : 'none';
   document.getElementById('tab-details').className  = 'tab' + (name==='details' ? ' active' : '');
   document.getElementById('tab-preview').className  = 'tab' + (name==='preview'  ? ' active' : '');
-  if (name === 'preview') { setTimeout(function(){ renderPreview(); scalePreview(); }, 80); }
+  if (name === 'preview') {
+    var pc = document.getElementById('tab-preview-content');
+    if(pc) pc.style.display = 'block';
+    setTimeout(function(){ renderPreview(); scalePreview(); }, 150);
+  }
 }
 function toggleSec(id, el) {
   var b = document.getElementById(id);
@@ -2668,8 +2655,14 @@ function invoiceStatusClass(s){return {na:'',unpaid:'inv-unpaid',partial:'inv-pa
 function openInvoicePDF(id){
   var ev=savedEvents.find(function(e){return e.id===id;});if(!ev)return;
   isNewEvent=false;isEditMode=false;currentEvent=JSON.parse(JSON.stringify(ev));
-  populateEventForm();showScreen('event');switchEventTab('preview');
-  setTimeout(function(){renderInvoicePreview(currentEvent);scalePreview();},250);
+  populateEventForm();showScreen('event');
+  // Manually switch to preview tab
+  document.getElementById('tab-details-content').style.display='none';
+  var pc=document.getElementById('tab-preview-content');if(pc)pc.style.display='block';
+  document.getElementById('tab-details').className='tab';
+  document.getElementById('tab-preview').className='tab active';
+  updateEventTopbar();
+  setTimeout(function(){renderInvoicePreview(currentEvent);scalePreview();},200);
 }
 function renderInvoicePreview(ev){
   var dp=document.getElementById('doc-preview');if(!dp)return;
