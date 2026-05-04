@@ -484,8 +484,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v13.3
- - v14.9</div>
+  A Davidowitz Project &copy; 2026 - v15.1</div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
 
@@ -842,7 +841,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
     <button onclick="doSaveAsPDF()" style="background:#4a5da8;border:none;color:#fff;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;">&#11123; PDF</button>
   </div>
   <div style="padding:12px;">
-    <button id="preview-email-btn" onclick="emailCrew()" style="display:block;width:100%;background:#2eaa7a;color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;">&#9993; Email Crew</button>
+    <button id="preview-email-btn" onclick="handlePreviewEmail()" style="display:block;width:100%;background:#2eaa7a;color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;">&#9993; <span id="preview-email-label">Email Crew</span></button>
     <div id="preview-popup-content" style="background:#fff;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,.1);padding:16px;font-family:Georgia,serif;font-size:13px;line-height:1.6;color:#222;">
       Loading...
     </div>
@@ -2005,10 +2004,10 @@ function doSaveAsPDF() {
         var ratio = canvas.height / canvas.width;
         var imgH = pageW * ratio;
         var y = 0;
-        while(y < imgH){
-          if(y > 0) pdf.addPage();
-          pdf.addImage(imgData, 'JPEG', 0, -y, pageW, imgH);
-          y += pageH;
+        var pageCount = Math.ceil(imgH / pageH);
+        for(var p=0; p<pageCount; p++){
+          if(p > 0) pdf.addPage();
+          pdf.addImage(imgData, 'JPEG', 0, -(p * pageH), pageW, imgH);
         }
         var ev = currentEvent;
         var fname = (ev&&ev.date?ev.date:'event') + (isPopupOpen?'-invoice':'-preview') + '.pdf';
@@ -2459,7 +2458,9 @@ function openInvoicePDF(id){
   var t=document.getElementById('preview-popup-title');
   if(t) t.textContent='Invoice';
   var eb=document.getElementById('preview-email-btn');
-  if(eb) eb.style.display='none';
+  if(eb) eb.style.display='block';
+  var el=document.getElementById('preview-email-label');
+  if(el) el.textContent='Email Customer';
   renderInvoicePopup(ev);
   document.getElementById('preview-popup').style.display='block';
   document.body.style.overflow='hidden';
@@ -2758,18 +2759,7 @@ function renderInvoiceStatus(){
 }
 function invoiceStatusLabel(s){return {na:'N/A',unpaid:'Unpaid',partial:'Partially Paid',paid:'Paid in Full'}[s]||'N/A';}
 function invoiceStatusClass(s){return {na:'',unpaid:'inv-unpaid',partial:'inv-partial',paid:'inv-paid'}[s]||'';}
-function openInvoicePDF(id){
-  var ev=savedEvents.find(function(e){return e.id===id;});if(!ev)return;
-  isNewEvent=false;isEditMode=false;currentEvent=JSON.parse(JSON.stringify(ev));
-  populateEventForm();showScreen('event');
-  // Manually switch to preview tab
-  document.getElementById('tab-details-content').style.display='none';
-  var pc=document.getElementById('tab-preview-content');if(pc)pc.style.display='block';
-  document.getElementById('tab-details').className='tab';
-  document.getElementById('tab-preview').className='tab active';
-  updateEventTopbar();
-  setTimeout(function(){renderInvoicePreview(currentEvent);scalePreview();},200);
-}
+
 function renderInvoicePreview(ev){
   var dp=document.getElementById('doc-preview');if(!dp)return;
   var cust=ev.customerName||'',date=fmtDate(ev.date||''),venue=ev.venueName||'';
@@ -2888,6 +2878,8 @@ function openPreviewPopup() {
   if(t) t.textContent='Preview';
   var eb=document.getElementById('preview-email-btn');
   if(eb) eb.style.display='block';
+  var el2=document.getElementById('preview-email-label');
+  if(el2) el2.textContent='Email Crew';
   renderPreviewPopup();
   document.getElementById('preview-popup').style.display = 'block';
   document.body.style.overflow = 'hidden';
@@ -2955,6 +2947,60 @@ function cancelEdit() {
   setEventEditMode(false);
   updateEventTopbar();
 }
+function handlePreviewEmail() {
+  var label = document.getElementById('preview-email-label');
+  if(label && label.textContent === 'Email Customer') {
+    emailCustomerInvoice();
+  } else {
+    emailCrew();
+  }
+}
+
+function emailCustomerInvoice() {
+  var ev = currentEvent;
+  if(!ev) { toast('No event loaded', true); return; }
+  var email = ev.customerEmail || '';
+  // Validate email
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    toast('No valid customer email on file. Please add one in the Customer section.', true);
+    return;
+  }
+  var cust = ev.customerName || 'Valued Customer';
+  var date = fmtDate(ev.date || '');
+  var venue = ev.venueName || '';
+  var orig = parseFloat(ev.invoiceOriginal||0), upgrade = parseFloat(ev.invoiceUpgrade||0);
+  var total = orig + upgrade, paid = parseFloat(ev.invoicePaid||0), bal = Math.max(0, total-paid);
+  var subject = 'Invoice – SK Music Production Inc – ' + (date||'Upcoming Event');
+  var nl='\n';
+  var body = 'Dear '+cust+','+nl+nl+
+    'Thank you for choosing SK Music Production Inc!'+nl+nl+
+    'Please find below a summary of your invoice:'+nl+nl+
+    'Event Date: '+(date||'TBD')+nl+
+    (venue?'Venue: '+venue+nl:'')+
+    nl+'INVOICE SUMMARY'+nl+
+    '-------------------------'+nl+
+    (orig>0?'Original Price:    $'+orig.toFixed(2)+nl:'')+
+    (upgrade>0?'Upgrade/Additional: $'+upgrade.toFixed(2)+nl:'')+
+    'Total:             $'+total.toFixed(2)+nl+
+    (paid>0?'Amount Paid:       $'+paid.toFixed(2)+nl:'')+
+    'Balance Due:       $'+bal.toFixed(2)+nl+
+    '-------------------------'+nl+nl+
+    'To arrange payment or if you have any questions, please reach out.'+nl+nl+
+    'We look forward to making your event a success!'+nl+nl+
+    'Warm regards,'+nl+
+    'SK Music Production Inc'+nl+
+    '845-445-6100'+nl+
+    'Info@Sheakallerband.com';
+  var a = document.createElement('a');
+  a.href = 'mailto:' + encodeURIComponent(email) +
+    '?subject=' + encodeURIComponent(subject) +
+    '&body=' + encodeURIComponent(body);
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){ document.body.removeChild(a); }, 300);
+}
+
 window.addEventListener('DOMContentLoaded', function() {
   loadAll();
   rebuildTypeSelect();
