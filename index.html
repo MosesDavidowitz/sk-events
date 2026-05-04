@@ -485,7 +485,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   border-top:1px solid rgba(255,255,255,.08);
 ">
   A Davidowitz Project &copy; 2026 - v13.3
- - v14.3</div>
+ - v14.7</div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
 
@@ -595,13 +595,13 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   </div>
   <!-- Details tab -->
   <div id="tab-details-content" class="scroll-area" style="display:block;">
-    <div style="text-align:right;font-size:11px;color:var(--muted);padding:0 2px 6px;"><span style="color:var(--danger);font-weight:700;">*</span> Required fields</div>
-    <div id="event-status-bar" style="padding:10px 14px;background:#fff;border-radius:12px;border:1px solid var(--border);margin-bottom:12px;display:flex;align-items:center;gap:10px;">
+    <div style="text-align:right;font-size:11px;color:var(--muted);padding:0 2px 6px;"><span style="color:var(--danger);font-weight:700;">*</span> Required fields
+<div id="event-status-bar" style="padding:10px 14px;background:#fff;border-radius:12px;border:1px solid var(--border);margin-bottom:12px;display:flex;align-items:center;gap:10px;">
       <div id="event-status-badge"></div>
       <div id="event-staffing-detail" style="font-size:12px;color:var(--muted);"></div>
     </div>
     <div class="card">
-      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">Event Info<span><button onclick="editCard('event-info')" id="btn-edit-event-info" style="background:#f0f4ff;color:var(--accent);border:1.5px solid #c8d0f0;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">&#9998; Edit</button><button onclick="saveCard('event-info')" id="btn-save-event-info" style="display:none;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">&#128190; Save</button></span></div>
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">Event Info</div>
       <div class="field" id="fd-date"><label class="req-label">Date</label><input type="date" id="f-date" oninput="markCardDirty('event-info');clearErr('fd-date');autoSave()"><div class="err-msg">Date is required</div></div>
       <div class="field" id="fd-type"><label class="req-label">Type of Event</label><select id="f-type" onchange="markCardDirty('event-info');onTypeChange()"></select><div class="err-msg">Please select a type</div></div>
       <div class="field" id="fd-custom" style="display:none;"><label class="req-label">Custom Event Type</label><input type="text" id="f-type-custom" placeholder="Describe the event..." oninput="markCardDirty('event-info');autoSave()"><div class="err-msg">Custom event type is required</div></div>
@@ -632,7 +632,6 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
         <input type="hidden" id="f-address">
       </div>
 
-```
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;padding:10px;background:var(--bg);border-radius:10px;">
     <div><label style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px;display:block;">Required Band Members</label>
     <select id="f-req-band" onchange="autoSave();renderBandList();" style="width:100%;padding:10px 12px;font-size:15px;border-radius:10px;border:1.5px solid var(--inp-border);background:#fff;-webkit-appearance:none;">
@@ -643,20 +642,19 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
       <option value="0">Not set</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option>
     </select></div>
   </div>
-
-  <div style="margin-top:12px;"><button id="btn-bottom-save-event-info" onclick="saveCard('event-info')" disabled style="width:100%;background:#ccc;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:default;-webkit-tap-highlight-color:transparent;opacity:0.7;transition:all .2s;">&#128190; Save Event Info</button></div>
 </div>
 <div class="card">
-  <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">&#128100; Customer<span><button onclick="editCard('customer')" id="btn-edit-customer" style="background:#f0f4ff;color:var(--accent);border:1.5px solid #c8d0f0;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">&#9998; Edit</button><button onclick="saveCard('customer')" id="btn-save-customer" style="display:none;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">&#128190; Save</button></span></div>
+  <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">&#128100; Customer</div>
   <div class="field"><label>Customer Name</label><input type="text" id="f-customer-name" placeholder="e.g. Goldberg Family" oninput="markCardDirty('customer');autoSave()"></div>
   <div class="field"><label>Email</label><input type="email" id="f-customer-email" placeholder="customer@email.com" oninput="markCardDirty('customer');autoSave()"></div>
   <div class="field"><label>Phone</label><input type="text" inputmode="numeric" id="f-customer-phone" placeholder="e.g. (845) 555-1234" oninput="markCardDirty('customer');formatPhoneInput(this);autoSave()"></div>
   <div class="field"><label>Notes</label><textarea id="f-customer-notes" placeholder="Additional notes about the customer..." oninput="markCardDirty('customer');autoSave()"></textarea></div>
-
-  <div style="margin-top:12px;"><button id="btn-bottom-save-customer" onclick="saveCard('customer')" disabled style="width:100%;background:#ccc;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:default;-webkit-tap-highlight-color:transparent;opacity:0.7;transition:all .2s;">&#128190; Save Customer</button></div>
 </div>
 
-        <div class="card">
+```
+    <div class="card">
+```
+
   <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">
     &#128181; Invoice
     <div style="display:flex;align-items:center;gap:8px;">
@@ -709,7 +707,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   </div>
 </div>
 <div class="card">
-  <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">Schedule<span><button onclick="editCard('schedule')" id="btn-edit-schedule" style="background:#f0f4ff;color:var(--accent);border:1.5px solid #c8d0f0;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">&#9998; Edit</button><button onclick="saveCard('schedule')" id="btn-save-schedule" style="display:none;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">&#128190; Save</button></span></div>
+  <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">Schedule</div>
   <div class="field"><label>Sound Check – Rhythm (Main Ballroom)</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-rhythm" oninput="markCardDirty('schedule');autoSave()"><button type="button" onclick="clearTimeField('f-sc-rhythm')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
   <div class="field"><label>Sound Check – Rhythm (Smorg)</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-rhythm-smorg" oninput="markCardDirty('schedule');autoSave()"><button type="button" onclick="clearTimeField('f-sc-rhythm-smorg')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
   <div class="field"><label>Sound Check – Horns / Strings</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-sc-horns" oninput="markCardDirty('schedule');autoSave()"><button type="button" onclick="clearTimeField('f-sc-horns')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div></div>
@@ -718,6 +716,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   <div class="field"><label>KP Note</label><input type="text" id="f-kp-note" oninput="markCardDirty('schedule');autoSave()"></div>
   <div class="field" class="field" id="fd-chuppah"><label class="req-label">Chuppah / Main Event Time</label><div style="display:flex;align-items:center;gap:8px;"><input type="time" id="f-chuppah" oninput="markCardDirty('schedule');autoSave();clearErr('fd-chuppah');"><button type="button" onclick="clearTimeField('f-chuppah')" style="background:#f0f2f7;border:1.5px solid var(--inp-border);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-tap-highlight-color:transparent;">✕ Clear</button></div>
   <div class="err-msg" id="err-fd-chuppah" style="display:none;">Chuppah / Main Event time is required</div></div>
+</div>
 <div class="card">
   <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">Band Members<button class="btn-broadcast" onclick="openBroadcast('band')">&#128226; Broadcast</button></div>
   <div id="band-list" class="member-list"></div>
@@ -736,7 +735,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   <button class="btn-add-member" id="btn-add-choir" onclick="openPopup('choir')">&#43; Add Choir / Group</button>
 </div>
 <div class="card">
-  <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">Dress Code &amp; Notes<span><button onclick="editCard('dresscode')" id="btn-edit-dresscode" style="background:#f0f4ff;color:var(--accent);border:1.5px solid #c8d0f0;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">&#9998; Edit</button><button onclick="saveCard('dresscode')" id="btn-save-dresscode" style="display:none;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">&#128190; Save</button></span></div>
+  <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">Dress Code &amp; Notes</div>
   <div class="field"><label>Dress Code</label><input type="text" id="f-dresscode" oninput="markCardDirty('dresscode');autoSave()"></div>
   <div class="field"><label>Additional Notes</label><textarea id="f-notes" oninput="markCardDirty('dresscode');autoSave()"></textarea></div>
   <div class="field">
@@ -745,13 +744,10 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
     <button id="btn-save-memo" onclick="saveMemo()" disabled style="margin-top:8px;background:#ccc;color:#fff;border:none;border-radius:10px;padding:10px 20px;font-size:14px;font-weight:700;cursor:default;width:100%;-webkit-tap-highlight-color:transparent;transition:background .2s;">💾 Save Memo</button>
     <div id="memo-saved-msg" style="display:none;text-align:center;color:#2eaa7a;font-size:12px;font-weight:600;margin-top:6px;">✓ Memo saved</div>
   </div>
-
-  <div style="margin-top:12px;"><button id="btn-bottom-save-dresscode" onclick="saveCard('dresscode')" disabled style="width:100%;background:#ccc;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:default;-webkit-tap-highlight-color:transparent;opacity:0.7;transition:all .2s;">&#128190; Save Dress Code</button></div>
 </div>
 
-  <div style="margin-top:12px;"><button id="btn-bottom-save-schedule" onclick="saveCard('schedule')" disabled style="width:100%;background:#ccc;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:default;-webkit-tap-highlight-color:transparent;opacity:0.7;transition:all .2s;">&#128190; Save Schedule</button></div>
-</div>
-```
+  </div>
+  </div>
 
   <!-- Preview tab -->
 
@@ -979,14 +975,17 @@ function topbarAction() {
   var action = document.getElementById('topbar-btn').getAttribute('data-action');
   if (action === 'saveEvent') saveCurrentEvent();
   else if (action === 'editEvent') enterEditMode();
+  else if (action === 'startEditMode') startEditMode();
 }
 function goHome() {
+  if (isEditMode && !isNewEvent) {
+    if (!confirm('You have unsaved changes. Leave without saving?')) return;
+    cancelEdit();
+  }
   if (isNewEvent && currentEvent) {
     var hasData = currentEvent.date || currentEvent.venueName || (currentEvent.band||[]).length || (currentEvent.singers||[]).length;
     if (hasData) {
-      if (!confirm('This event has not been created yet. Go back without creating it?')) {
-        return;
-      }
+      if (!confirm('This event has not been created yet. Go back without creating it?')) return;
     }
   }
   currentEvent = null;
@@ -1236,24 +1235,31 @@ function deleteEvent(id, e) {
 function openExistingEvent(id) {
   var ev = savedEvents.find(function(e){ return e.id === id; });
   if (!ev) return;
-  isNewEvent  = false;
-  isEditMode  = false;
+  isNewEvent = false;
+  isEditMode = false;
+  savedEditSnapshot = null;
   currentEvent = JSON.parse(JSON.stringify(ev));
-  if (!currentEvent.status) currentEvent.status = 'open';
   populateEventForm();
   showScreen('event');
   switchEventTab('details');
   setEventEditMode(false);
+  updateEventTopbar();
 }
 function updateEventTopbar() {
+  var back = document.getElementById('topbar-back');
+  var btn = document.getElementById('topbar-btn');
   if (isNewEvent) {
     setTopbar('New Event', '← Home', 'Create Event', 'saveEvent');
-    document.getElementById('topbar-back').setAttribute('data-back','goHome');
-    var btn=document.getElementById('topbar-btn');
-    if(btn) btn.className='btn-top btn-green';
+    if(back) back.setAttribute('data-back','goHome');
+    if(btn) btn.className = 'btn-top btn-green';
+  } else if (isEditMode) {
+    setTopbar('Edit Event', '← Cancel', 'Save', 'saveEvent');
+    if(back) back.setAttribute('data-back','cancelEdit');
+    if(btn) btn.className = 'btn-top btn-green';
   } else {
-    setTopbar('Event Details', '← Home', null, null);
-    document.getElementById('topbar-back').setAttribute('data-back','goHome');
+    setTopbar('Event Details', '← Home', 'Edit', 'startEditMode');
+    if(back) back.setAttribute('data-back','goHome');
+    if(btn) btn.className = 'btn-top btn-navy';
   }
 }
 function enterEditMode() {
@@ -1263,12 +1269,43 @@ function enterEditMode() {
   // Status does NOT change on Edit — only changes on Save
 }
 function setEventEditMode(editable) {
-  var invoiceIds=['f-invoice-original','f-invoice-upgrade','f-invoice-deposit','f-invoice-paid'];
-  invoiceIds.forEach(function(id){var el=document.getElementById(id);if(el)el.setAttribute('disabled','true');});
-  var sb=document.getElementById('btn-save-invoice'),eb=document.getElementById('btn-edit-invoice');
-  if(sb)sb.style.display='none'; if(eb)eb.style.display='inline-block';
-  ['f-venue','f-address'].forEach(function(id){var el=document.getElementById(id);if(el){el.setAttribute('disabled','true');el.style.background='#f3f4f8';el.style.color='#888';}});
-  document.querySelectorAll('.member-tag-del').forEach(function(b){b.style.display='block';});
+  isEditMode = editable;
+  var fields = document.querySelectorAll('#tab-details-content input:not(#f-venue):not(#f-address), #tab-details-content textarea, #tab-details-content select');
+  fields.forEach(function(el) {
+    if (editable) {
+      el.removeAttribute('disabled');
+      el.style.background = '';
+      el.style.color = '';
+      el.style.opacity = '1';
+    } else {
+      el.setAttribute('disabled', 'true');
+      el.style.background = '#f3f4f8';
+      el.style.color = '#888';
+    }
+  });
+  // Invoice always has its own lock
+  ['f-invoice-original','f-invoice-upgrade','f-invoice-deposit','f-invoice-paid'].forEach(function(id){
+    var el=document.getElementById(id); if(!el)return;
+    el.setAttribute('disabled','true');
+    el.style.background='#f3f4f8'; el.style.color='#888';
+  });
+  var sb=document.getElementById('btn-save-invoice'), eb=document.getElementById('btn-edit-invoice');
+  if(sb) sb.style.display='none';
+  if(eb) eb.style.display='inline-block';
+  // Venue readonly
+  ['f-venue','f-address'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el){el.setAttribute('disabled','true');el.style.background='#f3f4f8';el.style.color='#888';}
+  });
+  // Band/singer del buttons always visible
+  document.querySelectorAll('.member-tag-del').forEach(function(b){b.style.display=editable?'block':'none';});
+  document.querySelectorAll('.btn-add-member').forEach(function(b){b.style.display=editable?'flex':'none';});
+  // req dropdowns always editable when in edit mode
+  ['f-req-band','f-req-singers'].forEach(function(id){
+    var el=document.getElementById(id); if(!el)return;
+    if(editable){el.removeAttribute('disabled');el.style.background='';el.style.color='';}
+    else{el.setAttribute('disabled','true');el.style.background='#f3f4f8';el.style.color='#888';}
+  });
 }
 function saveCurrentEvent() {
   if (!validateEvent()) { toast('Please fill in all required fields', true); return; }
@@ -2487,51 +2524,89 @@ function openInvoicePDF(id){
 function renderInvoicePopup(ev){
   var el=document.getElementById('preview-popup-content');
   if(!el)return;
+  if(!ev){el.innerHTML='<p style="color:#888;text-align:center;padding:20px;">No event loaded.</p>';return;}
   var cust=ev.customerName||'', date=fmtDate(ev.date||''), venue=ev.venueName||'';
   var evType=(ev.type==='Other'?ev.typeCustom:ev.type)||'';
   var addr=[ev.addrStreet,ev.addrCity,(ev.addrState&&ev.addrZip?ev.addrState+' '+ev.addrZip:ev.addrState||ev.addrZip)].filter(Boolean).join(', ')||ev.venueAddress||'';
   var orig=parseFloat(ev.invoiceOriginal||0), upgrade=parseFloat(ev.invoiceUpgrade||0);
   var total=orig+upgrade, deposit=parseFloat(ev.invoiceDeposit||0), paid=parseFloat(ev.invoicePaid||0), bal=Math.max(0,total-paid);
   var status=ev.invoiceStatus||'na';
-  var sL={na:'N/A',unpaid:'UNPAID',partial:'PARTIALLY PAID',paid:'PAID IN FULL'};
-  var sC={na:'#888',unpaid:'#d93025',partial:'#3347a0',paid:'#1e7a50'};
-  var invNum='INV-'+(ev.date||'').replace(/-/g,'').slice(2)+'-'+String(ev.id).slice(-4).toUpperCase();
-  el.innerHTML=
-    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #eee;">'+
-    '<img src="images/logo.png" style="height:50px;" onerror="this.onerror=null">'+
-    '<div style="text-align:right;font-size:11px;font-family:Lato,sans-serif;color:#555;">'+
-    '<strong style="color:#1a5fa8;font-size:13px;display:block;">SK Music Production Inc</strong>'+
-    '845-445-6100<br>Info@Sheakallerband.com</div></div>'+
-    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid #1a1d2e;">'+
-    '<div><div style="font-size:22px;font-weight:900;color:#1a1d2e;font-family:Lato,sans-serif;">INVOICE</div>'+
-    '<div style="font-size:11px;color:#888;">'+esc(invNum)+'</div></div>'+
-    '<div style="background:'+(sC[status]||'#888')+';color:#fff;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:900;font-family:Lato,sans-serif;">'+(sL[status]||'N/A')+'</div></div>'+
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;font-family:Lato,sans-serif;">'+
-    '<div><div style="font-size:9px;font-weight:700;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;">Bill To</div>'+
-    '<div style="font-size:13px;font-weight:700;color:#1a1d2e;">'+(cust?esc(cust):'&mdash;')+'</div>'+
-    (ev.customerEmail?'<div style="font-size:11px;color:#888;">'+esc(ev.customerEmail)+'</div>':'')+
-    (ev.customerPhone?'<div style="font-size:11px;color:#888;">'+esc(ev.customerPhone)+'</div>':'')+
-    '</div><div><div style="font-size:9px;font-weight:700;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;">Event Details</div>'+
-    '<div style="font-size:12px;"><strong>Date:</strong> '+esc(date||'&mdash;')+'</div>'+
-    '<div style="font-size:12px;"><strong>Type:</strong> '+esc(evType||'&mdash;')+'</div>'+
-    '<div style="font-size:12px;"><strong>Venue:</strong> '+esc(venue||'&mdash;')+(addr?' &ndash; '+esc(addr):'')+'</div>'+
-    '</div></div>'+
-    '<div style="border-top:1px solid #eee;border-bottom:1px solid #eee;padding:8px 0;margin-bottom:12px;font-family:Lato,sans-serif;">'+
-    '<div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:#888;padding:4px 0;border-bottom:1px solid #f0f0f0;">'+
-    '<span>DESCRIPTION</span><span>AMOUNT</span></div>'+
-    '<div style="display:flex;justify-content:space-between;padding:8px 0;font-size:13px;">'+
-    '<span>Event Performance &mdash; SK Music Production Inc'+(upgrade>0?' (incl. $'+upgrade.toFixed(2)+' upgrades)':'')+'</span>'+
-    '<span style="font-weight:700;">$'+total.toFixed(2)+'</span></div></div>'+
-    '<div style="margin-left:auto;max-width:220px;font-family:Lato,sans-serif;">'+
-    (orig>0&&upgrade>0?'<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-bottom:1px solid #eee;"><span style="color:#888;">Original</span><span>$'+orig.toFixed(2)+'</span></div>':'')+
-    (upgrade>0?'<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-bottom:1px solid #eee;"><span style="color:#888;">Upgrade</span><span>$'+upgrade.toFixed(2)+'</span></div>':'')+
-    '<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-bottom:1px solid #eee;"><span style="color:#888;">Total</span><span style="font-weight:700;">$'+total.toFixed(2)+'</span></div>'+
-    (deposit>0?'<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-bottom:1px solid #eee;"><span style="color:#888;">Req. Deposit</span><span>$'+deposit.toFixed(2)+'</span></div>':'')+
-    (paid>0?'<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-bottom:1px solid #eee;"><span style="color:#888;">Paid</span><span style="color:#2eaa7a;font-weight:700;">&minus;$'+paid.toFixed(2)+'</span></div>':'')+
-    '<div style="display:flex;justify-content:space-between;padding:8px 0;font-size:16px;font-weight:900;border-top:2px solid #1a1d2e;">'+
-    '<span>Balance Due</span><span style="color:'+(bal<=0?'#2eaa7a':'#d93025')+';">$'+bal.toFixed(2)+'</span></div></div>'+
-    '<div style="margin-top:16px;padding-top:10px;border-top:1px solid #eee;font-size:10px;color:#aaa;font-family:Lato,sans-serif;text-align:center;">'+
-    'Thank you! Please make checks payable to SK Music Production Inc.<br>845-445-6100 · Info@Sheakallerband.com</div>';
+  var sLabel={na:'N/A',unpaid:'UNPAID',partial:'PARTIALLY PAID',paid:'PAID IN FULL'};
+  var sColor={na:'#888',unpaid:'#d93025',partial:'#3347a0',paid:'#1e7a50'};
+  var sBg={na:'#f5f5f5',unpaid:'#fff0f0',partial:'#e8f0fe',paid:'#e8f7f1'};
+  var invNum='INV-'+(ev.date||'').replace(/-/g,'').slice(2)+'-'+String(ev.id||'0000').slice(-4).toUpperCase();
+
+  var row=function(label,val,bold,color){
+    return '<tr>'+
+      '<td style="padding:9px 14px;font-size:13px;color:#666;border-bottom:1px solid #f0f0f0;white-space:nowrap;">'+label+'</td>'+
+      '<td style="padding:9px 14px;font-size:13px;font-weight:'+(bold?'800':'500')+';color:'+(color||'#1a1d2e')+';border-bottom:1px solid #f0f0f0;text-align:right;">'+val+'</td>'+
+    '</tr>';
+  };
+
+  el.innerHTML =
+    // Header
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:14px;border-bottom:2px solid #1a1d2e;">' +
+      '<img src="images/logo.png" style="height:56px;" onerror="this.onerror=null">' +
+      '<div style="text-align:right;font-family:Lato,sans-serif;">' +
+        '<div style="color:#1a1d2e;font-size:14px;font-weight:900;">SK Music Production Inc</div>' +
+        '<div style="color:#666;font-size:11px;margin-top:2px;">845-445-6100</div>' +
+        '<div style="color:#666;font-size:11px;">Info@Sheakallerband.com</div>' +
+      '</div>' +
+    '</div>' +
+    // Invoice title + status badge
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">' +
+      '<div>' +
+        '<div style="font-size:28px;font-weight:900;color:#1a1d2e;font-family:Lato,sans-serif;line-height:1;">INVOICE</div>' +
+        '<div style="font-size:11px;color:#aaa;margin-top:4px;font-family:Lato,sans-serif;">'+esc(invNum)+'</div>' +
+      '</div>' +
+      '<div style="background:'+sBg[status]+';color:'+sColor[status]+';border:1.5px solid '+sColor[status]+';padding:6px 14px;border-radius:20px;font-size:11px;font-weight:900;font-family:Lato,sans-serif;letter-spacing:.05em;">'+(sLabel[status]||'N/A')+'</div>' +
+    '</div>' +
+    // Bill To + Event Info
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">' +
+      '<div style="background:#f8f9fc;border-radius:8px;padding:12px;">' +
+        '<div style="font-size:9px;font-weight:800;color:#aaa;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;font-family:Lato,sans-serif;">Bill To</div>' +
+        '<div style="font-size:14px;font-weight:800;color:#1a1d2e;font-family:Lato,sans-serif;">'+(cust?esc(cust):'<span style="color:#ccc;">N/A</span>')+'</div>' +
+        (ev.customerEmail?'<div style="font-size:11px;color:#888;margin-top:3px;font-family:Lato,sans-serif;">'+esc(ev.customerEmail)+'</div>':'')+
+        (ev.customerPhone?'<div style="font-size:11px;color:#888;font-family:Lato,sans-serif;">'+esc(ev.customerPhone)+'</div>':'')+
+      '</div>' +
+      '<div style="background:#f8f9fc;border-radius:8px;padding:12px;">' +
+        '<div style="font-size:9px;font-weight:800;color:#aaa;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;font-family:Lato,sans-serif;">Event</div>' +
+        '<div style="font-size:12px;font-family:Lato,sans-serif;color:#1a1d2e;font-weight:700;">'+esc(date||'&mdash;')+'</div>' +
+        (evType?'<div style="font-size:11px;color:#888;margin-top:2px;font-family:Lato,sans-serif;">'+esc(evType)+'</div>':'')+
+        (venue?'<div style="font-size:11px;color:#888;font-family:Lato,sans-serif;">'+esc(venue)+'</div>':'')+
+        (addr?'<div style="font-size:10px;color:#aaa;font-family:Lato,sans-serif;">'+esc(addr)+'</div>':'')+
+      '</div>' +
+    '</div>' +
+    // Line items table
+    '<div style="border:1px solid #e8e8e8;border-radius:8px;overflow:hidden;margin-bottom:16px;">' +
+      '<div style="background:#1a1d2e;padding:10px 14px;display:flex;justify-content:space-between;">' +
+        '<span style="color:#fff;font-size:11px;font-weight:700;font-family:Lato,sans-serif;letter-spacing:.05em;">DESCRIPTION</span>' +
+        '<span style="color:#fff;font-size:11px;font-weight:700;font-family:Lato,sans-serif;letter-spacing:.05em;">AMOUNT</span>' +
+      '</div>' +
+      '<div style="padding:12px 14px;display:flex;justify-content:space-between;border-bottom:1px solid #f0f0f0;">' +
+        '<span style="font-size:13px;color:#1a1d2e;font-family:Lato,sans-serif;">Event Performance &mdash; SK Music Production Inc'+(upgrade>0?' <span style="font-size:11px;color:#888;">(incl. $'+upgrade.toFixed(2)+' upgrade)</span>':'')+'</span>' +
+        '<span style="font-size:13px;font-weight:800;color:#1a1d2e;font-family:Lato,sans-serif;white-space:nowrap;padding-left:10px;">$'+total.toFixed(2)+'</span>' +
+      '</div>' +
+    '</div>' +
+    // Totals
+    '<div style="margin-left:auto;max-width:260px;">' +
+      '<table style="width:100%;border-collapse:collapse;font-family:Lato,sans-serif;">' +
+        (orig>0&&upgrade>0?row('Original Price','$'+orig.toFixed(2)):'')+
+        (upgrade>0?row('Upgrade / Additional','$'+upgrade.toFixed(2)):'')+
+        row('Total','$'+total.toFixed(2),true)+
+        (deposit>0?row('Required Deposit','$'+deposit.toFixed(2)):'')+
+        (paid>0?row('Amount Paid','&minus; $'+paid.toFixed(2),false,'#1e7a50'):'')+
+      '</table>' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:'+(bal<=0?'#e8f7f1':'#fff0f0')+';border-radius:8px;margin-top:6px;">' +
+        '<span style="font-size:15px;font-weight:900;color:#1a1d2e;font-family:Lato,sans-serif;">Balance Due</span>' +
+        '<span style="font-size:22px;font-weight:900;color:'+(bal<=0?'#1e7a50':'#d93025')+';font-family:Lato,sans-serif;">$'+bal.toFixed(2)+'</span>' +
+      '</div>' +
+    '</div>' +
+    // Footer
+    '<div style="margin-top:20px;padding-top:12px;border-top:1px solid #eee;font-size:10px;color:#bbb;font-family:Lato,sans-serif;text-align:center;">'+
+      'Thank you for your business! Please make checks payable to SK Music Production Inc.<br>845-445-6100 &bull; Info@Sheakallerband.com'+
+    '</div>' +
+    '<div style="text-align:center;margin-top:12px;opacity:0.07;"><img src="images/logo.png" style="height:70px;" onerror="this.onerror=null"></div>';
 }
 function renderInvoicePreview(ev){
   var dp=document.getElementById('doc-preview');if(!dp)return;
@@ -2920,6 +2995,22 @@ function renderPreviewPopup() {
     (choir&&choir.length?section('GROUPS / CHOIRS','<table style="width:100%;border-collapse:collapse;font-size:12px;">'+choir.map(function(m){return '<tr><td style="padding:5px 10px;border-bottom:1px solid #f5f5f5;font-weight:600;">'+esc(m.name)+(m.count?' &ndash; '+esc(m.count)+' members':'')+'</td></tr>';}).join('')+'</table>'):'') +
     (ev.notes?'<div style="margin-top:10px;padding:10px 12px;background:#fffbea;border-radius:6px;font-size:12px;font-family:Lato,sans-serif;border-left:3px solid #f5a623;color:#555;">'+esc(ev.notes)+'</div>':'') +
     '<div style="text-align:center;margin-top:16px;opacity:0.08;"><img src="images/logo.png" style="height:70px;" onerror="this.onerror=null"></div>';
+}
+function startEditMode() {
+  if(!currentEvent) return;
+  isEditMode = true;
+  savedEditSnapshot = JSON.stringify(currentEvent);
+  setEventEditMode(true);
+  updateEventTopbar();
+}
+function cancelEdit() {
+  if(savedEditSnapshot) {
+    currentEvent = JSON.parse(savedEditSnapshot);
+    populateEventForm();
+  }
+  isEditMode = false;
+  setEventEditMode(false);
+  updateEventTopbar();
 }
 window.addEventListener('DOMContentLoaded', function() {
   loadAll();
