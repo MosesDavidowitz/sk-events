@@ -484,7 +484,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   z-index:50;
   border-top:1px solid rgba(255,255,255,.08);
 ">
-  A Davidowitz Project &copy; 2026 - v15.1</div>
+  A Davidowitz Project &copy; 2026 - v15.2</div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
 
@@ -2455,6 +2455,8 @@ function closeEventOptions(){document.getElementById('event-options-popup').clas
 function openInvoicePDF(id){
   var ev=savedEvents.find(function(e){return e.id===id;});
   if(!ev)return;
+  // Make sure currentEvent is set so email functions work
+  currentEvent=JSON.parse(JSON.stringify(ev));
   var t=document.getElementById('preview-popup-title');
   if(t) t.textContent='Invoice';
   var eb=document.getElementById('preview-email-btn');
@@ -2901,35 +2903,50 @@ function renderPreviewPopup() {
   var scR=fmtTime(ev.scRhythm||''), scRS=fmtTime(ev.scRhythmSmorg||''), scH=fmtTime(ev.scHorns||'');
   var scS=fmtTime(ev.scStrings||''), kpS=fmtTime(ev.kpStart||''), kpN=ev.kpNote||'', chu=fmtTime(ev.chuppah||'');
   var hasSchedule = scR||scRS||scH||scS;
-  var row = function(label,val){return val?'<tr><td style="padding:6px 10px;font-weight:700;color:#444;white-space:nowrap;width:40%;border-bottom:1px solid #f5f5f5;">'+label+'</td><td style="padding:6px 10px;border-bottom:1px solid #f5f5f5;color:#222;">'+val+'</td></tr>':'';};
-  var bandRows = band.length ? band.map(function(m){return '<tr><td style="padding:5px 10px;border-bottom:1px solid #f5f5f5;color:#555;white-space:nowrap;">'+(m.role?m.role:'&mdash;')+'</td><td style="padding:5px 10px;border-bottom:1px solid #f5f5f5;font-weight:600;">'+esc(m.name)+'</td></tr>';}).join('') : '<tr><td colspan="2" style="padding:8px 10px;color:#aaa;font-style:italic;">No band members added</td></tr>';
-  var singerRows = singers.length ? singers.map(function(m){return '<tr><td colspan="2" style="padding:5px 10px;border-bottom:1px solid #f5f5f5;font-weight:600;">'+esc(m.name)+'</td></tr>';}).join('') : '<tr><td colspan="2" style="padding:8px 10px;color:#aaa;font-style:italic;">No singers added</td></tr>';
-  var section = function(title,content){return '<div style="margin-bottom:14px;"><div style="background:#1a1d2e;color:#fff;padding:7px 12px;border-radius:6px 6px 0 0;font-size:12px;font-weight:700;letter-spacing:.05em;font-family:Lato,sans-serif;">'+title+'</div><div style="border:1px solid #e8e8e8;border-top:none;border-radius:0 0 6px 6px;overflow:hidden;">'+content+'</div></div>';};
+  var row = function(label,val){return val?'<tr><td style="padding:8px 14px;font-weight:700;color:#333;white-space:nowrap;width:38%;border-bottom:1px solid #f0f0f0;font-family:Lato,sans-serif;font-size:13px;">'+label+'</td><td style="padding:8px 14px;border-bottom:1px solid #f0f0f0;color:#222;font-family:Lato,sans-serif;font-size:13px;">'+val+'</td></tr>':'';};
+  var bandRows = band.length ? band.map(function(m){return '<tr><td style="padding:6px 14px;border-bottom:1px solid #f0f0f0;color:#666;font-size:12px;font-family:Lato,sans-serif;white-space:nowrap;">'+(m.role||'&mdash;')+'</td><td style="padding:6px 14px;border-bottom:1px solid #f0f0f0;font-weight:700;font-size:13px;font-family:Lato,sans-serif;">'+esc(m.name)+'</td></tr>';}).join('') : '<tr><td colspan="2" style="padding:8px 14px;color:#aaa;font-style:italic;font-family:Lato,sans-serif;">No band members added</td></tr>';
+  var singerRows = singers.length ? singers.map(function(m){return '<tr><td colspan="2" style="padding:6px 14px;border-bottom:1px solid #f0f0f0;font-weight:700;font-size:13px;font-family:Lato,sans-serif;">'+esc(m.name)+'</td></tr>';}).join('') : '<tr><td colspan="2" style="padding:8px 14px;color:#aaa;font-style:italic;font-family:Lato,sans-serif;">No singers added</td></tr>';
+  var section = function(title,content){return '<div style="margin-bottom:14px;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08);"><div style="background:#1a1d2e;color:#fff;padding:8px 14px;font-size:11px;font-weight:800;letter-spacing:.08em;font-family:Lato,sans-serif;">'+title+'</div><div style="background:#fff;">'+content+'</div></div>';};
   el.innerHTML =
-    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:12px;border-bottom:2px solid #1a1d2e;">' +
-      '<img src="images/logo.png" style="height:56px;" onerror="this.onerror=null">' +
-      '<div style="text-align:right;font-family:Lato,sans-serif;">' +
-        '<div style="color:#1a1d2e;font-size:14px;font-weight:900;">SK Music Production Inc</div>' +
-        '<div style="color:#666;font-size:11px;margin-top:2px;">845-445-6100</div>' +
+    // Watermark logo - behind everything
+    '<div style="position:relative;">' +
+    '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:70%;opacity:0.04;pointer-events:none;z-index:0;">' +
+      '<img src="images/logo.png" style="width:100%;" onerror="this.onerror=null">' +
+    '</div>' +
+    '<div style="position:relative;z-index:1;">' +
+    // Header with bigger logo, partial divider line
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">' +
+      '<img src="images/logo.png" style="height:80px;width:auto;" onerror="this.onerror=null">' +
+      '<div style="text-align:right;font-family:Lato,sans-serif;padding-top:6px;">' +
+        '<div style="color:#1a1d2e;font-size:15px;font-weight:900;">SK Music Production Inc</div>' +
+        '<div style="color:#666;font-size:11px;margin-top:3px;">845-445-6100</div>' +
         '<div style="color:#666;font-size:11px;">Info@Sheakallerband.com</div>' +
       '</div>' +
     '</div>' +
-    '<div style="text-align:center;margin-bottom:14px;">' +
-      '<div style="font-size:18px;font-weight:900;color:#1a1d2e;font-family:Lato,sans-serif;">'+esc(date||'No Date')+'</div>' +
-      '<div style="font-size:13px;color:#666;font-family:Lato,sans-serif;margin-top:2px;">'+esc(type)+(venue?' &bull; '+esc(venue):'')+'</div>' +
+    // Partial divider line (only right 70% of width)
+    '<div style="display:flex;margin-bottom:16px;">' +
+      '<div style="flex:0 0 30%;"></div>' +
+      '<div style="flex:1;border-top:2px solid #1a1d2e;"></div>' +
+    '</div>' +
+    // Date + event info centered
+    '<div style="text-align:center;margin-bottom:16px;">' +
+      '<div style="font-size:20px;font-weight:900;color:#1a1d2e;font-family:Lato,sans-serif;">'+esc(date||'No Date')+'</div>' +
+      '<div style="font-size:13px;color:#666;font-family:Lato,sans-serif;margin-top:3px;">'+esc(type)+(venue?' &bull; '+esc(venue):'')+'</div>' +
       (addr?'<div style="font-size:11px;color:#999;font-family:Lato,sans-serif;margin-top:2px;">'+esc(addr)+'</div>':'') +
     '</div>' +
-    '<table style="width:100%;border-collapse:collapse;font-family:Lato,sans-serif;font-size:13px;margin-bottom:14px;border:1px solid #e8e8e8;border-radius:6px;overflow:hidden;">' +
+    // Schedule table
+    '<table style="width:100%;border-collapse:collapse;margin-bottom:16px;border:1px solid #e8e8e8;border-radius:8px;overflow:hidden;">' +
       (hasSchedule?row('SC Rhythm (Main)',scR)+row('SC Rhythm (Smorg)',scRS)+row('SC Horns/Strings',scH)+row('SC Strings Lobby',scS):'') +
       row('KP Start', kpS+(kpN?' <span style="color:#888;font-size:11px;">('+esc(kpN)+')</span>':'')) +
       row('Chuppah / Main Event', chu) +
       (ev.dresscode?row('Dress Code',esc(ev.dresscode)):'') +
     '</table>' +
-    section('BAND MEMBERS','<table style="width:100%;border-collapse:collapse;font-size:12px;">'+bandRows+'</table>') +
-    section('SINGERS','<table style="width:100%;border-collapse:collapse;font-size:12px;">'+singerRows+'</table>') +
-    (choir&&choir.length?section('GROUPS / CHOIRS','<table style="width:100%;border-collapse:collapse;font-size:12px;">'+choir.map(function(m){return '<tr><td style="padding:5px 10px;border-bottom:1px solid #f5f5f5;font-weight:600;">'+esc(m.name)+(m.count?' &ndash; '+esc(m.count)+' members':'')+'</td></tr>';}).join('')+'</table>'):'') +
-    (ev.notes?'<div style="margin-top:10px;padding:10px 12px;background:#fffbea;border-radius:6px;font-size:12px;font-family:Lato,sans-serif;border-left:3px solid #f5a623;color:#555;">'+esc(ev.notes)+'</div>':'') +
-    '<div style="text-align:center;margin-top:16px;opacity:0.08;"><img src="images/logo.png" style="height:70px;" onerror="this.onerror=null"></div>';
+    // Band + Singers sections
+    section('BAND MEMBERS','<table style="width:100%;border-collapse:collapse;">'+bandRows+'</table>') +
+    section('SINGERS','<table style="width:100%;border-collapse:collapse;">'+singerRows+'</table>') +
+    (choir&&choir.length?section('GROUPS / CHOIRS','<table style="width:100%;border-collapse:collapse;">'+choir.map(function(m){return '<tr><td style="padding:6px 14px;border-bottom:1px solid #f0f0f0;font-weight:700;font-family:Lato,sans-serif;">'+esc(m.name)+(m.count?' &ndash; '+esc(m.count)+' members':'')+'</td></tr>';}).join('')+'</table>'):'') +
+    (ev.notes?'<div style="margin-top:10px;padding:10px 14px;background:#fffbea;border-radius:6px;font-size:12px;font-family:Lato,sans-serif;border-left:3px solid #f5a623;color:#555;">'+esc(ev.notes)+'</div>':'') +
+    '</div></div>';
 }
 function startEditMode() {
   if(!currentEvent) return;
