@@ -79,7 +79,7 @@ SCREENS
 .screen.active{display:flex;flex-direction:column;}
 #screen-home.active{display:flex;flex-direction:column;overflow:hidden;}
 #screen-settings.active,
-.scroll-area{flex:1;overflow-y:auto;padding:16px 14px 80px;-webkit-overflow-scrolling:touch;}
+.scroll-area{flex:1;overflow-y:auto;padding:16px 14px 80px;-webkit-overflow-scrolling:touch;text-align:left;}
 
 /* ═══════════════════════════════════════════
 HOME SCREEN
@@ -125,11 +125,11 @@ display:flex;align-items:center;gap:12px;
 /* ═══════════════════════════════════════════
 CARDS & FORMS
 ═══════════════════════════════════════════ */
-.card{background:#fff;border:1px solid var(–border);border-radius:14px;padding:16px 14px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
-.card-title{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(–accent);text-transform:uppercase;margin-bottom:14px;}
+.card{background:#fff;border:1px solid var(–border);border-radius:14px;padding:16px 14px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.05);;text-align:left;}
+.card-title{text-align:left;font-size:11px;font-weight:700;letter-spacing:.1em;color:var(–accent);text-transform:uppercase;margin-bottom:14px;}
 .field{margin-bottom:13px;position:relative;}
 .field:last-child{margin-bottom:0;}
-label{display:block;font-size:12px;color:var(–muted);font-weight:700;letter-spacing:.04em;margin-bottom:5px;}
+label{display:block;font-size:12px;color:var(–muted);font-weight:700;letter-spacing:.04em;margin-bottom:5px;text-align:left;}
 .req-label::after{content:” *”;color:var(–danger);font-weight:700;font-size:14px;}
 input[type=text],input[type=email],input[type=date],textarea,select{
 width:100%;background:var(–inp);color:var(–text);
@@ -182,8 +182,8 @@ display:flex;align-items:center;gap:8px;
 background:#f0f4ff;border:1px solid #c8d0f0;border-radius:10px;
 padding:10px 12px;
 }
-.member-tag-info{flex:1;}
-.member-tag-name{font-size:14px;font-weight:700;color:var(–text);}
+.member-tag-info{flex:1;text-align:left;}
+.member-tag-name{font-size:14px;font-weight:700;color:var(–text);text-align:left;}
 .member-tag-role{font-size:11px;color:var(–muted);margin-top:2px;}
 .member-tag-del{background:none;border:none;color:var(–danger);font-size:20px;cursor:pointer;padding:0 2px;-webkit-tap-highlight-color:transparent;}
 
@@ -485,7 +485,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   border-top:1px solid rgba(255,255,255,.08);
 ">
   A Davidowitz Project &copy; 2026 - v13.3
- - v14.7</div>
+ - v14.9</div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
 
@@ -1983,104 +1983,47 @@ function scalePreview() {
 window.addEventListener('resize',scalePreview);
 
 function doSaveAsPDF() {
-  renderPreview();
   var btn = document.getElementById('btn-print-main');
-  var origText = btn.innerHTML;
-  btn.innerHTML = '&#9203; Generating PDF...';
-  btn.disabled = true;
-
-  setTimeout(function() {
-    var wrapper = document.getElementById('preview-popup-content') || document.getElementById('pwrapper');
-    if (!wrapper) { btn.innerHTML = origText; btn.disabled = false; return; }
-
-    // Temporarily make wrapper full-size for capture
-    var origTransform = wrapper.style.transform;
-    var origWidth     = wrapper.style.width;
-    wrapper.style.transform = 'none';
-    wrapper.style.width     = '750px';
-
-    html2canvas(wrapper, {
-      scale: 2,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#ffffff',
-      logging: false,
-      imageTimeout: 15000,
-      onclone: function(doc) {
-        var el = doc.getElementById('pwrapper');
-        if (el) { el.style.transform = 'none'; el.style.width = '750px'; }
-      }
-    }).then(function(canvas) {
-      // Restore wrapper
-      wrapper.style.transform = origTransform;
-      wrapper.style.width     = origWidth;
-
-      var imgData = canvas.toDataURL('image/jpeg', 0.95);
-      var pdf     = new jspdf.jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-
-      var pageW = 210; // A4 width mm
-      var pageH = 297; // A4 height mm
-      var margin = 10;
-      var usableW = pageW - margin * 2;
-
-      // Scale image to fit width
-      var imgW = canvas.width;
-      var imgH = canvas.height;
-      var ratio = usableW / (imgW / (canvas.width / usableW));
-      var pdfW  = usableW;
-      var pdfH  = (imgH / imgW) * pdfW;
-
-      // If taller than one page, scale down to fit
-      var usableH = pageH - margin * 2;
-      if (pdfH > usableH) {
-        var scale = usableH / pdfH;
-        pdfW = pdfW * scale;
-        pdfH = pdfH * scale;
-      }
-
-      // Center on page
-      var x = (pageW - pdfW) / 2;
-      var y = margin;
-
-      pdf.addImage(imgData, 'JPEG', x, y, pdfW, pdfH);
-
-      // Build filename from event data
-      var ev = currentEvent || {};
-      var filename = (fmtDate(ev.date||'') || 'Event') + ' - Event Details.pdf';
-
-      // iOS Safari fix: use blob URL with anchor click
-      var pdfBlob = pdf.output('blob');
-      var blobUrl = URL.createObjectURL(pdfBlob);
-      var a = document.createElement('a');
-      a.href = blobUrl;
-      a.download = filename;
-      a.target = '_blank'; // fallback for browsers that don't support download attr
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(function() {
-        document.body.removeChild(a);
-        URL.revokeObjectURL(blobUrl);
-      }, 1000);
-
-      btn.innerHTML = origText;
-      btn.disabled  = false;
-
-    }).catch(function(err) {
-      wrapper.style.transform = origTransform;
-      wrapper.style.width     = origWidth;
-      console.error('PDF error:', err);
-      btn.innerHTML = origText;
-      btn.disabled  = false;
-      // Fallback to print if html2canvas fails
-      window.print();
+  if(btn){ var origText = btn.innerHTML; btn.innerHTML='Generating...'; btn.disabled=true; }
+  // Determine what to capture: invoice popup or event preview
+  var popup = document.getElementById('preview-popup');
+  var isPopupOpen = popup && popup.style.display === 'block';
+  var target = isPopupOpen
+    ? document.getElementById('preview-popup-content')
+    : document.getElementById('pwrapper');
+  if(!target){if(btn){btn.innerHTML=origText;btn.disabled=false;}return;}
+  var origW = target.style.width, origT = target.style.transform;
+  target.style.width = '750px';
+  target.style.transform = 'none';
+  setTimeout(function(){
+    html2canvas(target, {scale:2, useCORS:true, allowTaint:true, backgroundColor:'#ffffff', logging:false}).then(function(canvas){
+      try {
+        var imgData = canvas.toDataURL('image/jpeg', 0.95);
+        var pdf = new jspdf.jsPDF({orientation:'portrait', unit:'pt', format:'a4'});
+        var pageW = pdf.internal.pageSize.getWidth();
+        var pageH = pdf.internal.pageSize.getHeight();
+        var ratio = canvas.height / canvas.width;
+        var imgH = pageW * ratio;
+        var y = 0;
+        while(y < imgH){
+          if(y > 0) pdf.addPage();
+          pdf.addImage(imgData, 'JPEG', 0, -y, pageW, imgH);
+          y += pageH;
+        }
+        var ev = currentEvent;
+        var fname = (ev&&ev.date?ev.date:'event') + (isPopupOpen?'-invoice':'-preview') + '.pdf';
+        pdf.save(fname);
+      } catch(err){ alert('PDF error: '+err.message); }
+      target.style.width = origW;
+      target.style.transform = origT;
+      if(btn){btn.innerHTML=origText;btn.disabled=false;}
+    }).catch(function(err){
+      target.style.width=origW; target.style.transform=origT;
+      if(btn){btn.innerHTML=origText;btn.disabled=false;}
+      alert('Could not generate PDF: '+err.message);
     });
-  }, 300);
+  }, 100);
 }
-
 function renderPreview() {
   var ev = currentEvent;
   var dp = document.getElementById('doc-preview');
