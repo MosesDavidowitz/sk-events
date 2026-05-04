@@ -76,9 +76,9 @@ border-bottom:3px solid transparent;margin-bottom:-1px;
 SCREENS
 ═══════════════════════════════════════════ */
 .screen{display:none;flex:1;min-height:0;}
-.screen.active{display:flex;flex-direction:column;overflow:hidden;}
+.screen.active{display:flex;flex-direction:column;}
 #screen-home.active{display:flex;flex-direction:column;overflow:hidden;}
-#screen-settings.active,#screen-event.active{display:flex;flex-direction:column;overflow:hidden;}
+#screen-settings.active,
 .scroll-area{flex:1;overflow-y:auto;padding:16px 14px 80px;-webkit-overflow-scrolling:touch;}
 
 /* ═══════════════════════════════════════════
@@ -273,7 +273,7 @@ PREVIEW / PDF
 .btn-print{background:#4a5da8;color:#fff;box-shadow:0 3px 10px rgba(74,93,168,.3);}
 .btn-email-crew{background:#2eaa7a;color:#fff;box-shadow:0 3px 10px rgba(46,170,122,.3);}
 .preview-scaler{width:100%;border-radius:4px;box-shadow:0 2px 16px rgba(0,0,0,.12);}
-.preview-wrapper{background:#fff;color:#222;font-family:‘Times New Roman’,Times,serif;width:750px;transform-origin:top left;}
+.preview-wrapper{background:#fff;color:#222;font-family:Georgia,serif;width:100%;}
 .preview-inner{padding:22px 30px;position:relative;min-height:1060px;}
 .prev-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
 .prev-logo img{height:110px;width:auto;object-fit:contain;}
@@ -409,7 +409,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   <div class="home-hero" style="position:relative;">
   <button onclick="openSettings()" title="Settings" style="position:absolute;top:10px;left:10px;z-index:10;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.3);border-radius:50%;width:36px;height:36px;font-size:17px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;" aria-label="Settings">&#9881;</button>
   <button onclick="location.reload()" title="Refresh" style="position:absolute;top:10px;right:10px;z-index:10;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.3);border-radius:50%;width:36px;height:36px;font-size:17px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;" aria-label="Refresh">&#8635;</button>
-    <img src="images/logo-W.png" alt="Shea Kaller" onerror="this.style.display='none'">
+    <img src="images/logo-W.png" alt="Shea Kaller" onerror="this.onerror=null">
     <h1>Event Builder</h1>
     <p>SK Music Production Inc</p>
   </div>
@@ -485,7 +485,7 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   border-top:1px solid rgba(255,255,255,.08);
 ">
   A Davidowitz Project &copy; 2026 - v13.3
-</div>
+ - v14.2</div>
 
 <!-- ═══════════ SETTINGS SCREEN ═══════════ -->
 
@@ -591,10 +591,10 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
 <div class="screen" id="screen-event">
   <div class="tabs tabs-event">
     <button class="tab active" id="tab-details" onclick="switchEventTab('details')">&#9999;&#65038; Details</button>
-    <button class="tab" id="tab-preview" onclick="switchEventTab('preview')">&#128065; Preview</button>
+    <button class="tab" id="tab-preview" onclick="openPreviewPopup()">&#128065; Preview</button>
   </div>
   <!-- Details tab -->
-  <div id="tab-details-content" style="display:block;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 14px 80px;">
+  <div id="tab-details-content" class="scroll-area" style="display:block;">
     <div style="text-align:right;font-size:11px;color:var(--muted);padding:0 2px 6px;"><span style="color:var(--danger);font-weight:700;">*</span> Required fields</div>
     <div id="event-status-bar" style="padding:10px 14px;background:#fff;border-radius:12px;border:1px solid var(--border);margin-bottom:12px;display:flex;align-items:center;gap:10px;">
       <div id="event-status-badge"></div>
@@ -755,12 +755,12 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
 
   <!-- Preview tab -->
 
-  <div id="tab-preview-content" style="display:none;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 14px 40px;">
-    <div class="preview-outer" style="min-height:300px;">
+  <div id="tab-preview-content" class="scroll-area" style="display:none;">
+    <div class="preview-outer" style="min-height:0;width:100%;padding-bottom:40px;">
       <button id="btn-print-main" class="btn-block btn-print" onclick="doSaveAsPDF()">&#11123; Download PDF</button>
       <button id="btn-email-main" class="btn-block btn-email-crew" onclick="emailCrew()">&#9993; Email Crew</button>
-      <div class="preview-scaler" id="pscaler">
-        <div class="preview-wrapper" id="pwrapper" style="min-height:200px;">
+      <div class="preview-scaler" id="pscaler" style="width:100%;background:#fff;border-radius:4px;box-shadow:0 2px 16px rgba(0,0,0,.12);">
+        <div class="preview-wrapper" id="pwrapper" style="width:100%;background:#fff;padding:16px;">
           <div class="preview-inner" id="doc-preview"></div>
         </div>
       </div>
@@ -838,6 +838,20 @@ html,body{background:#fff!important;height:auto!important;overflow:visible!impor
   </div>
 </div>
 </div><!-- /app -->
+<!-- PREVIEW POPUP -->
+<div id="preview-popup" style="display:none;position:fixed;inset:0;z-index:900;background:#f0f2f7;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+  <div style="background:#1a1d2e;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;">
+    <button onclick="closePreviewPopup()" style="background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;padding:8px 14px;font-size:14px;font-weight:700;cursor:pointer;">&#8249; Close</button>
+    <span style="color:#fff;font-weight:700;font-size:15px;">Preview</span>
+    <button onclick="doSaveAsPDF()" style="background:#4a5da8;border:none;color:#fff;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;">&#11123; PDF</button>
+  </div>
+  <div style="padding:12px;">
+    <button onclick="emailCrew()" style="display:block;width:100%;background:#2eaa7a;color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;">&#9993; Email Crew</button>
+    <div id="preview-popup-content" style="background:#fff;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,.1);padding:16px;font-family:Georgia,serif;font-size:13px;line-height:1.6;color:#222;">
+      Loading...
+    </div>
+  </div>
+</div>
 <div id="toast"></div>
 
 <script>
@@ -1235,10 +1249,9 @@ function updateEventTopbar() {
   if (isNewEvent) {
     setTopbar('New Event', '← Home', 'Create Event', 'saveEvent');
     document.getElementById('topbar-back').setAttribute('data-back','goHome');
-    document.getElementById('topbar-btn').className = 'btn-top btn-green';
+    var btn=document.getElementById('topbar-btn');
+    if(btn) btn.className='btn-top btn-green';
   } else {
-    // Show status label only - no edit/save button (cards have their own)
-    var eff = currentEvent ? getEffectiveStatus(currentEvent) : 'open';
     setTopbar('Event Details', '← Home', null, null);
     document.getElementById('topbar-back').setAttribute('data-back','goHome');
   }
@@ -1250,22 +1263,11 @@ function enterEditMode() {
   // Status does NOT change on Edit — only changes on Save
 }
 function setEventEditMode(editable) {
-  // Invoice fields have their own edit button - lock them only
-  var invoiceIds = ['f-invoice-original','f-invoice-upgrade','f-invoice-deposit','f-invoice-paid'];
-  invoiceIds.forEach(function(id){
-    var el=document.getElementById(id);if(!el)return;
-    el.setAttribute('disabled','true');
-    if(el.parentElement) el.parentElement.style.background='var(--inp)';
-  });
-  var sb=document.getElementById('btn-save-invoice'), eb=document.getElementById('btn-edit-invoice');
-  if(sb) sb.style.display='none';
-  if(eb) eb.style.display='inline-block';
-  // Venue readonly fields
-  ['f-venue','f-address'].forEach(function(id){
-    var el=document.getElementById(id);
-    if(el){el.setAttribute('disabled','true');el.style.background='#f3f4f8';el.style.color='#888';}
-  });
-  // Band/singer buttons always visible
+  var invoiceIds=['f-invoice-original','f-invoice-upgrade','f-invoice-deposit','f-invoice-paid'];
+  invoiceIds.forEach(function(id){var el=document.getElementById(id);if(el)el.setAttribute('disabled','true');});
+  var sb=document.getElementById('btn-save-invoice'),eb=document.getElementById('btn-edit-invoice');
+  if(sb)sb.style.display='none'; if(eb)eb.style.display='inline-block';
+  ['f-venue','f-address'].forEach(function(id){var el=document.getElementById(id);if(el){el.setAttribute('disabled','true');el.style.background='#f3f4f8';el.style.color='#888';}});
   document.querySelectorAll('.member-tag-del').forEach(function(b){b.style.display='block';});
 }
 function saveCurrentEvent() {
@@ -1464,17 +1466,11 @@ function populateEventForm() {
 // ═══════════════════════════════════════════════════════════════
 function switchEventTab(name) {
   setTimeout(renderEventStatus, 50);
-  var dc = document.getElementById('tab-details-content');
-  var pc = document.getElementById('tab-preview-content');
-  if (dc) dc.style.display = (name==='details') ? 'block' : 'none';
-  if (pc) pc.style.display = (name==='preview')  ? 'block' : 'none';
-  document.getElementById('tab-details').className = 'tab' + (name==='details' ? ' active' : '');
-  document.getElementById('tab-preview').className = 'tab' + (name==='preview'  ? ' active' : '');
-  if (name === 'preview') {
-    renderPreview();
-    setTimeout(scalePreview, 50);
-    setTimeout(scalePreview, 300);
-  }
+  document.getElementById('tab-details-content').style.display = (name==='details') ? 'block' : 'none';
+  document.getElementById('tab-preview-content').style.display  = (name==='preview')  ? 'block' : 'none';
+  document.getElementById('tab-details').className  = 'tab' + (name==='details' ? ' active' : '');
+  document.getElementById('tab-preview').className  = 'tab' + (name==='preview'  ? ' active' : '');
+  if (name === 'preview') { renderPreview(); }
 }
 function toggleSec(id, el) {
   var b = document.getElementById(id);
@@ -1942,16 +1938,10 @@ function renderContacts() {
 // PREVIEW / PDF
 // ═══════════════════════════════════════════════════════════════
 function scalePreview() {
-  var sc=document.getElementById('pscaler'),wr=document.getElementById('pwrapper');
-  if(!sc||!wr)return;
-  // Always use window width minus padding as the basis
-  var w = window.innerWidth - 28;
-  if(sc.offsetWidth > 0) w = sc.offsetWidth;
-  var scale = w / 750;
-  wr.style.width = '750px';
-  wr.style.transformOrigin = 'top left';
-  wr.style.transform = 'scale(' + scale + ')';
-  sc.style.height = (wr.scrollHeight * scale + 20) + 'px';
+  var wr=document.getElementById('pwrapper');
+  if(wr){wr.style.transform='none';wr.style.width='100%';}
+  var sc=document.getElementById('pscaler');
+  if(sc){sc.style.height='auto';}
 }
 window.addEventListener('resize',scalePreview);
 
@@ -1963,7 +1953,7 @@ function doSaveAsPDF() {
   btn.disabled = true;
 
   setTimeout(function() {
-    var wrapper = document.getElementById('pwrapper');
+    var wrapper = document.getElementById('preview-popup-content') || document.getElementById('pwrapper');
     if (!wrapper) { btn.innerHTML = origText; btn.disabled = false; return; }
 
     // Temporarily make wrapper full-size for capture
@@ -2056,7 +2046,12 @@ function doSaveAsPDF() {
 
 function renderPreview() {
   var ev = currentEvent;
-  if (!ev) return;
+  var dp = document.getElementById('doc-preview');
+  if (!dp) return;
+  if (!ev) {
+    dp.innerHTML = '<div style="padding:20px;background:#fff3cd;color:#856404;font-size:14px;font-weight:700;border-radius:8px;">Open an event first to see preview</div>';
+    return;
+  }
   var date    = fmtDate(ev.date||gv('f-date'));
   var venue   = ev.venueName || gv('f-venue') || '';
   var address = ev.venueAddress || gv('f-address') || '';
@@ -2479,13 +2474,62 @@ function showEventOptions(id,e){
 }
 function closeEventOptions(){document.getElementById('event-options-popup').classList.remove('open');optionsEventId=null;}
 function openInvoicePDF(id){
-  var ev=savedEvents.find(function(e){return e.id===id;});if(!ev)return;
-  isNewEvent=false;isEditMode=false;currentEvent=JSON.parse(JSON.stringify(ev));
-  populateEventForm();showScreen('event');
-  switchEventTab('preview');
-  setTimeout(function(){renderInvoicePreview(currentEvent);},100);
-  setTimeout(scalePreview,200);
-  setTimeout(scalePreview,600);
+  var ev=savedEvents.find(function(e){return e.id===id;});
+  if(!ev)return;
+  isNewEvent=false; isEditMode=false;
+  currentEvent=JSON.parse(JSON.stringify(ev));
+  renderInvoicePopup(currentEvent);
+  document.getElementById('preview-popup').style.display='block';
+  document.body.style.overflow='hidden';
+}
+function renderInvoicePopup(ev){
+  var el=document.getElementById('preview-popup-content');
+  if(!el)return;
+  var cust=ev.customerName||'', date=fmtDate(ev.date||''), venue=ev.venueName||'';
+  var evType=(ev.type==='Other'?ev.typeCustom:ev.type)||'';
+  var addr=[ev.addrStreet,ev.addrCity,(ev.addrState&&ev.addrZip?ev.addrState+' '+ev.addrZip:ev.addrState||ev.addrZip)].filter(Boolean).join(', ')||ev.venueAddress||'';
+  var orig=parseFloat(ev.invoiceOriginal||0), upgrade=parseFloat(ev.invoiceUpgrade||0);
+  var total=orig+upgrade, deposit=parseFloat(ev.invoiceDeposit||0), paid=parseFloat(ev.invoicePaid||0), bal=Math.max(0,total-paid);
+  var status=ev.invoiceStatus||'na';
+  var sL={na:'N/A',unpaid:'UNPAID',partial:'PARTIALLY PAID',paid:'PAID IN FULL'};
+  var sC={na:'#888',unpaid:'#d93025',partial:'#3347a0',paid:'#1e7a50'};
+  var invNum='INV-'+(ev.date||'').replace(/-/g,'').slice(2)+'-'+String(ev.id).slice(-4).toUpperCase();
+  el.innerHTML=
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #eee;">'+
+    '<img src="images/logo.png" style="height:50px;" onerror="this.onerror=null">'+
+    '<div style="text-align:right;font-size:11px;font-family:Lato,sans-serif;color:#555;">'+
+    '<strong style="color:#1a5fa8;font-size:13px;display:block;">SK Music Production Inc</strong>'+
+    '845-445-6100<br>Info@Sheakallerband.com</div></div>'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid #1a1d2e;">'+
+    '<div><div style="font-size:22px;font-weight:900;color:#1a1d2e;font-family:Lato,sans-serif;">INVOICE</div>'+
+    '<div style="font-size:11px;color:#888;">'+esc(invNum)+'</div></div>'+
+    '<div style="background:'+(sC[status]||'#888')+';color:#fff;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:900;font-family:Lato,sans-serif;">'+(sL[status]||'N/A')+'</div></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;font-family:Lato,sans-serif;">'+
+    '<div><div style="font-size:9px;font-weight:700;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;">Bill To</div>'+
+    '<div style="font-size:13px;font-weight:700;color:#1a1d2e;">'+(cust?esc(cust):'&mdash;')+'</div>'+
+    (ev.customerEmail?'<div style="font-size:11px;color:#888;">'+esc(ev.customerEmail)+'</div>':'')+
+    (ev.customerPhone?'<div style="font-size:11px;color:#888;">'+esc(ev.customerPhone)+'</div>':'')+
+    '</div><div><div style="font-size:9px;font-weight:700;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;">Event Details</div>'+
+    '<div style="font-size:12px;"><strong>Date:</strong> '+esc(date||'&mdash;')+'</div>'+
+    '<div style="font-size:12px;"><strong>Type:</strong> '+esc(evType||'&mdash;')+'</div>'+
+    '<div style="font-size:12px;"><strong>Venue:</strong> '+esc(venue||'&mdash;')+(addr?' &ndash; '+esc(addr):'')+'</div>'+
+    '</div></div>'+
+    '<div style="border-top:1px solid #eee;border-bottom:1px solid #eee;padding:8px 0;margin-bottom:12px;font-family:Lato,sans-serif;">'+
+    '<div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:#888;padding:4px 0;border-bottom:1px solid #f0f0f0;">'+
+    '<span>DESCRIPTION</span><span>AMOUNT</span></div>'+
+    '<div style="display:flex;justify-content:space-between;padding:8px 0;font-size:13px;">'+
+    '<span>Event Performance &mdash; SK Music Production Inc'+(upgrade>0?' (incl. $'+upgrade.toFixed(2)+' upgrades)':'')+'</span>'+
+    '<span style="font-weight:700;">$'+total.toFixed(2)+'</span></div></div>'+
+    '<div style="margin-left:auto;max-width:220px;font-family:Lato,sans-serif;">'+
+    (orig>0&&upgrade>0?'<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-bottom:1px solid #eee;"><span style="color:#888;">Original</span><span>$'+orig.toFixed(2)+'</span></div>':'')+
+    (upgrade>0?'<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-bottom:1px solid #eee;"><span style="color:#888;">Upgrade</span><span>$'+upgrade.toFixed(2)+'</span></div>':'')+
+    '<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-bottom:1px solid #eee;"><span style="color:#888;">Total</span><span style="font-weight:700;">$'+total.toFixed(2)+'</span></div>'+
+    (deposit>0?'<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-bottom:1px solid #eee;"><span style="color:#888;">Req. Deposit</span><span>$'+deposit.toFixed(2)+'</span></div>':'')+
+    (paid>0?'<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-bottom:1px solid #eee;"><span style="color:#888;">Paid</span><span style="color:#2eaa7a;font-weight:700;">&minus;$'+paid.toFixed(2)+'</span></div>':'')+
+    '<div style="display:flex;justify-content:space-between;padding:8px 0;font-size:16px;font-weight:900;border-top:2px solid #1a1d2e;">'+
+    '<span>Balance Due</span><span style="color:'+(bal<=0?'#2eaa7a':'#d93025')+';">$'+bal.toFixed(2)+'</span></div></div>'+
+    '<div style="margin-top:16px;padding-top:10px;border-top:1px solid #eee;font-size:10px;color:#aaa;font-family:Lato,sans-serif;text-align:center;">'+
+    'Thank you! Please make checks payable to SK Music Production Inc.<br>845-445-6100 · Info@Sheakallerband.com</div>';
 }
 function renderInvoicePreview(ev){
   var dp=document.getElementById('doc-preview');if(!dp)return;
@@ -2550,8 +2594,8 @@ function renderInvoicePreview(ev){
     '</div>' +
     '<div class="prev-watermark"><img src="images/logo.png" alt="" onerror="this.onerror=null"></div>';
 
-  setTimeout(scalePreview,50);
 }
+
 function shareEventWhatsApp(id){
   var ev=savedEvents.find(function(ev){return ev.id===id;});if(!ev)return;
   var evType=(ev.type==='Other')?(ev.typeCustom||'Event'):(ev.type||'Event');
@@ -2819,6 +2863,62 @@ function markCardClean(cardId) {
   }
 }
 
+function openPreviewPopup() {
+  renderPreviewPopup();
+  document.getElementById('preview-popup').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closePreviewPopup() {
+  document.getElementById('preview-popup').style.display = 'none';
+  document.body.style.overflow = '';
+}
+function renderPreviewPopup() {
+  var ev = currentEvent;
+  var el = document.getElementById('preview-popup-content');
+  if (!el) return;
+  if (!ev) { el.innerHTML = '<p style="color:#888;text-align:center;padding:20px;">No event loaded.</p>'; return; }
+  var date = fmtDate(ev.date||gv('f-date'));
+  var venue = ev.venueName||gv('f-venue')||'';
+  var addr = [ev.addrStreet,ev.addrCity,(ev.addrState&&ev.addrZip?ev.addrState+' '+ev.addrZip:ev.addrState||ev.addrZip)].filter(Boolean).join(', ')||ev.venueAddress||'';
+  var type = (ev.type==='Other'?ev.typeCustom:ev.type)||'';
+  var band = ev.band||[], singers = ev.singers||[], choir = ev.choir||[];
+  var scR=fmtTime(ev.scRhythm||''), scRS=fmtTime(ev.scRhythmSmorg||''), scH=fmtTime(ev.scHorns||'');
+  var scS=fmtTime(ev.scStrings||''), kpS=fmtTime(ev.kpStart||''), kpN=ev.kpNote||'', chu=fmtTime(ev.chuppah||'');
+  var bandH = band.length ? band.map(function(m){return '<li>'+(m.role?'<strong>'+esc(m.role)+':</strong> ':'')+esc(m.name)+'</li>';}).join('') : '<li style="color:#999">N/A</li>';
+  var singerH = singers.length ? singers.map(function(m){return '<li>'+esc(m.name)+'</li>';}).join('') : '<li style="color:#999">N/A</li>';
+  var choirH = choir.length ? choir.map(function(m){return '<li>'+esc(m.name)+(m.count?' – '+m.count+' Members':'')+'</li>';}).join('') : '';
+  el.innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #eee;">' +
+      '<img src="images/logo.png" style="height:60px;" onerror="this.onerror=null">' +
+      '<div style="text-align:right;font-size:11px;font-family:Lato,sans-serif;color:#555;">' +
+        '<strong style="color:#1a5fa8;font-size:13px;display:block;">SK Music Production Inc</strong>' +
+        '845-445-6100<br>Info@Sheakallerband.com' +
+      '</div>' +
+    '</div>' +
+    '<h2 style="text-align:center;color:#1a5fa8;font-family:Lato,sans-serif;font-size:16px;margin-bottom:12px;">Event Details</h2>' +
+    '<p>Dear Crew,</p>' +
+    '<p>Please find below the schedule and band lineup for the event on <strong>'+esc(date)+'</strong>'+(venue?', at <strong>'+esc(venue)+'</strong>':'')+'.</p>' +
+    '<p><strong>Type:</strong> '+esc(type||'—')+'</p>' +
+    (addr?'<p><strong>Address:</strong> '+esc(addr)+'</p>':'') +
+    '<hr style="border:none;border-top:1px solid #eee;margin:10px 0;">' +
+    '<p><strong>Sound Check Schedule:</strong></p><ul>' +
+      (scR?'<li>Rhythm (Main): '+scR+'</li>':'')+
+      (scRS?'<li>Rhythm (Smorg): '+scRS+'</li>':'')+
+      (scH?'<li>Horns/Strings: '+scH+'</li>':'')+
+      (scS?'<li>Strings in Lobby: '+scS+'</li>':'')+
+    '</ul>' +
+    '<p><strong>Event Schedule:</strong></p><ul>' +
+      '<li>KP Start: '+esc(kpS)+(kpN?' ('+esc(kpN)+')':'')+'</li>' +
+      '<li>Chuppah/Main Event: '+esc(chu)+'</li>' +
+    '</ul>' +
+    '<p><strong>Band Members:</strong></p><ul>'+bandH+'</ul>' +
+    '<p><strong>Singers:</strong></p><ul>'+singerH+'</ul>' +
+    (choirH?'<p><strong>Groups/Choirs:</strong></p><ul>'+choirH+'</ul>':'') +
+    (ev.dresscode?'<p><strong>Dress Code:</strong> '+esc(ev.dresscode)+'</p>':'') +
+    (ev.notes?'<p>'+esc(ev.notes)+'</p>':'') +
+    '<p style="margin-top:16px;color:#555;">We\'ll keep you updated if anything changes.</p>' +
+    '<div style="text-align:right;margin-top:20px;opacity:0.15;"><img src="images/logo.png" style="height:80px;" onerror="this.onerror=null"></div>';
+}
 window.addEventListener('DOMContentLoaded', function() {
   loadAll();
   rebuildTypeSelect();
